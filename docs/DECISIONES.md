@@ -79,3 +79,16 @@ Se fijan los tiempos de `DISENO_UI.md` §4. Cambios frente a la primera versión
 - La confirmación usa `EFFECT_CLICK` del sistema (respaldo `[0, 40]`). Comparte "un pulso" con el estado 1,
   pero dura 40 ms frente a 150 ms y siempre llega justo después de un toque en la pantalla.
 Pendiente: el emulador no vibra; si hay un reloj físico se prueban en la Fase 5.
+
+### D-013 · 2026-11-13 · Revisión del sistema de diseño (tarea 1.1)
+- **Contraste:** se midieron con WCAG 2.1 todas las combinaciones de texto que usa la interfaz (incluidas
+  tarjetas presionadas y tarjetas tintadas al 12 %). El tema oscuro cumplía en todo. En el claro fallaban
+  por poco `state2Prepare` (4.39:1 sobre `surfaceBright`) y `state4Leave` (4.48:1). Se oscurecieron sin
+  cambiar el tono: `#0B6FB8 → #0B6BB1` y `#0E7A4B → #0D7548`. Ahora el peor caso es 4.6:1. Las cifras
+  anteriores del documento eran solo sobre `background`; se reemplazan por la tabla completa.
+  El script queda en `design/contraste.py`.
+- **Tipografía:** el prototipo usaba tamaños fuera de la escala (11, 14, 17 y 18 sp). Se agregan dos
+  estilos que la app necesita, `button` (15 sp, 600) y `caption` (12 sp, 500, el mínimo), se fija la
+  unidad de `display` en 18 sp y se prohíben los tamaños sueltos.
+- **Formas:** se documenta la tarjeta (esquinas de 18 dp, borde de 1 dp), que faltaba. El botón inferior
+  y el área segura ya se definieron en D-011.

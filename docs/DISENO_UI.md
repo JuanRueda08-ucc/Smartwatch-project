@@ -49,9 +49,9 @@ el color de un estado.
 | `onSurfaceVariant` | `#5A5D6B` | `#A8A8B3` | Texto secundario |
 | `primary` | `#2F5BD3` | `#8AB4FF` | Acciones generales, marca |
 | `state1Finish` | `#5B3FD1` | `#B39DFF` | Estado 1: Termina lo que haces (violeta, calma) |
-| `state2Prepare` | `#0B6FB8` | `#5CC8FF` | Estado 2: Prepárate (azul) |
+| `state2Prepare` | `#0B6BB1` | `#5CC8FF` | Estado 2: Prepárate (azul) |
 | `state3Check` | `#8A5A00` | `#FFC857` | Estado 3: Revisa tus cosas (ámbar) |
-| `state4Leave` | `#0E7A4B` | `#5EE6A0` | Estado 4: Sal ahora (verde, "adelante") |
+| `state4Leave` | `#0D7548` | `#5EE6A0` | Estado 4: Sal ahora (verde, "adelante") |
 | `late` | `#C62828` | `#FF6B6B` | Solo cuando el plan ya va tarde |
 | `onState` | `#FFFFFF` | `#000000` | Texto sobre botones de estado |
 
@@ -59,10 +59,21 @@ En el tema claro los colores de estado son más oscuros y saturados para que se 
 claro; en el oscuro son más luminosos. Para fondos suaves de tarjeta (por ejemplo, la tarjeta del
 estado activo) se usa el color del estado al 12 % de opacidad sobre `surface`.
 
-Contraste medido (WCAG): todos los textos y colores de estado del tema claro están entre 4.9:1 y 16:1
-sobre `#F6F7FB`; los del oscuro entre 7.5:1 y 13.6:1 sobre `#000000`. El blanco sobre cada color de
-estado claro es ≥ 5.2:1. Verificar de nuevo en la Fase 5 si se cambia algún valor.
-Nunca se usa solo el color para comunicar el estado: siempre va con ícono y texto.
+Contraste medido (WCAG 2.1, revisión de la tarea 1.1). Se midió cada texto (`onSurface`,
+`onSurfaceVariant`, `primary`, los 4 estados y `late`) sobre `background`, `surface`, `surfaceBright` y
+sobre el tinte del 12 % de su propio color, más `onState` sobre cada botón relleno:
+
+| Tema | Texto sobre fondos (mínimo – máximo) | `onState` sobre botones | Peor caso |
+|---|---|---|---|
+| Claro | 4.6:1 – 17.2:1 | ≥ 5.6:1 | `state4Leave` sobre su tinte, 4.6:1 |
+| Oscuro | 5.1:1 – 18.8:1 | ≥ 7.6:1 | `late` sobre `surfaceBright`, 5.1:1 |
+
+Todo cumple el mínimo de 4.5:1 para texto. `surfaceBright` sobre `background` (1.1:1 claro,
+1.5:1 oscuro) es decorativo: bordes de tarjeta y pista del anillo. Lo que comunica información (el arco
+del anillo, los puntos de la línea de tiempo) usa colores de estado, que tienen ≥ 4.9:1 frente al fondo.
+Si se cambia algún valor, repetir la medición con `python design/contraste.py` (Fase 5).
+Nunca se usa solo el color para comunicar el estado: siempre va con ícono y texto. En el resumen semanal,
+las barras "tarde" además van rayadas.
 
 ### Tipografía
 
@@ -70,16 +81,21 @@ Fuente del sistema (Roboto Flex vía Material 3 de Wear). Escala:
 
 | Estilo | Tamaño | Uso |
 |---|---|---|
-| `display` | 40 sp, peso 600, cifras tabulares | Cuenta regresiva principal |
+| `display` | 40 sp, peso 600, cifras tabulares; unidad ("min", "h", "%") a 18 sp en `onSurfaceVariant` | Cuenta regresiva principal |
 | `title` | 20 sp, peso 600 | Nombre del estado o del evento |
 | `body` | 15 sp | Texto general |
-| `label` | 13 sp, peso 500 | Chips, etiquetas, hora secundaria |
+| `button` | 15 sp, peso 600 | Texto de botones, chips y nombres en tarjetas |
+| `label` | 13 sp, peso 500 | Etiquetas, hora secundaria |
+| `caption` | 12 sp, peso 500 | Insignias, subtítulos de fila, línea de aprendizaje. Nunca más pequeño |
 
 Las cifras de tiempo usan `fontFeatureSettings = "tnum"` para que no "bailen" al cambiar.
+No se usan tamaños fuera de esta escala.
 
 ### Formas y espaciado
 
 - Botones y chips: forma de píldora (`CircleShape` en los extremos).
+- Tarjetas: esquinas de 18 dp, relleno `surface` y borde de 1 dp en `surfaceBright` (en el tema claro,
+  `surface` sobre `background` casi no se distingue sin el borde).
 - Botón principal en la parte inferior: **132 × 48 dp** (≈ 58 % del ancho en Large Round), con su borde
   inferior a 26 dp del borde de la pantalla. Así sus extremos quedan al menos 14 dp dentro del círculo.
   El contenido que se desplaza pasa por debajo de él con un degradado al color `background`.
