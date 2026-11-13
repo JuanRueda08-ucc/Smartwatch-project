@@ -39,3 +39,19 @@ ofrece un tema claro del sistema y Wear Compose Material 3 está pensado para os
 construye con un `ColorScheme` propio y la elección (Claro, Oscuro, Automático) se guarda en DataStore.
 El modo ambiente siempre es negro en ambos temas. Costo: el fondo claro consume más batería en pantallas
 OLED; se acepta porque el objetivo es la evaluación de la interfaz.
+
+### D-009 · 2026-11-13 · Avance automático entre estados y estado "tarde"
+En los estados 1 a 3, si el tiempo del paso se acaba sin que la persona toque "Listo", la app pasa sola al
+siguiente estado: es la alarma programada del siguiente paso, con su vibración. El estado "tarde" aplica
+solo al estado 4: si pasa la hora de salida más el margen de seguridad sin "Ya salí", el anillo cambia a
+`late`, el texto dice "Vas X min tarde" y suena el patrón "Vas tarde" cada 60 s, máximo 3 veces.
+Si la persona confirma antes de tiempo, el siguiente paso empieza en ese momento y conserva su hora de fin.
+Motivo: DISENO_UI §3.6 y ARQUITECTURA no coincidían; así la persona nunca queda atascada en un paso viejo
+y el rojo se reserva para cuando de verdad va tarde (principio "Calma, no alarma").
+
+### D-010 · 2026-11-13 · Prototipo HTML: escala 1 dp = 2 px e íconos SVG en línea
+El prototipo (`design/prototipo/index.html`) simula Wear OS Large Round: 454 px a 320 dpi, es decir
+1 dp = 2 px (display 80 px, title 40 px, body 30 px, label 26 px, botón 104 px de alto). Los íconos son
+SVG en línea que imitan Material Symbols Rounded, porque el archivo no carga recursos externos.
+En la app se usan los Material Symbols reales. En el estado 3 la lista de objetos se desplaza bajo el
+botón "Listo" (patrón de lista con botón inferior de Wear) para mantener objetivos táctiles de 48 dp.

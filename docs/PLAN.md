@@ -12,7 +12,7 @@ Prioridad general: **interfaz pulida > funciones completas > "IA" sofisticada**.
 Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 
 - [ ] 1.1 Revisar y ajustar el sistema de diseño de `DISENO_UI.md` (paletas clara y oscura, tipografía, formas).
-- [ ] 1.2 Prototipo navegable en HTML (`design/prototipo/index.html`) con marco redondo de 454×454 px
+- [x] 1.2 Prototipo navegable en HTML (`design/prototipo/index.html`) con marco redondo de 454×454 px
       que muestre todas las pantallas de `DISENO_UI.md` y la navegación entre ellas, en tema claro
       por defecto y con un interruptor para ver el tema oscuro.
 - [ ] 1.3 Revisión del prototipo con el usuario; anotar cambios en `DECISIONES.md`.

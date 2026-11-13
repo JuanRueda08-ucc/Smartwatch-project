@@ -1,0 +1,1532 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Tiempo · Prototipo</title>
+<style>
+/* =====================================================================
+   Tokens de DISENO_UI.md §2 (valores exactos). --l-* claro, --d-* oscuro.
+   Las pantallas del reloj solo usan los tokens activos (--background, ...).
+   Escala: Wear OS Large Round, 454 px a 320 dpi → 1 dp = 2 px.
+   ===================================================================== */
+:root{
+  --l-background:#F6F7FB; --l-surface:#FFFFFF; --l-surfaceBright:#E8EAF2;
+  --l-onSurface:#1A1B22; --l-onSurfaceVariant:#5A5D6B; --l-primary:#2F5BD3;
+  --l-state1Finish:#5B3FD1; --l-state2Prepare:#0B6FB8; --l-state3Check:#8A5A00;
+  --l-state4Leave:#0E7A4B; --l-late:#C62828; --l-onState:#FFFFFF;
+
+  --d-background:#000000; --d-surface:#1B1B1F; --d-surfaceBright:#2A2A30;
+  --d-onSurface:#F2F2F5; --d-onSurfaceVariant:#A8A8B3; --d-primary:#8AB4FF;
+  --d-state1Finish:#B39DFF; --d-state2Prepare:#5CC8FF; --d-state3Check:#FFC857;
+  --d-state4Leave:#5EE6A0; --d-late:#FF6B6B; --d-onState:#000000;
+
+  /* Modo ambiente: siempre negro con texto y contornos grises, en ambos temas */
+  --ambient-bg:#000000; --ambient-ink:#D6D6DC; --ambient-ink2:#8E8E96;
+
+  --dp:2px;
+  --ring-r:219;
+  --font: "Roboto Flex", Roboto, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+:root[data-theme="light"]{
+  --background:var(--l-background); --surface:var(--l-surface); --surfaceBright:var(--l-surfaceBright);
+  --onSurface:var(--l-onSurface); --onSurfaceVariant:var(--l-onSurfaceVariant); --primary:var(--l-primary);
+  --state1Finish:var(--l-state1Finish); --state2Prepare:var(--l-state2Prepare); --state3Check:var(--l-state3Check);
+  --state4Leave:var(--l-state4Leave); --late:var(--l-late); --onState:var(--l-onState);
+  /* Página alrededor del reloj (no es parte de la app) */
+  --page:#E3E6EE; --panel:#FFFFFF; --line:#D9DCE5; --shadow:rgba(20,24,40,.10);
+}
+:root[data-theme="dark"]{
+  --background:var(--d-background); --surface:var(--d-surface); --surfaceBright:var(--d-surfaceBright);
+  --onSurface:var(--d-onSurface); --onSurfaceVariant:var(--d-onSurfaceVariant); --primary:var(--d-primary);
+  --state1Finish:var(--d-state1Finish); --state2Prepare:var(--d-state2Prepare); --state3Check:var(--d-state3Check);
+  --state4Leave:var(--d-state4Leave); --late:var(--d-late); --onState:var(--d-onState);
+  --page:#0B0C0F; --panel:#15161A; --line:#2A2B31; --shadow:rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:var(--font); background:var(--page); color:var(--onSurface);
+  min-height:100vh; transition:background-color .3s ease, color .3s ease;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit}
+button:focus-visible{outline:3px solid var(--primary);outline-offset:3px}
+.tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------------- Página ---------------- */
+.app{max-width:1220px;margin:0 auto;padding:28px 16px 56px}
+.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+.top h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.3px}
+.top p{margin:0;color:var(--onSurfaceVariant);font-size:15px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:36px;align-items:start}
+@media (max-width:980px){ .stage{grid-template-columns:minmax(0,1fr)} }
+.watch-col{display:flex;flex-direction:column;align-items:center;gap:22px;min-width:0}
+@media (min-width:981px){ .watch-col{position:sticky;top:28px} }
+.hints{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;color:var(--onSurfaceVariant);font-size:14px;max-width:520px;text-align:center}
+kbd{font:600 12px var(--font);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;background:var(--panel);color:var(--onSurface)}
+
+/* ---------------- Reloj ---------------- */
+.watch-fit{position:relative;width:calc(520px * var(--s,1));height:calc(520px * var(--s,1))}
+.watch-scale{position:absolute;left:0;top:0;width:520px;height:520px;transform:scale(var(--s,1));transform-origin:0 0}
+.watch{
+  position:absolute;left:10px;top:10px;width:500px;height:500px;border-radius:50%;padding:23px;
+  background:radial-gradient(circle at 32% 24%, #4A4D57, #1C1D22 58%, #0E0F12);
+  box-shadow:0 34px 60px -22px rgba(0,0,0,.55), inset 0 0 0 2px rgba(255,255,255,.07), inset 0 -6px 14px rgba(0,0,0,.5);
+  --amp:0; --buzz:var(--primary);
+}
+.watch.buzzing{animation:buzz 55ms linear infinite;
+  box-shadow:0 0 0 calc(var(--amp) * 16px) color-mix(in srgb, var(--buzz) 40%, transparent),
+             0 34px 60px -22px rgba(0,0,0,.55), inset 0 0 0 2px rgba(255,255,255,.07)}
+@keyframes buzz{
+  0%{transform:translate(calc(var(--amp) * -4px),0) rotate(calc(var(--amp) * -.5deg))}
+  50%{transform:translate(calc(var(--amp) * 4px),0) rotate(calc(var(--amp) * .5deg))}
+  100%{transform:translate(calc(var(--amp) * -4px),0) rotate(calc(var(--amp) * -.5deg))}
+}
+.crown{position:absolute;right:-13px;top:50%;width:20px;height:68px;margin-top:-34px;border-radius:7px;
+  background:repeating-linear-gradient(0deg,#2B2D33 0 3px,#454852 3px 6px);box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.crown:active{scale:.94}
+
+.screen{
+  position:relative;width:454px;height:454px;border-radius:50%;overflow:hidden;
+  background:var(--background);touch-action:none;user-select:none;-webkit-user-select:none;
+  isolation:isolate;color:var(--onSurface);font-family:var(--font);
+}
+/* Transición suave de color al cambiar de tema (300 ms, DISENO_UI §3.12) */
+.screen, .screen *{transition-property:background-color,color,border-color,fill,stroke;transition-duration:.3s;transition-timing-function:ease}
+.layer{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:var(--background)}
+.layer.enter{animation:enter .26s cubic-bezier(.2,.8,.2,1)}
+.layer.swap .col{animation:swap .35s cubic-bezier(.2,.8,.2,1)}
+.layer.under{pointer-events:none}
+.layer.swiping{box-shadow:-24px 0 40px rgba(0,0,0,.3)}
+@keyframes enter{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:none}}
+@keyframes swap{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:60px 45px 40px}
+.scroll::-webkit-scrollbar{display:none}
+.has-edge .scroll{padding-bottom:160px}
+.scroll.curved{padding-top:92px;padding-bottom:170px}
+.is-home .scroll{padding-top:50px;padding-bottom:64px}
+.is-home .col{gap:4px}
+/* Pantallas de un vistazo con botón inferior: todo cabe sin desplazar */
+.is-state .scroll{padding-top:46px;padding-bottom:141px}
+.is-state .col{gap:2px}
+.is-state .st-ic{width:52px;height:52px;font-size:32px}
+.is-state .res-ic{width:84px;height:84px;font-size:50px;margin-bottom:4px}
+.is-state .learn{padding:0 10px;font-size:24px;color:var(--onSurfaceVariant);margin-top:2px}
+.is-voice .scroll{padding-top:48px;padding-bottom:30px}
+.col{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
+.col.top{justify-content:flex-start}
+.top-fade{position:absolute;left:0;right:0;top:0;height:70px;background:linear-gradient(var(--background) 45%, transparent);pointer-events:none;z-index:3}
+
+.tt{position:absolute;inset:0;pointer-events:none;z-index:5}
+.tt text{fill:var(--onSurface);font:500 26px var(--font);font-variant-numeric:tabular-nums}
+.ring{position:absolute;inset:0;pointer-events:none;z-index:2;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:10}
+.ring .track{stroke:var(--surfaceBright)}
+.ring .prog{stroke-linecap:round;transition:stroke-dashoffset .25s linear, stroke .3s ease}
+.sind{position:absolute;inset:0;pointer-events:none;z-index:5}
+.sind path{fill:none;stroke-width:6;stroke-linecap:round}
+.sind-track{stroke:var(--surfaceBright)}
+.sind-thumb{stroke:var(--onSurfaceVariant)}
+
+/* Tipografía (DISENO_UI §2) */
+.display{font-size:80px;font-weight:600;line-height:1;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.display .unit{font-size:36px;font-weight:600;letter-spacing:0;margin-left:6px;color:var(--onSurfaceVariant)}
+.title{font-size:40px;font-weight:600;line-height:1.08;text-wrap:balance}
+.body{font-size:30px;line-height:1.22}
+.label{font-size:26px;font-weight:500;line-height:1.25}
+.muted{color:var(--onSurfaceVariant)}
+.mt8{margin-top:8px}.mt16{margin-top:16px}
+.ic{width:1em;height:1em;flex:none}
+
+/* Componentes */
+.chip{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:96px;padding:0 38px;border-radius:48px;
+  background:var(--surface);border:2px solid var(--surfaceBright);font-size:30px;font-weight:600;transition:scale .12s}
+.chip .ic{font-size:36px}
+.chip.primary{background:var(--primary);color:var(--onState);border-color:transparent}
+.chip.full{width:100%;justify-content:flex-start;padding:0 30px}
+.chip.full .chev{margin-left:auto;color:var(--onSurfaceVariant)}
+button:active{scale:.97}
+.card{display:block;width:100%;text-align:left;background:var(--surface);border:2px solid var(--surfaceBright);border-radius:36px;padding:18px 28px}
+.edge{position:absolute;left:50%;bottom:37px;width:318px;height:104px;margin-left:-159px;border-radius:52px;z-index:6;
+  background:var(--btn,var(--primary));color:var(--onState);font-size:32px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:12px;transition:scale .12s, background-color .3s}
+.edge .ic{font-size:38px}
+.edge-fade{position:absolute;left:0;right:0;bottom:0;height:190px;background:linear-gradient(transparent, var(--background) 52%);pointer-events:none;z-index:4}
+.swipe-hint{position:absolute;left:50%;bottom:12px;width:96px;height:52px;margin-left:-48px;display:grid;place-items:center;color:var(--onSurfaceVariant);font-size:36px;z-index:6}
+.toast{position:absolute;left:50%;top:50%;z-index:20;max-width:330px;padding:20px 30px;border-radius:40px;text-align:center;
+  background:var(--onSurface);color:var(--background);font-size:26px;font-weight:500;pointer-events:none;
+  opacity:0;transform:translate(-50%,-50%) scale(.9);transition:opacity .2s, transform .2s}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* Inicio */
+.illus{position:relative;width:128px;height:128px;border-radius:50%;display:grid;place-items:center;font-size:64px;
+  color:var(--primary);background:color-mix(in srgb, var(--primary) 12%, var(--surface));margin-bottom:6px}
+.illus .spark{position:absolute;right:6px;top:4px;font-size:34px}
+.st-ic{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:38px;color:var(--c);
+  background:color-mix(in srgb, var(--c) 12%, var(--surface))}
+
+/* Lista de eventos */
+.list-head{margin-bottom:6px}
+.group{align-self:stretch;text-align:left;padding:14px 12px 2px}
+.ci{transform-origin:center;will-change:transform}
+.ev .ev-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ev-time{font-size:40px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.ev-title{font-size:30px;font-weight:500;line-height:1.2;margin:2px 0}
+.ev.hl{border-color:var(--primary);box-shadow:0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent)}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:22px;font-weight:600;padding:6px 14px;border-radius:20px;
+  color:var(--c,var(--state4Leave));background:color-mix(in srgb, var(--c,var(--state4Leave)) 12%, var(--surface))}
+.badge .ic{font-size:24px}
+
+/* Detalle */
+.tl{list-style:none;margin:10px 0 4px;padding:0;width:100%;text-align:left}
+.tl-row{position:relative;display:grid;grid-template-columns:30px 76px 1fr;align-items:center;gap:12px;padding:10px 16px;border-radius:30px;border:2px solid transparent}
+.tl-row + .tl-row{margin-top:6px}
+.tl-dot{position:relative;width:30px;height:30px;border-radius:50%;background:var(--c);display:grid;place-items:center;color:var(--onState);font-size:20px}
+.tl-row + .tl-row .tl-dot::before{content:"";position:absolute;bottom:100%;left:50%;width:4px;height:30px;margin-left:-2px;background:var(--surfaceBright)}
+.tl-time{font-size:30px;font-weight:600;font-variant-numeric:tabular-nums}
+.tl-name{font-size:26px;font-weight:500;line-height:1.15}
+.tl-row.now{background:color-mix(in srgb, var(--c) 12%, var(--surface));border-color:var(--c)}
+.tl-row.past .tl-time,.tl-row.past .tl-name{color:var(--onSurfaceVariant)}
+
+/* Voz */
+.wave{display:flex;align-items:center;gap:10px;height:110px;margin-bottom:6px}
+.wave i{display:block;width:14px;height:100%;border-radius:7px;background:var(--primary);transform-origin:center;animation:wave 1s ease-in-out infinite}
+.wave i:nth-child(2){animation-delay:-.15s}.wave i:nth-child(3){animation-delay:-.35s}.wave i:nth-child(4){animation-delay:-.5s}
+.wave i:nth-child(5){animation-delay:-.25s}.wave i:nth-child(6){animation-delay:-.6s}.wave i:nth-child(7){animation-delay:-.1s}
+@keyframes wave{0%,100%{transform:scaleY(.2)}50%{transform:scaleY(1)}}
+.ex{font-size:26px;color:var(--onSurfaceVariant);line-height:1.25}
+.heard{font-size:30px;line-height:1.25;padding:0 6px}
+
+/* Confirmar */
+.field{position:relative}
+.f-label{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.f-value{font-size:30px;font-weight:600;line-height:1.2;margin-top:2px}
+.field.warn{border:3px solid var(--state3Check);background:color-mix(in srgb, var(--state3Check) 12%, var(--surface))}
+.warn-tag{display:inline-flex;align-items:center;gap:6px;color:var(--state3Check);font-size:22px;font-weight:600}
+.warn-tag .ic{font-size:24px}
+
+/* Estados */
+.item{display:flex;align-items:center;gap:16px;width:100%;min-height:96px;padding:0 24px;border-radius:48px;
+  background:var(--surface);border:2px solid var(--surfaceBright);font-size:30px;font-weight:500;text-align:left}
+.item > .ic{font-size:36px;color:var(--onSurfaceVariant)}
+.item .box{margin-left:auto;width:40px;height:40px;border-radius:50%;border:3px solid var(--onSurfaceVariant);display:grid;place-items:center;font-size:26px}
+.item.on{background:color-mix(in srgb, var(--state3Check) 12%, var(--surface));border-color:var(--state3Check)}
+.item.on > .ic{color:var(--state3Check)}
+.item.on .box{background:var(--state3Check);border-color:var(--state3Check);color:var(--onState)}
+.items{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:6px}
+
+/* Resultado */
+.res-ic{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;font-size:64px}
+.res-ic.ok{background:var(--state4Leave);color:var(--onState)}
+.res-ic.late{background:var(--surfaceBright);color:var(--onSurfaceVariant)}
+.learn{display:flex;gap:14px;align-items:flex-start;text-align:left;font-size:26px;line-height:1.25}
+.learn .ic{font-size:32px;color:var(--primary);margin-top:2px}
+
+/* Explicación */
+.reason .r-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.r-ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:32px;color:var(--primary);background:color-mix(in srgb, var(--primary) 12%, var(--surface))}
+.r-min{font-size:30px;font-weight:600;color:var(--primary);font-variant-numeric:tabular-nums}
+.r-text{font-size:28px;line-height:1.22}
+
+/* Ajustar */
+.adj{text-align:center;padding:18px 20px 16px}
+.adj-head{display:flex;align-items:center;justify-content:center;gap:10px}
+.adj-head .dot{width:18px;height:18px;border-radius:50%;background:var(--c)}
+.stepper{display:flex;align-items:center;justify-content:space-between;margin:8px 0 4px}
+.round{width:96px;height:96px;border-radius:50%;background:var(--surfaceBright);display:grid;place-items:center;font-size:40px;transition:scale .12s}
+.adj-val{font-size:40px;font-weight:600;font-variant-numeric:tabular-nums;cursor:ns-resize}
+.adj-val .unit{font-size:26px;color:var(--onSurfaceVariant);margin-left:4px}
+.link{color:var(--primary);font-size:26px;font-weight:600;padding:12px 16px;min-height:56px}
+
+/* Rutinas */
+.rt-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.rt-name{font-size:34px;font-weight:600}
+.segbar{display:flex;gap:4px;height:14px;margin:12px 0 10px}
+.segbar i{display:block;border-radius:7px;min-width:10px}
+
+/* Resumen */
+.bars{display:flex;align-items:flex-end;justify-content:center;gap:12px;height:150px;margin-top:14px}
+.bar-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%}
+.bar{width:30px;border-radius:15px;background:var(--state4Leave)}
+.bar.late{background:repeating-linear-gradient(-45deg, var(--late) 0 6px, color-mix(in srgb, var(--late) 55%, var(--background)) 6px 12px)}
+.bar.none{background:var(--surfaceBright)}
+.legend{display:flex;gap:20px;justify-content:center;margin-top:6px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.lg{width:18px;height:18px;border-radius:50%;display:inline-block;background:var(--state4Leave)}
+.lg.late{background:repeating-linear-gradient(-45deg, var(--late) 0 4px, color-mix(in srgb, var(--late) 55%, var(--background)) 4px 8px)}
+
+/* Ajustes */
+.sec{align-self:stretch;text-align:left;padding:14px 12px 0}
+.opt{display:flex;align-items:center;gap:18px;min-height:104px;padding:14px 22px}
+.opt .o-label{font-size:30px;font-weight:500;flex:1}
+.radio{width:40px;height:40px;border-radius:50%;border:3px solid var(--onSurfaceVariant);display:grid;place-items:center}
+.opt.sel{border-color:var(--primary)}
+.opt.sel .radio{border-color:var(--primary)}
+.opt.sel .radio::after{content:"";width:20px;height:20px;border-radius:50%;background:var(--primary)}
+.thumb{position:relative;flex:none;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:600}
+.thumb .t-ring{position:absolute;inset:5px;border-radius:50%;border:5px solid;transform:rotate(45deg)}
+.t-light{background:var(--l-background);color:var(--l-onSurface);box-shadow:inset 0 0 0 2px var(--l-surfaceBright)}
+.t-light .t-ring{border-color:var(--l-state2Prepare) var(--l-state2Prepare) var(--l-surfaceBright) var(--l-surfaceBright)}
+.t-dark{background:var(--d-background);color:var(--d-onSurface);box-shadow:inset 0 0 0 2px var(--d-surfaceBright)}
+.t-dark .t-ring{border-color:var(--d-state2Prepare) var(--d-state2Prepare) var(--d-surfaceBright) var(--d-surfaceBright)}
+.t-auto{background:linear-gradient(90deg, var(--l-background) 50%, var(--d-background) 50%);box-shadow:inset 0 0 0 2px var(--l-surfaceBright)}
+.t-auto .t-ring{border-color:var(--d-state2Prepare) var(--d-state2Prepare) var(--l-state2Prepare) var(--l-state2Prepare)}
+.row{display:flex;align-items:center;gap:16px;min-height:104px;padding:14px 22px}
+.row .r-label{flex:1;text-align:left}
+.row .r-label small{display:block;font-size:22px;font-weight:500;color:var(--onSurfaceVariant);margin-top:2px}
+.switch{flex:none;position:relative;width:76px;height:44px;border-radius:22px;background:var(--surfaceBright)}
+.switch::after{content:"";position:absolute;top:6px;left:6px;width:32px;height:32px;border-radius:50%;background:var(--onSurfaceVariant);transition:transform .2s, background-color .3s}
+.switch.on{background:var(--primary)}
+.switch.on::after{transform:translateX(32px);background:var(--onState)}
+
+/* Modo ambiente */
+.layer.amb{background:var(--ambient-bg);color:var(--ambient-ink)}
+.layer.amb .tt text{fill:var(--ambient-ink)}
+.layer.amb .muted{color:var(--ambient-ink2)}
+.layer.amb .ring .track{stroke:var(--ambient-ink2);stroke-width:2}
+.layer.amb .ring .prog{stroke:var(--ambient-ink);stroke-width:3}
+.layer.amb .display .unit{color:var(--ambient-ink2)}
+.amb-ic{font-size:52px;color:var(--ambient-ink)}
+.amb-ic .ic{stroke-width:1.5}
+
+/* ---------------- Panel de control (fuera del reloj) ---------------- */
+.panel{display:flex;flex-direction:column;gap:16px;min-width:0}
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px 18px 16px;box-shadow:0 6px 20px -12px var(--shadow);transition:background-color .3s, border-color .3s}
+.pcard h2{margin:0 0 12px;font-size:15px;font-weight:700;letter-spacing:.2px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.pcard h2 span{font-weight:500;font-size:13px;color:var(--onSurfaceVariant)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--page);border-radius:12px;padding:4px;gap:4px}
+.seg button{padding:9px 6px;border-radius:9px;font-size:14px;font-weight:600;text-align:center;color:var(--onSurfaceVariant)}
+.seg button[aria-checked="true"]{background:var(--panel);color:var(--onSurface);box-shadow:0 1px 4px var(--shadow)}
+.prow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;font-size:14px;font-weight:600}
+.prow small{display:block;font-weight:400;color:var(--onSurfaceVariant);font-size:12.5px;margin-top:2px}
+.pswitch{position:relative;flex:none;width:44px;height:26px;border-radius:13px;background:var(--line)}
+.pswitch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.pswitch[aria-checked="true"]{background:var(--primary)}
+.pswitch[aria-checked="true"]::after{transform:translateX(18px)}
+.simclock{display:flex;align-items:baseline;gap:10px}
+.simclock .t{font-size:34px;font-weight:700;letter-spacing:-.5px}
+.simclock .d{color:var(--onSurfaceVariant);font-size:14px}
+.simclock .pill{margin-left:auto;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:color-mix(in srgb, var(--primary) 14%, var(--panel));color:var(--primary)}
+.ptl{position:relative;height:16px;border-radius:8px;background:var(--page);margin:14px 0 6px;overflow:hidden}
+.ptl i{position:absolute;top:0;bottom:0}
+.ptl .lz{background:repeating-linear-gradient(-45deg, color-mix(in srgb, var(--late) 45%, transparent) 0 4px, transparent 4px 8px)}
+.ptl .now{width:3px;margin-left:-1px;background:var(--onSurface);z-index:2}
+.ptl-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--onSurfaceVariant)}
+.ptl-legend span{display:inline-flex;align-items:center;gap:5px}
+.ptl-legend b{width:9px;height:9px;border-radius:50%;display:inline-block}
+.status{margin:10px 0 12px;font-size:14px;line-height:1.4;min-height:2.8em}
+.pbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pbtn{padding:11px 10px;border-radius:12px;border:1px solid var(--line);font-size:13.5px;font-weight:600;text-align:center;background:var(--panel)}
+.pbtn.primary{grid-column:1 / -1;background:var(--primary);color:var(--onState);border-color:transparent;font-size:15px;padding:13px}
+.pbtn:disabled{opacity:.45;cursor:default}
+.hlog{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
+.hlog li > div{min-width:0}
+.hlog li{display:grid;grid-template-columns:10px minmax(0,1fr);gap:10px;align-items:start;padding:10px 12px;border-radius:12px;background:var(--page);font-size:13px}
+.hlog li.fresh{animation:fresh .6s ease}
+@keyframes fresh{from{transform:translateX(-8px);opacity:0}}
+.hdot{width:10px;height:10px;border-radius:50%;margin-top:4px}
+.hname{font-weight:700;font-size:13.5px}
+.htime{color:var(--onSurfaceVariant);font-weight:500;margin-left:6px}
+.hlog code{display:block;font:12px ui-monospace, Consolas, monospace;color:var(--onSurfaceVariant);margin-top:3px;word-break:break-word}
+.hfeel{color:var(--onSurfaceVariant);margin-top:2px}
+.hwave{display:block;width:120px;height:24px;margin-top:6px}
+.hempty{color:var(--onSurfaceVariant);font-size:13.5px;line-height:1.4}
+.jumps{display:flex;flex-wrap:wrap;gap:6px}
+.jumps button{padding:7px 11px;border-radius:999px;border:1px solid var(--line);font-size:13px;font-weight:500;background:var(--panel)}
+.jumps button:hover{border-color:var(--primary);color:var(--primary)}
+
+@media (prefers-reduced-motion:reduce){
+  .watch.buzzing{animation:none}
+  .layer.enter,.layer.swap .col,.wave i{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>A Tiempo</h1>
+    <p>Prototipo navegable · Wear OS Large Round, 454 × 454 px (1 dp = 2 px)</p>
+  </header>
+
+  <main class="stage">
+    <section class="watch-col" aria-label="Reloj">
+      <div class="watch-fit" id="watchFit">
+        <div class="watch-scale">
+          <div class="watch" id="watch">
+            <div class="screen" id="screen" aria-live="polite">
+              <div class="toast" id="toast" role="status"></div>
+            </div>
+            <button class="crown" id="crown" title="Botón lateral: ir a Inicio" aria-label="Botón lateral: ir a Inicio"></button>
+          </div>
+        </div>
+      </div>
+      <div class="hints">
+        <span>Toca para usar</span>
+        <span>Arrastra a la derecha o <kbd>Esc</kbd> para volver</span>
+        <span>Rueda del ratón = corona</span>
+        <span>En Inicio, desliza hacia arriba para ver los eventos</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <section class="pcard">
+        <h2>Tema</h2>
+        <div class="seg" role="radiogroup" aria-label="Tema" id="themeSeg">
+          <button role="radio" data-mode="light">Claro</button>
+          <button role="radio" data-mode="dark">Oscuro</button>
+          <button role="radio" data-mode="auto">Automático</button>
+        </div>
+        <div class="prow">
+          <span>Modo ambiente<small>Pantalla siempre activa en reposo. Toca el reloj para despertarlo.</small></span>
+          <button class="pswitch" id="ambSw" role="switch" aria-checked="false" aria-label="Modo ambiente"></button>
+        </div>
+      </section>
+
+      <section class="pcard">
+        <h2>Simulación del tiempo <span id="simEvent"></span></h2>
+        <div class="simclock">
+          <span class="t tnum" id="simTime">6:58</span>
+          <span class="d" id="simDay">Lunes 16</span>
+          <span class="pill" id="simSpeed">Tiempo real</span>
+        </div>
+        <div class="ptl" id="ptl"></div>
+        <div class="ptl-legend" id="ptlLegend"></div>
+        <p class="status" id="simStatus"></p>
+        <div class="pbtns">
+          <button class="pbtn primary" id="btnFast">Acelerar tiempo</button>
+          <button class="pbtn" id="btnNext">Saltar al siguiente aviso</button>
+          <button class="pbtn" id="btnPause">Pausar</button>
+          <button class="pbtn" id="btnReset" style="grid-column:1 / -1">Reiniciar demo</button>
+        </div>
+      </section>
+
+      <section class="pcard">
+        <h2>Vibraciones <span>qué sentirías en la muñeca</span></h2>
+        <ol class="hlog" id="hlog"></ol>
+      </section>
+
+      <section class="pcard">
+        <h2>Ir a una pantalla</h2>
+        <div class="jumps" id="jumps"></div>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<script>
+'use strict';
+
+/* =====================================================================
+   Datos y constantes
+   ===================================================================== */
+const DAY = 1440;                       // minutos por día
+const DEMO_START = 6 * 60 + 58;         // lunes 16, 6:58
+const RC = 2 * Math.PI * 219;           // circunferencia del anillo
+const DAY_LONG = ['Hoy · lunes 16', 'Mañana · martes 17', 'Miércoles 18', 'Jueves 19', 'Viernes 20', 'Sábado 21', 'Domingo 22'];
+const DAY_SHORT = ['Hoy', 'Mañana', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+const SIM_DAY = ['Lunes 16', 'Martes 17', 'Miércoles 18', 'Jueves 19', 'Viernes 20', 'Sábado 21', 'Domingo 22'];
+
+const STEPS = [
+  { name: 'Termina lo que haces', short: 'Termina', tl: 'Termina lo que haces', msg: 'Cierra lo que tienes abierto', icon: 'hourglass', token: '--state1Finish', haptic: 's0' },
+  { name: 'Prepárate', short: 'Prepárate', tl: 'Prepárate', msg: 'Vístete y alístate', icon: 'hanger', token: '--state2Prepare', haptic: 's1' },
+  { name: 'Revisa tus cosas', short: 'Revisa', tl: 'Revisa tus cosas', msg: '', icon: 'backpack', token: '--state3Check', haptic: 's2' },
+  { name: 'Sal ahora', short: 'Sal ahora', tl: 'Sal', msg: '', icon: 'walk', token: '--state4Leave', haptic: 's3' },
+];
+const ADJ_NAMES = ['Termina lo que haces', 'Prepárate', 'Revisa tus cosas', 'Trayecto'];
+
+/* Patrones hápticos de DISENO_UI §4 (pausa, vibración, pausa, ...) */
+const HAPTICS = {
+  s0: { name: 'Estado 1 · Termina lo que haces', t: [0, 120], a: [0, 120], feel: 'Un toque suave', token: '--state1Finish' },
+  s1: { name: 'Estado 2 · Prepárate', t: [0, 120, 100, 120], a: [0, 180, 0, 180], feel: 'Dos toques', token: '--state2Prepare' },
+  s2: { name: 'Estado 3 · Revisa tus cosas', t: [0, 80, 80, 80, 80, 80], a: [0, 200, 0, 200, 0, 200], feel: 'Tres toques rápidos', token: '--state3Check' },
+  s3: { name: 'Estado 4 · Sal ahora', t: [0, 400, 150, 400], a: [0, 255, 0, 255], feel: 'Dos vibraciones largas y fuertes', token: '--state4Leave' },
+  confirm: { name: 'Confirmación', t: [0, 40], a: [0, 150], feel: 'Clic breve', token: '--primary' },
+  late: { name: 'Vas tarde', t: [0, 400, 150, 400], a: [0, 255, 0, 255], feel: 'Patrón del estado 4 repetido', token: '--late' },
+};
+
+function initialRoutines() {
+  return {
+    clase: {
+      name: 'Clase', learned: [10, 14, 7, 9], manual: [null, null, 5, null], margin: 2,
+      extras: [
+        { step: 1, min: 6, text: 'Los lunes tardas 6 min más en prepararte', icon: 'calendar' },
+        { step: 3, min: 5, text: 'Tráfico alto hacia la universidad', icon: 'car' },
+        { step: 3, min: 4, text: 'Hay lluvia prevista', icon: 'rain' },
+      ],
+      items: [['key', 'Llaves'], ['wallet', 'Billetera'], ['id', 'Carné'], ['book', 'Cuaderno']],
+    },
+    cita: {
+      name: 'Cita', learned: [5, 15, 5, 20], manual: [null, null, null, null], margin: 5, extras: [],
+      items: [['key', 'Llaves'], ['wallet', 'Billetera'], ['id', 'Documento'], ['doc', 'Orden médica']],
+    },
+    social: {
+      name: 'Salida social', learned: [10, 30, 5, 25], manual: [null, null, null, null], margin: 5, extras: [],
+      items: [['key', 'Llaves'], ['wallet', 'Billetera'], ['phone', 'Celular'], ['hanger', 'Chaqueta']],
+    },
+  };
+}
+function initialEvents() {
+  return [
+    { id: 1, title: 'Clase de cálculo', day: 0, at: 8 * 60, routine: 'clase', place: 'Bloque 7' },
+    { id: 2, title: 'Reunión de grupo', day: 0, at: 14 * 60, routine: 'cita', place: 'Biblioteca' },
+    { id: 3, title: 'Cita médica', day: 3, at: 15 * 60 + 30, routine: 'cita', place: 'Clínica del Norte' },
+  ];
+}
+const WEEK = [
+  { l: 'L', st: 'ok', m: 3 }, { l: 'M', st: 'ok', m: 5 }, { l: 'X', st: 'ok', m: 8 }, { l: 'J', st: 'late', m: 4 },
+  { l: 'V', st: 'ok', m: 2 }, { l: 'S', st: 'ok', m: 6 }, { l: 'D', st: 'none', m: 0 },
+];
+
+function initialState(keep = {}) {
+  return {
+    now: DEMO_START, speed: 1, paused: false,
+    themeMode: keep.themeMode || 'light', ambient: false, vib: true, demo: false, emptyHome: false,
+    events: initialEvents(), routines: initialRoutines(), nextId: 4,
+    prep: null, done: new Map(), result: null, draft: null, highlight: null,
+    log: [], version: 0,
+  };
+}
+let S = initialState();
+
+/* =====================================================================
+   Íconos (SVG en línea, estilo Material Symbols Rounded)
+   ===================================================================== */
+const ICONS = {
+  hourglass: '<path d="M6 3h12M6 21h12"/><path d="M8 3v3a4 4 0 0 0 1.8 3.3L12 11l2.2-1.7A4 4 0 0 0 16 6V3"/><path d="M8 21v-3a4 4 0 0 1 1.8-3.3L12 13l2.2 1.7A4 4 0 0 1 16 18v3"/><path d="M10 18.5h4"/>',
+  hanger: '<path d="M10 6a2 2 0 1 1 2 2v1.5"/><path d="M12 9.5 3.6 15.6a1 1 0 0 0 .6 1.9h15.6a1 1 0 0 0 .6-1.9Z"/>',
+  backpack: '<rect x="5" y="7" width="14" height="14" rx="4"/><path d="M9 7V5.5a3 3 0 0 1 6 0V7"/><path d="M9 13h6v3"/>',
+  walk: '<circle cx="13.5" cy="4.5" r="1.6"/><path d="M12.6 8 11.4 14M8.5 12.5 10 9l2.6-1 2.2 3 2.2.6M11.4 14l-2 6.5M11.4 14l2.6 2.6.6 3.9"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.3"/><circle cx="12" cy="17" r=".6" fill="currentColor"/>',
+  chevUp: '<path d="m6 15 6-6 6 6"/>',
+  chevRight: '<path d="m9 6 6 6-6 6"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  minus: '<path d="M5 12h14"/>',
+  repeat: '<path d="m17 2 3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12"/><path d="m7 22-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/>',
+  chart: '<path d="M5 20v-8M10 20V5M15 20v-6M20 20V9"/>',
+  tune: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  rain: '<path d="M7 15h10a3.5 3.5 0 0 0 .4-7 5.5 5.5 0 0 0-10.6 1A3 3 0 0 0 7 15Z"/><path d="m9 18-1 2.5M13 18l-1 2.5M17 18l-1 2.5"/>',
+  car: '<path d="M4 17v-5l2.2-5.2A1.5 1.5 0 0 1 7.6 6h8.8a1.5 1.5 0 0 1 1.4.8L20 12v5Z"/><path d="M4 12h16M7.5 14.5h1M15.5 14.5h1M6 17v2M18 17v2"/>',
+  calendar: '<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  key: '<circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l2 2M14 9l2 2"/>',
+  wallet: '<rect x="3" y="6" width="18" height="13" rx="3"/><path d="M15.5 12.5h2.5M3 9.5h18"/>',
+  id: '<rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-1.4 1.7-2 3-2s2.5.6 3 2M14.5 10h3.5M14.5 14h3.5"/>',
+  book: '<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 3v18M12.5 8h3.5M12.5 12h3.5"/>',
+  phone: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+  doc: '<path d="M7 3h7l4 4v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v4h4M8.5 12h7M8.5 16h5"/>',
+  warning: '<path d="M12 4 2.8 19.5h18.4Z"/><path d="M12 10v4"/><circle cx="12" cy="16.8" r=".6" fill="currentColor"/>',
+  edit: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16Z"/>',
+  spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/>',
+  vibrate: '<rect x="8" y="4" width="8" height="16" rx="2"/><path d="M4.5 8v8M19.5 8v8M2 10v4M22 10v4"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".6" fill="currentColor"/>',
+  bolt: '<path d="M13 3 5 13.5h6L10 21l8-10.5h-6Z"/>',
+};
+function icon(n) {
+  return `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+}
+
+/* =====================================================================
+   Utilidades de tiempo y plan
+   ===================================================================== */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const pad = n => String(n).padStart(2, '0');
+function clock(abs) {
+  const m = ((Math.floor(abs + 1e-6) % DAY) + DAY) % DAY;
+  return `${Math.floor(m / 60)}:${pad(m % 60)}`;
+}
+function ceilMin(x) { return Math.max(0, Math.ceil(x - 1e-6)); }
+function durHTML(min) {
+  const m = ceilMin(min);
+  if (m < 60) return `<span class="num">${m}</span><span class="unit">min</span>`;
+  return `<span class="num">${Math.floor(m / 60)}:${pad(m % 60)}</span><span class="unit">h</span>`;
+}
+const absAt = ev => ev.day * DAY + ev.at;
+const findEv = id => S.events.find(e => e.id === id);
+
+function effSteps(r) {
+  return [0, 1, 2, 3].map(i => (r.manual[i] ?? r.learned[i]) + r.extras.filter(e => e.step === i).reduce((s, e) => s + e.min, 0));
+}
+function planFor(ev) {
+  const r = S.routines[ev.routine];
+  const [f, p, c, travel] = effSteps(r);
+  const at = absAt(ev);
+  const leave = at - travel - r.margin;
+  const check = leave - c, prepare = check - p, finish = prepare - f;
+  return { finish, prepare, check, leave, leaveEnd: leave + r.margin, at, travel };
+}
+const starts = p => [p.finish, p.prepare, p.check, p.leave];
+const ends = p => [p.prepare, p.check, p.leave, p.leaveEnd];
+
+function nextEvent() {
+  if (S.prep) return findEv(S.prep.eventId);
+  return S.events
+    .filter(e => !S.done.has(e.id) && absAt(e) > S.now)
+    .sort((a, b) => absAt(a) - absAt(b))[0] || null;
+}
+const stepEnd = P => ends(P.plan)[P.step];
+const isLate = () => !!S.prep && S.prep.step === 3 && S.now >= S.prep.plan.leaveEnd;
+const lateMinutes = () => Math.max(1, ceilMin(S.now - S.prep.plan.leaveEnd));
+const bump = () => { S.version++; };
+
+/* =====================================================================
+   Motor de estados (mismo comportamiento que tendrá PrepStateMachine)
+   ===================================================================== */
+function engine() {
+  if (!S.prep) {
+    const ev = nextEvent();
+    if (ev && S.now >= planFor(ev).finish) startPrep(ev, false);
+    return;
+  }
+  const P = S.prep, p = P.plan;
+  if (P.step < 3) {
+    // D-009: si el tiempo del paso se acaba sin confirmar, suena el aviso del siguiente paso
+    if (S.now >= stepEnd(P)) advance(false);
+  } else if (S.now >= p.leaveEnd && P.lateCount < 3 && (P.lateCount === 0 || S.now >= P.lastLate + 1)) {
+    P.lateCount++;
+    P.lastLate = S.now;
+    haptic('late', `aviso ${P.lateCount} de 3`);
+    bump();
+  }
+}
+
+function startPrep(ev, manual) {
+  const p = planFor(ev);
+  let step = 0;
+  starts(p).forEach((t, i) => { if (S.now >= t) step = i; });
+  const stepStart = manual ? S.now : starts(p)[step];
+  S.prep = { eventId: ev.id, plan: p, step, stepStart, startedAt: stepStart, items: new Set(), lateCount: 0, lastLate: 0, dur: [], sweep: true };
+  if (manual) haptic('confirm');
+  haptic(STEPS[step].haptic, manual ? 'empezaste antes' : 'aviso programado', manual ? 350 : 0);
+  bump();
+  showPrep();
+}
+
+function advance(manual) {
+  const P = S.prep;
+  P.dur[P.step] = S.now - P.stepStart;
+  if (manual) haptic('confirm');
+  P.step++;
+  P.stepStart = manual ? S.now : starts(P.plan)[P.step];
+  P.sweep = true;
+  haptic(STEPS[P.step].haptic, manual ? 'confirmaste antes' : 'aviso programado', manual ? 350 : 0);
+  bump();
+  showPrep();
+}
+
+function leaveNow() {
+  const P = S.prep, p = P.plan;
+  haptic('confirm', 'Ya salí');
+  const lateMin = S.now > p.leaveEnd ? ceilMin(S.now - p.leaveEnd) : 0;
+  const prepMin = Math.max(1, Math.round(P.dur[1] ?? (p.check - p.prepare)));
+  S.result = { eventId: P.eventId, lateMin, prepMin, arrive: Math.floor(S.now) + p.travel };
+  S.done.set(P.eventId, S.result);
+  S.prep = null;
+  bump();
+  nav.replace('result');
+}
+
+/* Una alarma abre la pantalla de estado, como el fullScreenIntent */
+function showPrep() {
+  if (S.ambient) { S.ambient = false; syncPanel(); }
+  if (nav.top().name === 'prep') render('swap');
+  else nav.push('prep');
+}
+
+/* =====================================================================
+   Hápticos: registro en el panel + vibración visual del reloj
+   ===================================================================== */
+function haptic(key, note = '', delay = 0) {
+  const run = () => {
+    const h = HAPTICS[key];
+    S.log.unshift({ ...h, note, at: S.now, off: !S.vib, fresh: true });
+    if (S.log.length > 40) S.log.pop();
+    renderLog();
+    if (!S.vib) return;
+    buzz(h);
+    try {
+      if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(h.t.slice(1));
+    } catch (e) { /* sin soporte */ }
+  };
+  delay ? setTimeout(run, delay) : run();
+}
+function buzz(h) {
+  const el = document.getElementById('watch');
+  el.style.setProperty('--buzz', `var(${h.token})`);
+  let t = 0;
+  for (let i = 1; i < h.t.length; i += 2) {
+    t += h.t[i - 1];
+    const on = h.t[i], amp = h.a[i] / 255;
+    setTimeout(() => { el.style.setProperty('--amp', amp); el.classList.add('buzzing'); }, t);
+    setTimeout(() => el.classList.remove('buzzing'), t + on);
+    t += on;
+  }
+}
+function waveSVG(h) {
+  const W = 96, H = 28, total = h.t.reduce((a, b) => a + b, 0);
+  let x = 0, out = `<rect x="0" y="${H / 2 - 1}" width="${W}" height="2" rx="1" fill="var(--line)"/>`;
+  h.t.forEach((d, i) => {
+    const w = d / total * W;
+    if (i % 2 === 1) {
+      const hh = Math.max(4, h.a[i] / 255 * H);
+      out += `<rect x="${x.toFixed(1)}" y="${((H - hh) / 2).toFixed(1)}" width="${Math.max(3, w - 1).toFixed(1)}" height="${hh.toFixed(1)}" rx="2" fill="var(${h.token})"/>`;
+    }
+    x += w;
+  });
+  return `<svg class="hwave" viewBox="0 0 ${W} ${H}" aria-hidden="true">${out}</svg>`;
+}
+function renderLog() {
+  const ol = document.getElementById('hlog');
+  if (!S.log.length) {
+    ol.innerHTML = '<li class="hempty" style="display:block">Aún no hay vibraciones. Pulsa «Acelerar tiempo» o «Saltar al siguiente aviso» para recorrer los 4 estados.</li>';
+    return;
+  }
+  ol.innerHTML = S.log.map(h => `
+    <li class="${h.fresh ? 'fresh' : ''}">
+      <span class="hdot" style="background:var(${h.token})"></span>
+      <div>
+        <div class="hname">${h.name}<span class="htime">${clock(h.at)}${h.note ? ' · ' + h.note : ''}</span></div>
+        <code>[${h.t.join(', ')}] amp [${h.a.join(', ')}]</code>
+        <div class="hfeel">${h.off ? 'Vibraciones desactivadas: no sonaría' : h.feel}</div>
+        ${waveSVG(h)}
+      </div>
+    </li>`).join('');
+  S.log.forEach(h => { h.fresh = false; });
+}
+
+/* =====================================================================
+   Navegación
+   ===================================================================== */
+const nav = {
+  stack: [{ name: 'home' }],
+  top() { return this.stack[this.stack.length - 1]; },
+  push(name, arg) { this.stack.push({ name, arg }); render('enter'); },
+  replace(name, arg) { this.stack[this.stack.length - 1] = { name, arg }; render('enter'); },
+  reset(list) { this.stack = list.map(x => (typeof x === 'string' ? { name: x } : x)); render('enter'); },
+  back() { if (this.stack.length > 1 && !S.ambient) animateBack(); },
+};
+const host = document.getElementById('screen');
+let cur = null;            // { layer, scr, ver }
+let screenTimers = [];
+const later = (fn, ms) => screenTimers.push(setTimeout(fn, ms));
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast.h);
+  toast.h = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* =====================================================================
+   Piezas de pantalla
+   ===================================================================== */
+function ringSVG(r) {
+  return `<svg class="ring" viewBox="0 0 454 454" aria-hidden="true"><circle class="track" cx="227" cy="227" r="219"/>
+    <circle class="prog" cx="227" cy="227" r="219" style="stroke:${r.color};stroke-dasharray:${RC.toFixed(1)};stroke-dashoffset:${(RC * (1 - clamp(r.frac))).toFixed(1)}"/></svg>`;
+}
+function timeTextSVG() {
+  return `<svg class="tt" viewBox="0 0 454 454" aria-hidden="true"><path id="ttArc" d="M 37 227 A 190 190 0 0 1 417 227" fill="none"/>
+    <text><textPath href="#ttArc" startOffset="50%" text-anchor="middle" class="tt-text">${clock(S.now)}</textPath></text></svg>`;
+}
+function edgeBtn(label, act, arg = '', ic = '', color = '') {
+  return `<button class="edge" data-act="${act}" data-arg="${arg}" ${color ? `style="--btn:${color}"` : ''}>${ic ? icon(ic) : ''}${label}</button>`;
+}
+function setRing(L, frac, color) {
+  const c = L.querySelector('.ring .prog');
+  if (!c) return;
+  c.style.strokeDashoffset = (RC * (1 - clamp(frac))).toFixed(1);
+  if (color) c.style.stroke = color;
+}
+function bind(L, key, html) {
+  const el = L.querySelector(`[data-bind="${key}"]`);
+  if (el && el.innerHTML !== html) el.innerHTML = html;
+}
+function arcPath(r, a0, a1) {
+  const rad = a => a * Math.PI / 180;
+  const x0 = 227 + r * Math.cos(rad(a0)), y0 = 227 + r * Math.sin(rad(a0));
+  const x1 = 227 + r * Math.cos(rad(a1)), y1 = 227 + r * Math.sin(rad(a1));
+  return `M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+}
+function updateIndicator(L) {
+  const sc = L.querySelector('.scroll'), svg = L.querySelector('.sind');
+  if (!sc || !svg) return;
+  const max = sc.scrollHeight - sc.clientHeight;
+  if (max < 4) { svg.innerHTML = ''; return; }
+  const span = 50, thumb = Math.max(10, span * sc.clientHeight / sc.scrollHeight);
+  const a0 = -span / 2 + (span - thumb) * (sc.scrollTop / max);
+  svg.innerHTML = `<path class="sind-track" d="${arcPath(206, -span / 2, span / 2)}"/><path class="sind-thumb" d="${arcPath(206, a0, a0 + thumb)}"/>`;
+}
+/* Simula TransformingLazyColumn: los elementos se encogen y se desvanecen cerca del borde */
+function applyCurve(L) {
+  const sc = L.querySelector('.scroll.curved');
+  if (!sc) return;
+  sc.querySelectorAll('.ci').forEach(el => {
+    const c = el.offsetTop + el.offsetHeight / 2 - sc.scrollTop;
+    const d = clamp(Math.abs(c - 227) / 227);
+    el.style.transform = `scale(${(1 - 0.3 * d * d).toFixed(3)})`;
+    el.style.opacity = (1 - 0.75 * d * d * d).toFixed(3);
+  });
+}
+
+/* =====================================================================
+   Pantallas (DISENO_UI §3)
+   ===================================================================== */
+const SCREENS = {};
+
+/* 3.1 Inicio */
+SCREENS.home = () => {
+  const ev = S.emptyHome ? null : nextEvent();
+  if (!ev) {
+    return {
+      cls: 'is-home',
+      body: `<div class="illus">${icon('calendar')}<span class="spark">${icon('spark')}</span></div>
+        <div class="title">Sin eventos próximos</div>
+        <div class="body muted">Dime qué tienes y a qué hora</div>`,
+      edge: edgeBtn('Crear con voz', 'go', 'voice', 'mic'),
+    };
+  }
+  if (S.prep) {
+    const P = S.prep, st = STEPS[P.step];
+    const color = () => (isLate() ? 'var(--late)' : `var(${st.token})`);
+    const frac = () => (isLate() ? 1 : (stepEnd(P) - S.now) / (stepEnd(P) - P.stepStart));
+    const disp = () => (isLate() ? `<span class="num">+${lateMinutes()}</span><span class="unit">min</span>` : durHTML(stepEnd(P) - S.now));
+    return {
+      live: true, home: true, cls: 'is-home',
+      ring: { frac: frac(), color: color() },
+      body: `<div class="label muted">${ev.title} · ${clock(P.plan.at)}</div>
+        <div class="st-ic" style="--c:${color()}">${icon(st.icon)}</div>
+        <div class="title" style="color:${color()}">${st.name}</div>
+        <div class="display" data-bind="cd">${disp()}</div>
+        <button class="chip mt8" data-act="go" data-arg="prep">Volver al aviso</button>`,
+      extra: `<button class="swipe-hint" data-act="go" data-arg="events" aria-label="Ver eventos">${icon('chevUp')}</button>`,
+      tick(L) { bind(L, 'cd', disp()); setRing(L, frac()); },
+    };
+  }
+  const p = planFor(ev);
+  const frac = () => clamp(1 - (p.finish - S.now) / 60);
+  return {
+    live: true, home: true, cls: 'is-home',
+    ring: { frac: frac(), color: 'var(--primary)' },
+    body: `<div class="label muted">${DAY_SHORT[ev.day]} · ${clock(p.at)}${ev.place ? ' · ' + ev.place : ''}</div>
+      <div class="title">${ev.title}</div>
+      <div class="body muted mt8">Empieza a prepararte en</div>
+      <div class="display" data-bind="cd">${durHTML(p.finish - S.now)}</div>
+      <button class="chip mt8" data-act="go" data-arg="detail:${ev.id}">Ver plan</button>`,
+    extra: `<button class="swipe-hint" data-act="go" data-arg="events" aria-label="Ver eventos">${icon('chevUp')}</button>`,
+    tick(L) { bind(L, 'cd', durHTML(p.finish - S.now)); setRing(L, frac()); },
+  };
+};
+
+/* 3.2 Lista de eventos */
+SCREENS.events = () => {
+  const evs = [...S.events].sort((a, b) => absAt(a) - absAt(b));
+  let html = `<div class="title list-head ci">Eventos</div>
+    <button class="chip primary full ci" data-act="go" data-arg="voice">${icon('mic')}Nuevo evento</button>`;
+  let lastDay = -1;
+  evs.forEach(ev => {
+    if (ev.day !== lastDay) { html += `<div class="group label muted ci">${DAY_LONG[ev.day]}</div>`; lastDay = ev.day; }
+    const active = S.prep && S.prep.eventId === ev.id;
+    const p = active ? S.prep.plan : planFor(ev);
+    const done = S.done.get(ev.id);
+    let badge = '';
+    if (done) badge = done.lateMin ? `<span class="badge" style="--c:var(--onSurfaceVariant)">${done.lateMin} min tarde</span>` : `<span class="badge">${icon('check')}A tiempo</span>`;
+    else if (active) badge = `<span class="badge" style="--c:var(${isLate() ? '--late' : STEPS[S.prep.step].token})">${STEPS[S.prep.step].short}</span>`;
+    html += `<button class="card ev ci ${S.highlight === ev.id ? 'hl' : ''}" data-act="go" data-arg="detail:${ev.id}">
+      <div class="ev-row"><span class="ev-time">${clock(p.at)}</span>${badge}</div>
+      <div class="ev-title">${ev.title}</div>
+      <div class="label muted">Sal a las ${clock(p.leave)}${ev.place ? ' · ' + ev.place : ''}</div>
+    </button>`;
+  });
+  html += `<div class="group label muted ci">Más</div>
+    <button class="chip full ci" data-act="go" data-arg="routines">${icon('repeat')}Rutinas<span class="chev">${icon('chevRight')}</span></button>
+    <button class="chip full ci" data-act="go" data-arg="summary">${icon('chart')}Resumen semanal<span class="chev">${icon('chevRight')}</span></button>
+    <button class="chip full ci" data-act="go" data-arg="settings">${icon('tune')}Ajustes<span class="chev">${icon('chevRight')}</span></button>`;
+  return {
+    live: true, curved: true, align: 'top', body: html,
+    mount() { if (S.highlight) later(() => { S.highlight = null; }, 2500); },
+  };
+};
+
+/* 3.3 Detalle del evento */
+SCREENS.detail = (id) => {
+  const ev = findEv(Number(id));
+  const active = S.prep && S.prep.eventId === ev.id;
+  const p = active ? S.prep.plan : planFor(ev);
+  const done = S.done.get(ev.id);
+  const curStep = active ? S.prep.step : -1;
+  const rows = STEPS.map((st, i) => {
+    const status = done || i < curStep ? 'past' : i === curStep ? 'now' : '';
+    return `<li class="tl-row ${status}" style="--c:var(${st.token})">
+      <span class="tl-dot">${status === 'past' ? icon('check') : ''}</span>
+      <span class="tl-time">${clock(starts(p)[i])}</span>
+      <span class="tl-name">${st.tl}</span></li>`;
+  }).join('');
+  let edge = '';
+  if (active) edge = edgeBtn('Ver aviso', 'go', 'prep', STEPS[curStep].icon);
+  else if (!done && !S.prep && nextEvent() && nextEvent().id === ev.id) edge = edgeBtn('Empezar ahora', 'startNow', ev.id);
+  return {
+    live: true, align: 'top',
+    body: `<div class="title">${ev.title}</div>
+      <div class="label muted">${DAY_LONG[ev.day].split(' · ')[0]} · ${clock(p.at)}${ev.place ? ' · ' + ev.place : ''}</div>
+      <ol class="tl">${rows}</ol>
+      <div class="label muted">Llegas a las ${clock(p.leave + p.travel)}</div>
+      <button class="chip mt8" data-act="go" data-arg="explain:${ev.id}">${icon('help')}¿Por qué a esta hora?</button>`,
+    edge,
+  };
+};
+
+/* 3.4 Crear por voz */
+SCREENS.voice = () => ({
+  cls: 'is-voice',
+  body: `<div class="vstate" style="display:contents">
+      <button class="wave" data-act="voiceDone" aria-label="Terminar de escuchar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></button>
+      <div class="title">Te escucho…</div>
+      <div class="label muted mt8">Prueba con</div>
+      <div class="ex">«Clase de cálculo mañana a las 7»</div>
+      <div class="ex">«Cita médica el jueves a las 3 y media»</div>
+    </div>`,
+  mount(L) {
+    later(() => {
+      const v = L.querySelector('.vstate');
+      if (v) v.innerHTML = `<div class="r-ic" style="width:72px;height:72px;font-size:40px">${icon('check')}</div>
+        <div class="label muted">Entendí</div>
+        <div class="heard">«Cine con Laura el sábado a las 6 de la tarde»</div>`;
+    }, 2600);
+    later(() => doAct('voiceDone'), 4300);
+  },
+});
+
+/* 3.5 Confirmar evento */
+function initDraft() {
+  S.draft = {
+    titles: ['Cine con Laura', 'Cine con Laura y Andrés'], ti: 0,
+    times: [18 * 60, 18 * 60 + 30, 17 * 60 + 30], tm: 0,
+    routines: ['social', 'cita', 'clase'], ri: 0,
+    places: [null, 'Cine Andino', 'Centro comercial Santafé'], pi: 0, placeOk: false,
+    day: 5,
+  };
+}
+SCREENS.confirm = () => {
+  if (!S.draft) initDraft();
+  const d = S.draft;
+  const field = (key, label, value, warn) => `
+    <button class="card field ${warn ? 'warn' : ''}" data-act="cycle" data-arg="${key}">
+      <div class="label muted f-label">${label}${warn ? `<span class="warn-tag">${icon('warning')}Revisa esto</span>` : ''}</div>
+      <div class="f-value">${value}</div>
+    </button>`;
+  return {
+    align: 'top',
+    body: `<div class="title">¿Lo guardo así?</div>
+      <div class="label muted">Toca un dato para cambiarlo</div>
+      ${field('title', 'Título', d.titles[d.ti])}
+      ${field('time', 'Día y hora', `Sábado 21 · ${clock(d.times[d.tm])}`)}
+      ${field('routine', 'Rutina', S.routines[d.routines[d.ri]].name)}
+      ${field('place', 'Lugar', d.places[d.pi] || 'Sin lugar', !d.placeOk)}`,
+    edge: edgeBtn('Guardar', 'save', '', 'check'),
+  };
+};
+
+/* 3.6 Estados de preparación */
+SCREENS.prep = () => {
+  const P = S.prep;
+  if (!P) {
+    return {
+      body: `<div class="title">No hay una preparación activa</div>`,
+      edge: edgeBtn('Ir a inicio', 'home'),
+    };
+  }
+  const st = STEPS[P.step], late = isLate();
+  const color = late ? 'var(--late)' : `var(${st.token})`;
+  const frac = () => (isLate() ? 1 : (stepEnd(P) - S.now) / (stepEnd(P) - P.stepStart));
+  const disp = () => (isLate() ? `<span class="num" style="color:var(--late)">+${lateMinutes()}</span><span class="unit">min</span>` : durHTML(stepEnd(P) - S.now));
+  const arrive = () => `Llegas a las ${clock(Math.max(Math.floor(S.now), P.plan.leave) + P.plan.travel)}`;
+  let sub = '';
+  if (P.step === 0 || P.step === 1) sub = `<div class="body muted">${st.msg}</div>`;
+  if (P.step === 3) {
+    sub = late
+      ? `<div class="body" style="color:var(--late)" data-bind="lt">Vas ${lateMinutes()} min tarde</div><div class="label muted" data-bind="arr">${arrive()}</div>`
+      : `<div class="body muted" data-bind="arr">${arrive()}</div>`;
+  }
+  if (P.step === 2) {
+    const items = S.routines[findEv(P.eventId).routine].items;
+    const n = P.items.size, all = n === items.length;
+    sub = `<div class="label" style="color:${all ? 'var(--state3Check)' : 'var(--onSurfaceVariant)'}">${all ? 'Todo listo' : `Revisados ${n} de ${items.length}`}</div>
+      <div class="items">${items.map(([ic, name], i) => {
+        const on = P.items.has(i);
+        return `<button class="item ${on ? 'on' : ''}" role="checkbox" aria-checked="${on}" data-act="item" data-arg="${i}">${icon(ic)}<span>${name}</span><span class="box">${on ? icon('check') : ''}</span></button>`;
+      }).join('')}</div>`;
+  }
+  const isLeave = P.step === 3;
+  return {
+    align: P.step === 2 ? 'top' : '',
+    cls: P.step === 2 ? '' : 'is-state',
+    ring: { frac: frac(), color },
+    lateFlag: late,
+    body: `<div class="st-ic" style="--c:${color}">${icon(st.icon)}</div>
+      <div class="title" style="color:${color}">${st.name}</div>
+      <div class="display" data-bind="cd">${disp()}</div>
+      ${sub}`,
+    edge: edgeBtn(isLeave ? 'Ya salí' : 'Listo', isLeave ? 'left' : 'ready', '', isLeave ? 'walk' : 'check', color),
+    mount(L) {
+      if (!P.sweep) return;
+      P.sweep = false;
+      // Barrido del anillo al entrar a un estado nuevo
+      const c = L.querySelector('.ring .prog');
+      c.style.transition = 'none';
+      c.style.strokeDashoffset = RC.toFixed(1);
+      c.getBoundingClientRect();
+      c.style.transition = 'stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1), stroke .3s ease';
+      c.style.strokeDashoffset = (RC * (1 - clamp(frac()))).toFixed(1);
+      later(() => { c.style.transition = ''; }, 950);
+    },
+    tick(L, scr) {
+      if (!S.prep) return;
+      if (isLate() !== scr.lateFlag) { render('keep'); return; }
+      bind(L, 'cd', disp());
+      if (isLate()) bind(L, 'lt', `Vas ${lateMinutes()} min tarde`);
+      bind(L, 'arr', arrive());
+      if (!L.querySelector('.ring .prog').style.transition) setRing(L, frac());
+    },
+  };
+};
+
+/* 3.7 Resultado */
+SCREENS.result = () => {
+  const r = S.result;
+  if (!r) return { body: '<div class="title">Sin resultado</div>', edge: edgeBtn('Ir a inicio', 'home') };
+  const ok = !r.lateMin;
+  return {
+    cls: 'is-state',
+    body: `<div class="res-ic ${ok ? 'ok' : 'late'}">${icon(ok ? 'check' : 'clock')}</div>
+      <div class="title">${ok ? 'Saliste a tiempo' : `Saliste ${r.lateMin} min tarde`}</div>
+      <div class="body muted">Llegas a las ${clock(r.arrive)}</div>
+      <div class="learn">${icon('spark')}<span>Prepararte te tomó ${r.prepMin} min. ${ok ? 'Ajusté tu rutina.' : `La próxima vez te aviso ${r.lateMin} min antes.`}</span></div>`,
+    edge: edgeBtn('Listo', 'home', '', 'check'),
+  };
+};
+
+/* 3.8 ¿Por qué te avisé antes? */
+SCREENS.explain = (id) => {
+  const ev = findEv(Number(id)), r = S.routines[ev.routine];
+  const reasons = r.extras.map(e => ({ icon: e.icon, text: e.text, min: e.min }));
+  r.manual.forEach((m, i) => {
+    if (m != null && m !== r.learned[i]) reasons.push({ icon: 'edit', text: `Tú ajustaste «${ADJ_NAMES[i]}» a ${m} min`, min: m - r.learned[i] });
+  });
+  reasons.sort((a, b) => b.min - a.min);
+  const total = reasons.reduce((s, x) => s + x.min, 0);
+  const cards = reasons.map(x => `
+    <div class="card reason">
+      <div class="r-top"><span class="r-ic">${icon(x.icon)}</span><span class="r-min">${x.min > 0 ? '+' : '−'}${Math.abs(x.min)} min</span></div>
+      <div class="r-text">${x.text}</div>
+    </div>`).join('');
+  return {
+    align: 'top',
+    body: `<div class="title">¿Por qué te avisé antes?</div>
+      ${reasons.length ? cards : `<div class="body muted mt8">Este evento usa tu rutina «${r.name}» tal como la aprendí.</div>`}
+      ${reasons.length ? `<div class="label muted mt8">En total te aviso ${Math.abs(total)} min ${total >= 0 ? 'antes' : 'después'} que tu rutina base.</div>` : ''}`,
+    edge: edgeBtn('No es así', 'go', `adjust:${ev.routine}`, 'edit'),
+  };
+};
+
+/* 3.9 Ajustar estimaciones */
+SCREENS.adjust = (rid) => {
+  const r = S.routines[rid];
+  const tokens = STEPS.map(s => s.token);
+  const cards = [0, 1, 2, 3].map(i => {
+    const m = r.manual[i], val = m ?? r.learned[i];
+    return `<div class="card adj" style="--c:var(${tokens[i]})">
+      <div class="adj-head label"><span class="dot"></span>${ADJ_NAMES[i]}</div>
+      <div class="stepper">
+        <button class="round" data-act="adj" data-arg="${rid}:${i}:-1" aria-label="Menos minutos">${icon('minus')}</button>
+        <span class="adj-val" data-wheel="${rid}:${i}">${val}<span class="unit">min</span></span>
+        <button class="round" data-act="adj" data-arg="${rid}:${i}:1" aria-label="Más minutos">${icon('plus')}</button>
+      </div>
+      <div class="label muted">Aprendido: ${r.learned[i]} min${m != null ? ` · Tu ajuste: ${m} min` : ''}</div>
+      ${m != null ? `<button class="link" data-act="adjReset" data-arg="${rid}:${i}">Usar lo aprendido</button>` : ''}
+    </div>`;
+  }).join('');
+  return {
+    align: 'top',
+    body: `<div class="title">${r.name}</div><div class="label muted">Minutos de cada paso</div>${cards}`,
+    edge: edgeBtn('Guardar', 'adjSave', '', 'check'),
+  };
+};
+
+/* 3.10 Rutinas */
+SCREENS.routines = () => {
+  const cards = Object.entries(S.routines).map(([id, r]) => {
+    const eff = effSteps(r), total = eff.reduce((a, b) => a + b, 0) + r.margin;
+    return `<button class="card ci" data-act="go" data-arg="adjust:${id}">
+      <div class="rt-head"><span class="rt-name">${r.name}</span><span class="label muted">${total} min</span></div>
+      <div class="segbar" role="img" aria-label="${eff.map((m, i) => `${ADJ_NAMES[i]} ${m} min`).join(', ')}">
+        ${eff.map((m, i) => `<i style="flex:${m};background:var(${STEPS[i].token})"></i>`).join('')}</div>
+      <div class="label muted">${r.items.map(x => x[1]).join(' · ')}</div>
+    </button>`;
+  }).join('');
+  return { curved: true, align: 'top', body: `<div class="title list-head ci">Rutinas</div>${cards}` };
+};
+
+/* 3.11 Resumen semanal */
+SCREENS.summary = () => ({
+  ring: { frac: 5 / 6, color: 'var(--state4Leave)' },
+  align: 'top',
+  body: `<div class="label muted" style="margin-top:20px">Esta semana</div>
+    <div class="display">83<span class="unit">%</span></div>
+    <div class="label muted">salidas a tiempo</div>
+    <div class="bars" role="img" aria-label="Lunes a tiempo, martes a tiempo, miércoles a tiempo, jueves tarde, viernes a tiempo, sábado a tiempo, domingo sin salidas">
+      ${WEEK.map(d => `<div class="bar-col"><div class="bar ${d.st === 'ok' ? '' : d.st}" style="height:${d.st === 'none' ? 10 : 24 + d.m * 11}px"></div><span class="label muted">${d.l}</span></div>`).join('')}
+    </div>
+    <div class="legend label muted"><span><i class="lg"></i>A tiempo</span><span><i class="lg late"></i>Tarde</span></div>
+    <div class="body mt16">Esta semana saliste a tiempo 5 de 6 veces. Tu mejor día fue el miércoles.</div>`,
+});
+
+/* 3.12 Ajustes */
+SCREENS.settings = () => {
+  const opts = [['light', 'Claro'], ['dark', 'Oscuro'], ['auto', 'Automático']];
+  return {
+    curved: true, align: 'top',
+    body: `<div class="title list-head ci">Ajustes</div>
+      <div class="sec label muted ci">Tema</div>
+      ${opts.map(([k, l]) => `<button class="card opt ci ${S.themeMode === k ? 'sel' : ''}" role="radio" aria-checked="${S.themeMode === k}" data-act="theme" data-arg="${k}">
+        <span class="thumb t-${k}"><span class="t-ring"></span>${k === 'auto' ? '' : '12'}</span>
+        <span class="o-label">${l}${k === 'auto' ? '<span class="label muted" style="display:block;font-size:22px">Oscuro de 19:00 a 5:59</span>' : ''}</span>
+        <span class="radio"></span></button>`).join('')}
+      <div class="sec label muted ci">Avisos</div>
+      <button class="card row ci" role="switch" aria-checked="${S.vib}" data-act="vib">
+        <span class="label r-label">Vibraciones</span><span class="switch ${S.vib ? 'on' : ''}"></span></button>
+      ${S.demo ? `<button class="card row ci" role="switch" aria-checked="${S.speed === 12}" data-act="demo">
+        <span class="label r-label">Modo demo<small>1 min = 5 s</small></span><span class="switch ${S.speed === 12 ? 'on' : ''}"></span></button>` : ''}
+      <div class="sec label muted ci">Acerca de</div>
+      <button class="card row ci" data-longpress="version">
+        <span class="label r-label">A Tiempo<small>Versión 0.1 · prototipo</small></span>${icon('info')}</button>`,
+  };
+};
+
+/* Modo ambiente */
+SCREENS.ambient = () => {
+  const ev = nextEvent();
+  const view = () => {
+    if (S.prep) {
+      const st = STEPS[S.prep.step];
+      return `<div class="amb-ic">${icon(st.icon)}</div><div class="title">${st.name}</div>
+        <div class="display">${isLate() ? `<span class="num">+${lateMinutes()}</span><span class="unit">min</span>` : durHTML(stepEnd(S.prep) - S.now)}</div>`;
+    }
+    if (!ev) return `<div class="title">Sin eventos próximos</div>`;
+    const p = planFor(ev);
+    return `<div class="title">${ev.title}</div><div class="body muted">Empieza a prepararte en</div><div class="display">${durHTML(p.finish - S.now)}</div>`;
+  };
+  return {
+    amb: true, live: true,
+    ring: { frac: 0, color: 'var(--ambient-ink)' },
+    body: `<div data-bind="amb" style="display:contents">${view()}</div>`,
+    tick(L) { bind(L, 'amb', view()); },
+  };
+};
+
+/* =====================================================================
+   Render
+   ===================================================================== */
+function routeNow() { return S.ambient ? { name: 'ambient' } : nav.top(); }
+function buildLayer(route) {
+  const scr = SCREENS[route.name](route.arg);
+  const layer = document.createElement('div');
+  layer.className = ['layer', scr.edge ? 'has-edge' : '', scr.cls || '', scr.amb ? 'amb' : ''].join(' ');
+  if (scr.amb) layer.dataset.act = 'wake';
+  layer.innerHTML = `${scr.ring ? ringSVG(scr.ring) : ''}
+    <div class="scroll ${scr.curved ? 'curved' : ''}"><div class="col ${scr.align || ''}">${scr.body}</div></div>
+    <div class="top-fade"></div>
+    ${timeTextSVG()}
+    <svg class="sind" viewBox="0 0 454 454" aria-hidden="true"></svg>
+    ${scr.edge ? `<div class="edge-fade"></div>${scr.edge}` : ''}
+    ${scr.extra || ''}`;
+  return { layer, scr };
+}
+function mountLayer(b, passive, scrollTop = 0) {
+  const sc = b.layer.querySelector('.scroll');
+  if (scrollTop) sc.scrollTop = scrollTop;
+  sc.addEventListener('scroll', () => { applyCurve(b.layer); updateIndicator(b.layer); }, { passive: true });
+  applyCurve(b.layer);
+  updateIndicator(b.layer);
+  if (!passive && b.scr.mount) b.scr.mount(b.layer);
+}
+function render(anim) {
+  screenTimers.forEach(clearTimeout);
+  screenTimers = [];
+  const keepScroll = anim === 'keep' || anim === 'swap';
+  const prevScroll = keepScroll && cur ? cur.layer.querySelector('.scroll').scrollTop : 0;
+  host.querySelectorAll('.layer').forEach(l => l.remove());
+  const b = buildLayer(routeNow());
+  host.insertBefore(b.layer, host.firstChild);
+  if (anim === 'enter') b.layer.classList.add('enter');
+  if (anim === 'swap') b.layer.classList.add('swap');
+  cur = { ...b, ver: S.version };
+  mountLayer(b, false, anim === 'swap' ? 0 : prevScroll);
+}
+function uiTick() {
+  applyTheme();
+  if (!cur) return;
+  cur.layer.querySelectorAll('.tt-text').forEach(t => { t.textContent = clock(S.now); });
+  if (cur.scr.live && cur.ver !== S.version) { render('keep'); }
+  else if (cur.scr.tick) cur.scr.tick(cur.layer, cur.scr);
+  updatePanel();
+}
+
+/* ---------- Deslizar para volver (SwipeDismissableNavHost) ---------- */
+let swipe = null;
+function startSwipe() {
+  const under = buildLayer(nav.stack[nav.stack.length - 2]);
+  under.layer.classList.add('under');
+  host.insertBefore(under.layer, cur.layer);
+  mountLayer(under, true);
+  cur.layer.classList.add('swiping');
+  swipe = under;
+}
+function updateSwipe(dx) {
+  const p = clamp(dx / 454);
+  cur.layer.style.transform = `translateX(${dx}px) scale(${1 - 0.06 * p})`;
+  swipe.layer.style.transform = `scale(${0.92 + 0.08 * p})`;
+  swipe.layer.style.opacity = 0.4 + 0.6 * p;
+}
+function endSwipe(commit) {
+  const top = cur.layer, under = swipe.layer;
+  const ease = 'transform .2s cubic-bezier(.2,.8,.2,1), opacity .2s';
+  top.style.transition = ease; under.style.transition = ease;
+  if (commit) {
+    top.style.transform = 'translateX(470px) scale(.94)';
+    under.style.transform = 'none'; under.style.opacity = 1;
+    setTimeout(() => { swipe = null; nav.stack.pop(); render(null); }, 200);
+  } else {
+    top.style.transform = ''; under.style.transform = 'scale(.92)'; under.style.opacity = .4;
+    setTimeout(() => { under.remove(); top.classList.remove('swiping'); top.style.transition = ''; swipe = null; }, 200);
+  }
+}
+function animateBack() {
+  if (swipe) return;
+  startSwipe();
+  updateSwipe(0);
+  requestAnimationFrame(() => endSwipe(true));
+}
+
+/* =====================================================================
+   Acciones
+   ===================================================================== */
+function doAct(act, arg, el) {
+  switch (act) {
+    case 'go': {
+      const [name, param] = String(arg).split(':');
+      if (name === 'prep' && !S.prep) return;
+      nav.push(name, param);
+      break;
+    }
+    case 'home': S.emptyHome = false; nav.reset(['home']); break;
+    case 'startNow': startPrep(findEv(Number(arg)), true); break;
+    case 'ready': advance(true); break;
+    case 'left': leaveNow(); break;
+    case 'item': {
+      const i = Number(arg), set = S.prep.items;
+      set.has(i) ? set.delete(i) : set.add(i);
+      render('keep');
+      break;
+    }
+    case 'voiceDone':
+      if (nav.top().name !== 'voice') return;
+      initDraft();
+      nav.replace('confirm');
+      break;
+    case 'cycle': {
+      const d = S.draft;
+      if (arg === 'title') d.ti = (d.ti + 1) % d.titles.length;
+      if (arg === 'time') d.tm = (d.tm + 1) % d.times.length;
+      if (arg === 'routine') d.ri = (d.ri + 1) % d.routines.length;
+      if (arg === 'place') { d.pi = (d.pi + 1) % d.places.length; d.placeOk = true; }
+      render('keep');
+      break;
+    }
+    case 'save': {
+      const d = S.draft, id = S.nextId++;
+      S.events.push({ id, title: d.titles[d.ti], day: d.day, at: d.times[d.tm], routine: d.routines[d.ri], place: d.places[d.pi] });
+      S.highlight = id; S.draft = null;
+      haptic('confirm', 'evento guardado');
+      nav.reset(['home', 'events']);
+      later(() => {
+        const card = cur.layer.querySelector('.ev.hl');
+        if (card) cur.layer.querySelector('.scroll').scrollTop = card.offsetTop - 140;
+      }, 30);
+      toast('Evento guardado');
+      bump();
+      break;
+    }
+    case 'adj': {
+      const [rid, i, delta] = arg.split(':'), r = S.routines[rid];
+      const base = r.manual[i] ?? r.learned[i];
+      r.manual[i] = clamp(base + Number(delta), 1, 90);
+      bump(); render('keep');
+      break;
+    }
+    case 'adjReset': {
+      const [rid, i] = arg.split(':');
+      S.routines[rid].manual[i] = null;
+      bump(); render('keep');
+      break;
+    }
+    case 'adjSave': haptic('confirm', 'rutina guardada'); nav.back(); toast('Rutina actualizada'); break;
+    case 'theme': setThemeMode(arg); break;
+    case 'vib': S.vib = !S.vib; render('keep'); toast(S.vib ? 'Vibraciones activadas' : 'Vibraciones desactivadas'); break;
+    case 'demo': setSpeed(S.speed === 12 ? 1 : 12); render('keep'); break;
+    case 'version':
+      if (!S.demo) { S.demo = true; render('keep'); toast('Modo demo disponible'); }
+      break;
+    case 'wake': S.ambient = false; syncPanel(); render('enter'); break;
+  }
+}
+
+/* ---------- Puntero: toques, arrastre vertical y deslizar para volver ---------- */
+let drag = null, suppressClick = false;
+host.addEventListener('pointerdown', e => {
+  if (e.button !== 0 || !cur) return;
+  const sc = cur.layer.querySelector('.scroll');
+  drag = { x: e.clientX, y: e.clientY, t: performance.now(), axis: null, sc, st: sc.scrollTop, dx: 0, dy: 0 };
+  const lp = e.target.closest('[data-longpress]');
+  if (lp) drag.lp = setTimeout(() => { if (drag) drag.lpFired = true; doAct(lp.dataset.longpress); }, 800);
+});
+window.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const s = scaleFactor();
+  drag.dx = (e.clientX - drag.x) / s;
+  drag.dy = (e.clientY - drag.y) / s;
+  if (!drag.axis) {
+    if (Math.hypot(drag.dx, drag.dy) < 8) return;
+    drag.axis = Math.abs(drag.dx) > Math.abs(drag.dy) ? 'x' : 'y';
+    clearTimeout(drag.lp);
+    if (drag.axis === 'x' && drag.dx > 0 && nav.stack.length > 1 && !S.ambient && !swipe) { startSwipe(); drag.swipe = true; }
+  }
+  if (drag.swipe) updateSwipe(Math.max(0, drag.dx));
+  else if (drag.axis === 'y') drag.sc.scrollTop = drag.st - drag.dy;
+});
+function endDrag() {
+  if (!drag) return;
+  clearTimeout(drag.lp);
+  const v = drag.dx / Math.max(1, performance.now() - drag.t);
+  if (drag.swipe) endSwipe(drag.dx > 120 || v > 0.6);
+  else if (drag.axis === 'y' && cur.scr.home && drag.dy < -60 && drag.sc.scrollHeight <= drag.sc.clientHeight + 4) nav.push('events');
+  if (drag.axis || drag.lpFired) { suppressClick = true; setTimeout(() => { suppressClick = false; }, 0); }
+  drag = null;
+}
+window.addEventListener('pointerup', endDrag);
+window.addEventListener('pointercancel', endDrag);
+host.addEventListener('click', e => {
+  if (suppressClick) { e.preventDefault(); e.stopPropagation(); return; }
+  const a = e.target.closest('[data-act]');
+  if (a && host.contains(a)) doAct(a.dataset.act, a.dataset.arg, a);
+});
+/* Rueda = corona: desplaza listas, ajusta minutos sobre un valor y en Inicio abre la lista */
+let wheelLock = 0;
+host.addEventListener('wheel', e => {
+  const w = e.target.closest('[data-wheel]');
+  if (w) {
+    e.preventDefault();
+    const now = performance.now();
+    if (now - wheelLock < 90) return;
+    wheelLock = now;
+    doAct('adj', `${w.dataset.wheel}:${e.deltaY > 0 ? -1 : 1}`);
+    return;
+  }
+  if (cur && cur.scr.home && e.deltaY > 20 && performance.now() - wheelLock > 600) {
+    const sc = cur.layer.querySelector('.scroll');
+    if (sc.scrollHeight <= sc.clientHeight + 4) { wheelLock = performance.now(); nav.push('events'); }
+  }
+}, { passive: false });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' || (e.key === 'Backspace' && !/input|textarea/i.test(e.target.tagName))) { e.preventDefault(); nav.back(); }
+});
+document.getElementById('crown').addEventListener('click', () => {
+  if (S.ambient) { doAct('wake'); return; }
+  doAct('home');
+});
+
+/* =====================================================================
+   Tema
+   ===================================================================== */
+function effectiveTheme() {
+  if (S.themeMode !== 'auto') return S.themeMode;
+  const h = Math.floor((((S.now % DAY) + DAY) % DAY) / 60);
+  return h >= 6 && h < 19 ? 'light' : 'dark';
+}
+function applyTheme() {
+  const t = effectiveTheme();
+  if (document.documentElement.dataset.theme !== t) document.documentElement.dataset.theme = t;
+}
+function setThemeMode(m) {
+  S.themeMode = m;
+  applyTheme();
+  syncPanel();
+  if (cur && nav.top().name === 'settings' && !S.ambient) render('keep');
+}
+
+/* =====================================================================
+   Panel de control
+   ===================================================================== */
+const SPEEDS = [[1, 'Tiempo real'], [12, '1 min = 5 s'], [60, '1 min = 1 s']];
+function setSpeed(v) { S.speed = v; syncPanel(); }
+function scaleFactor() { return parseFloat(getComputedStyle(document.getElementById('watchFit')).getPropertyValue('--s')) || 1; }
+function fitWatch() {
+  const col = document.querySelector('.watch-col');
+  const s = Math.min(1, col.clientWidth / 520);
+  document.getElementById('watchFit').style.setProperty('--s', s.toFixed(4));
+}
+function nextTrigger() {
+  if (!S.prep) { const ev = nextEvent(); return ev ? planFor(ev).finish : null; }
+  const P = S.prep;
+  if (P.step < 3) return stepEnd(P);
+  if (S.now < P.plan.leaveEnd) return P.plan.leaveEnd;
+  if (P.lateCount < 3) return P.lateCount === 0 ? S.now : P.lastLate + 1;
+  return null;
+}
+let ptlKey = '';
+function updatePanel() {
+  document.getElementById('simTime').textContent = clock(S.now);
+  document.getElementById('simDay').textContent = SIM_DAY[Math.floor(S.now / DAY)] || '';
+  const ev = nextEvent();
+  document.getElementById('simEvent').textContent = ev ? ev.title : '';
+  const box = document.getElementById('ptl'), leg = document.getElementById('ptlLegend');
+  const status = document.getElementById('simStatus');
+  if (!ev) {
+    box.innerHTML = ''; leg.innerHTML = '';
+    status.textContent = 'No hay más avisos programados. Reinicia la demo para repetir el flujo.';
+  } else {
+    const p = S.prep ? S.prep.plan : planFor(ev);
+    const a = p.finish - 5, b = p.leaveEnd + 6;
+    const pct = x => clamp((x - a) / (b - a)) * 100;
+    const key = `${ev.id}:${p.finish}:${p.leaveEnd}`;
+    if (key !== ptlKey) {
+      ptlKey = key;
+      const st = starts(p), en = ends(p);
+      box.innerHTML = STEPS.map((s, i) => `<i style="left:${pct(st[i])}%;width:${pct(en[i]) - pct(st[i])}%;background:var(${s.token})"></i>`).join('')
+        + `<i class="lz" style="left:${pct(p.leaveEnd)}%;right:0"></i><i class="now" id="ptlNow"></i>`;
+      leg.innerHTML = STEPS.map((s, i) => `<span><b style="background:var(${s.token})"></b>${clock(st[i])} ${s.short}</span>`).join('')
+        + `<span><b style="background:var(--late)"></b>${clock(p.leaveEnd)} tarde</span>`;
+    }
+    document.getElementById('ptlNow').style.left = pct(S.now) + '%';
+    if (!S.prep) status.innerHTML = `Próximo aviso: <b>Termina lo que haces</b> a las ${clock(p.finish)} (en ${ceilMin(p.finish - S.now)} min).`;
+    else if (isLate()) status.innerHTML = `<b style="color:var(--late)">Vas ${lateMinutes()} min tarde.</b> Aviso «Vas tarde» ${S.prep.lateCount} de 3.`;
+    else status.innerHTML = `Estado actual: <b style="color:var(${STEPS[S.prep.step].token})">${STEPS[S.prep.step].name}</b> · faltan ${ceilMin(stepEnd(S.prep) - S.now)} min.`;
+  }
+  document.getElementById('btnNext').disabled = nextTrigger() == null;
+}
+function syncPanel() {
+  document.querySelectorAll('#themeSeg button').forEach(b => b.setAttribute('aria-checked', String(b.dataset.mode === S.themeMode)));
+  document.getElementById('ambSw').setAttribute('aria-checked', String(S.ambient));
+  const sp = SPEEDS.find(x => x[0] === S.speed) || SPEEDS[0];
+  document.getElementById('simSpeed').textContent = sp[1] + (S.paused ? ' · en pausa' : '');
+  const nxt = SPEEDS[(SPEEDS.indexOf(sp) + 1) % SPEEDS.length];
+  document.getElementById('btnFast').textContent = S.speed === 60 ? 'Volver a tiempo real' : `Acelerar tiempo (${nxt[1]})`;
+  document.getElementById('btnPause').textContent = S.paused ? 'Reanudar' : 'Pausar';
+}
+
+document.getElementById('themeSeg').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (b) setThemeMode(b.dataset.mode);
+});
+document.getElementById('ambSw').addEventListener('click', () => { S.ambient = !S.ambient; syncPanel(); render('enter'); });
+document.getElementById('btnFast').addEventListener('click', () => {
+  const i = SPEEDS.findIndex(x => x[0] === S.speed);
+  S.paused = false;
+  setSpeed(SPEEDS[(i + 1) % SPEEDS.length][0]);
+  if (cur && nav.top().name === 'settings') render('keep');
+});
+document.getElementById('btnPause').addEventListener('click', () => { S.paused = !S.paused; syncPanel(); });
+document.getElementById('btnNext').addEventListener('click', () => {
+  const t = nextTrigger();
+  if (t == null) return;
+  S.now = Math.max(S.now, t) + 0.001;
+  engine();
+  uiTick();
+});
+document.getElementById('btnReset').addEventListener('click', () => {
+  S = initialState({ themeMode: S.themeMode });
+  ptlKey = '';
+  renderLog(); syncPanel();
+  nav.reset(['home']);
+});
+
+/* Atajos a cada pantalla */
+const JUMPS = [
+  ['home', 'Inicio'], ['homeEmpty', 'Inicio sin eventos'], ['events', 'Lista de eventos'], ['detail', 'Detalle del evento'],
+  ['voice', 'Crear por voz'], ['confirm', 'Confirmar evento'], ['s0', 'Estado 1 · Termina'], ['s1', 'Estado 2 · Prepárate'],
+  ['s2', 'Estado 3 · Revisa'], ['s3', 'Estado 4 · Sal ahora'], ['late', 'Vas tarde'], ['resOk', 'Resultado a tiempo'],
+  ['resLate', 'Resultado tarde'], ['explain', '¿Por qué te avisé?'], ['adjust', 'Ajustar estimaciones'], ['routines', 'Rutinas'],
+  ['summary', 'Resumen semanal'], ['settings', 'Ajustes'], ['ambient', 'Modo ambiente'],
+];
+document.getElementById('jumps').innerHTML = JUMPS.map(([k, l]) => `<button data-jump="${k}">${l}</button>`).join('');
+document.getElementById('jumps').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (b) jump(b.dataset.jump);
+});
+function setPrepStep(k, late) {
+  const ev = findEv(1), p = planFor(ev);
+  S.done.delete(1); S.result = null;
+  S.now = late ? p.leaveEnd + 3 : starts(p)[k] + 0.2;
+  S.prep = { eventId: 1, plan: p, step: k, stepStart: starts(p)[k], startedAt: p.finish, items: new Set(), lateCount: 0, lastLate: 0, dur: [], sweep: true };
+  bump();
+  nav.reset(['home', 'prep']);
+  if (!late) haptic(STEPS[k].haptic, 'atajo');
+}
+function setResult(late) {
+  const ev = findEv(1), p = planFor(ev);
+  S.prep = null;
+  S.now = late ? p.leaveEnd + 4 : p.leave + 1;
+  S.result = { eventId: 1, lateMin: late ? 4 : 0, prepMin: late ? 27 : 22, arrive: Math.floor(S.now) + p.travel };
+  S.done.set(1, S.result);
+  bump();
+  nav.reset(['home', 'result']);
+}
+function jump(k) {
+  S.emptyHome = false;
+  if (k !== 'ambient') S.ambient = false;
+  const H = 'home', E = 'events';
+  switch (k) {
+    case 'home': nav.reset([H]); break;
+    case 'homeEmpty': S.emptyHome = true; nav.reset([H]); break;
+    case 'events': nav.reset([H, E]); break;
+    case 'routines': case 'summary': case 'settings': nav.reset([H, E, k]); break;
+    case 'detail': nav.reset([H, { name: 'detail', arg: '1' }]); break;
+    case 'explain': nav.reset([H, { name: 'detail', arg: '1' }, { name: 'explain', arg: '1' }]); break;
+    case 'adjust': nav.reset([H, { name: 'detail', arg: '1' }, { name: 'explain', arg: '1' }, { name: 'adjust', arg: 'clase' }]); break;
+    case 'voice': nav.reset([H, E, 'voice']); break;
+    case 'confirm': initDraft(); nav.reset([H, E, 'confirm']); break;
+    case 's0': case 's1': case 's2': case 's3': setPrepStep(Number(k[1]), false); break;
+    case 'late': setPrepStep(3, true); break;
+    case 'resOk': setResult(false); break;
+    case 'resLate': setResult(true); break;
+    case 'ambient': S.ambient = true; render('enter'); break;
+  }
+  syncPanel();
+}
+
+/* =====================================================================
+   Arranque y bucle del reloj simulado
+   ===================================================================== */
+let lastT = performance.now(), uiAcc = 0;
+setInterval(() => {
+  const n = performance.now(), dt = n - lastT;
+  lastT = n;
+  if (!S.paused) S.now += dt / 1000 * S.speed / 60;
+  engine();
+  uiAcc += dt;
+  if (uiAcc >= 250) { uiAcc = 0; uiTick(); }
+}, 100);
+window.addEventListener('resize', fitWatch);
+fitWatch();
+applyTheme();
+syncPanel();
+renderLog();
+render('enter');
+updatePanel();
+</script>
+</body>
+</html>
