@@ -124,3 +124,12 @@ entidad `Routine` de `ARQUITECTURA.md` solo tenía los ajustes manuales. Se agre
 `defaultFinishMin`, `defaultPrepareMin`, `defaultCheckMin` y `defaultTravelMin`. Además: claves foráneas
 con borrado en cascada (evento → sesiones → registros), índices para las consultas por fecha y por
 rutina y paso, `dayOfWeek` en formato ISO (1 = lunes) y el esquema exportado en `wear/schemas`.
+
+### D-017 · 2026-11-13 · Forma del historial de ejemplo
+El modelo solo aplica el efecto del día con 3 o más registros de ese día, y 14 días traen solo 2 lunes.
+Para que la explicación "Los lunes tardas 6 min más" tenga datos sin alargar el historial, la semana más
+antigua tiene dos clases el lunes (mañana y laboratorio). Resultado: 13 salidas en 14 días. La semana
+reciente queda con 6 salidas, 5 a tiempo, el jueves tarde y el miércoles como mejor día, como el resumen
+del prototipo. Los datos son deterministas (semilla fija) y relativos a la fecha del primer arranque; el
+primer evento queda unas 2 horas después del arranque para que la demo muestre una cuenta regresiva.
+Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en America/Bogota.

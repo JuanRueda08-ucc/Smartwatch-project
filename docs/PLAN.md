@@ -27,7 +27,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
       tipografía y formas de `DISENO_UI.md`. Preferencia de tema en DataStore.
 - [x] 2.3 Navegación (`SwipeDismissableNavHost`) con todas las rutas como pantallas vacías.
 - [x] 2.4 Room: entidades `Event`, `Routine`, `PrepSession`, `StepRecord` (ver `ARQUITECTURA.md`).
-- [ ] 2.5 Datos de ejemplo: 3 rutinas y 2 semanas de historial sembrados en el primer arranque
+- [x] 2.5 Datos de ejemplo: 3 rutinas y 2 semanas de historial sembrados en el primer arranque
       (para que la demo y el resumen semanal tengan contenido).
 
 **Listo cuando:** la app abre en el emulador y se puede navegar entre todas las pantallas vacías.
