@@ -102,3 +102,12 @@ Room 2.8.5, DataStore 1.3.0, lifecycle 2.11.0, activity-compose 1.13.0. Sin alph
 - Las librerías actuales exigen `compileSdk` 37, así que se compila contra Android 37.2. `targetSdk` queda
   en 36 (Wear OS 6) y `minSdk` en 30 (Wear OS 3).
 - Emulador: Wear OS 6 (API 36), perfil Large Round, AVD `ATiempo_Large_Round_API36`.
+
+### D-015 · 2026-11-13 · Tokens propios sobre el ColorScheme de Wear Material 3
+Los 12 tokens de `DISENO_UI.md` viven en `ui/theme/Color.kt` (`AppColors`, el único archivo con colores
+hexadecimales) y se exponen con `AppTheme.colors`. Para que los componentes estándar de Wear se vean bien
+también en tema claro, cada tema construye un `ColorScheme` completo: `background → background`,
+`surface → surfaceContainer/surfaceContainerLow`, `surfaceBright → surfaceContainerHigh/outlineVariant`,
+`onState → onPrimary`, `late → error`, `state1Finish → tertiary`. Los colores de estado van aparte en
+`LocalStateColors` porque Material 3 no tiene roles equivalentes. La escala tipográfica (`AppType`) se
+asigna a los slots de la `Typography` de Wear y el cambio de tema anima cada color durante 300 ms.

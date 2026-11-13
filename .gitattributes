@@ -1,0 +1,6 @@
+# gradlew debe conservar LF para ejecutarse en Linux y macOS; los .bat usan CRLF.
+* text=auto
+gradlew text eol=lf
+*.bat text eol=crlf
+*.jar binary
+*.png binary
