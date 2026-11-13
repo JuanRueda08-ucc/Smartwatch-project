@@ -80,7 +80,13 @@ Las cifras de tiempo usan `fontFeatureSettings = "tnum"` para que no "bailen" al
 ### Formas y espaciado
 
 - Botones y chips: forma de píldora (`CircleShape` en los extremos).
-- Botón principal en la parte inferior, ancho del 70 %, alto 52 dp.
+- Botón principal en la parte inferior: **132 × 48 dp** (≈ 58 % del ancho en Large Round), con su borde
+  inferior a 26 dp del borde de la pantalla. Así sus extremos quedan al menos 14 dp dentro del círculo.
+  El contenido que se desplaza pasa por debajo de él con un degradado al color `background`.
+- **Área segura:** ningún texto ni control en reposo pasa de **103 dp desde el centro** (206 px en
+  Large Round). El anillo de progreso ocupa la franja de 107 a 112 dp y no se invade.
+- En toda pantalla que se desplaza, cada fila se encoge lo justo para no salirse del área segura y se
+  desvanece al acercarse al borde (comportamiento de `TransformingLazyColumn`), no solo en las listas.
 - Espaciado base 4 dp; separaciones comunes 8, 12, 16 dp.
 - Objetivos táctiles ≥ 48 dp.
 

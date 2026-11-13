@@ -107,15 +107,17 @@ kbd{font:600 12px var(--font);border:1px solid var(--line);border-bottom-width:2
 .scroll::-webkit-scrollbar{display:none}
 .has-edge .scroll{padding-bottom:160px}
 .scroll.curved{padding-top:92px;padding-bottom:170px}
-.is-home .scroll{padding-top:50px;padding-bottom:64px}
+.is-home .scroll{padding-top:62px;padding-bottom:64px}
 .is-home .col{gap:4px}
+.is-home .mt8{margin-top:2px}
 /* Pantallas de un vistazo con botón inferior: todo cabe sin desplazar */
-.is-state .scroll{padding-top:46px;padding-bottom:141px}
+.is-state .scroll{padding-top:46px;padding-bottom:149px}
 .is-state .col{gap:2px}
 .is-state .st-ic{width:52px;height:52px;font-size:32px}
 .is-state .res-ic{width:84px;height:84px;font-size:50px;margin-bottom:4px}
 .is-state .learn{padding:0 10px;font-size:24px;color:var(--onSurfaceVariant);margin-top:2px}
-.is-voice .scroll{padding-top:48px;padding-bottom:30px}
+.is-voice .scroll{padding-top:44px;padding-bottom:60px}
+.is-voice .wave{height:90px}
 .col{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}
 .col.top{justify-content:flex-start}
 .top-fade{position:absolute;left:0;right:0;top:0;height:70px;background:linear-gradient(var(--background) 45%, transparent);pointer-events:none;z-index:3}
@@ -150,12 +152,13 @@ kbd{font:600 12px var(--font);border:1px solid var(--line);border-bottom-width:2
 .chip.full .chev{margin-left:auto;color:var(--onSurfaceVariant)}
 button:active{scale:.97}
 .card{display:block;width:100%;text-align:left;background:var(--surface);border:2px solid var(--surfaceBright);border-radius:36px;padding:18px 28px}
-.edge{position:absolute;left:50%;bottom:37px;width:318px;height:104px;margin-left:-159px;border-radius:52px;z-index:6;
-  background:var(--btn,var(--primary));color:var(--onState);font-size:32px;font-weight:600;
+/* Botón inferior: 132 × 48 dp, a 26 dp del borde. Sus extremos quedan ≥ 14 dp dentro del círculo. */
+.edge{position:absolute;left:50%;bottom:53px;width:264px;height:96px;margin-left:-132px;border-radius:48px;z-index:6;
+  background:var(--btn,var(--primary));color:var(--onState);font-size:30px;font-weight:600;
   display:flex;align-items:center;justify-content:center;gap:12px;transition:scale .12s, background-color .3s}
-.edge .ic{font-size:38px}
+.edge .ic{font-size:34px}
 .edge-fade{position:absolute;left:0;right:0;bottom:0;height:190px;background:linear-gradient(transparent, var(--background) 52%);pointer-events:none;z-index:4}
-.swipe-hint{position:absolute;left:50%;bottom:12px;width:96px;height:52px;margin-left:-48px;display:grid;place-items:center;color:var(--onSurfaceVariant);font-size:36px;z-index:6}
+.swipe-hint{position:absolute;left:50%;bottom:22px;width:96px;height:48px;margin-left:-48px;border-radius:24px;display:grid;place-items:center;color:var(--onSurfaceVariant);font-size:36px;z-index:6}
 .toast{position:absolute;left:50%;top:50%;z-index:20;max-width:330px;padding:20px 30px;border-radius:40px;text-align:center;
   background:var(--onSurface);color:var(--background);font-size:26px;font-weight:500;pointer-events:none;
   opacity:0;transform:translate(-50%,-50%) scale(.9);transition:opacity .2s, transform .2s}
@@ -197,7 +200,7 @@ button:active{scale:.97}
 .wave i:nth-child(2){animation-delay:-.15s}.wave i:nth-child(3){animation-delay:-.35s}.wave i:nth-child(4){animation-delay:-.5s}
 .wave i:nth-child(5){animation-delay:-.25s}.wave i:nth-child(6){animation-delay:-.6s}.wave i:nth-child(7){animation-delay:-.1s}
 @keyframes wave{0%,100%{transform:scaleY(.2)}50%{transform:scaleY(1)}}
-.ex{font-size:26px;color:var(--onSurfaceVariant);line-height:1.25}
+.ex{font-size:26px;color:var(--onSurfaceVariant);line-height:1.25;max-width:270px;text-wrap:balance}
 .heard{font-size:30px;line-height:1.25;padding:0 6px}
 
 /* Confirmar */
@@ -761,15 +764,60 @@ function updateIndicator(L) {
   const a0 = -span / 2 + (span - thumb) * (sc.scrollTop / max);
   svg.innerHTML = `<path class="sind-track" d="${arcPath(206, -span / 2, span / 2)}"/><path class="sind-thumb" d="${arcPath(206, a0, a0 + thumb)}"/>`;
 }
-/* Simula TransformingLazyColumn: los elementos se encogen y se desvanecen cerca del borde */
+/* Simula TransformingLazyColumn en toda pantalla que se desplaza: cada fila se encoge lo justo
+   para que su punto más lejano quede dentro de SAFE_R (el anillo empieza en 214 px),
+   y se desvanece cuando ya está muy encogida. Las pantallas que caben completas no se tocan. */
+const SAFE_R = 206;
+function curveTargets(sc) {
+  const out = [];
+  const walk = el => {
+    for (const c of el.children) {
+      if (c.matches('.tl, .items') || getComputedStyle(c).display === 'contents') walk(c);
+      else out.push(c);
+    }
+  };
+  walk(sc.querySelector('.col'));
+  return out;
+}
+function measureCurve(el) {
+  el.style.transform = '';
+  const cs = getComputedStyle(el);
+  const boxy = el.tagName === 'BUTTON' || cs.backgroundColor !== 'rgba(0, 0, 0, 0)' || parseFloat(cs.borderTopWidth) > 0;
+  let hh = el.offsetHeight / 2;
+  let hw = el.offsetWidth / 2;
+  if (!boxy) {
+    // Texto suelto: se mide el ancho real de las letras, no el de la caja
+    // Relativo a la capa, que puede estar escalada por la animación de entrada o por el reloj
+    const scr = el.closest('.layer').getBoundingClientRect(), k = scr.width / 454, cx = scr.left + scr.width / 2;
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    const rc = r.getBoundingClientRect();
+    hw = rc.width ? Math.max(Math.abs(rc.left - cx), Math.abs(rc.right - cx)) / k : 0;
+    hh = Math.max(hh, rc.height / k / 2);   // las cifras grandes sobresalen de su renglón
+  }
+  el._fit = { hw, hh, rad: boxy ? Math.min(parseFloat(cs.borderTopLeftRadius) || 0, hh) : 0 };
+}
+function fitScale(cy, f) {
+  for (let s = 1; s > 0.5; s -= 0.02) {
+    // Centro del redondeo de la esquina más lejana, más el radio
+    const x = s * (f.hw - f.rad), y = Math.abs(cy) + s * (f.hh - f.rad);
+    if (Math.hypot(Math.max(0, x), y) + s * f.rad <= SAFE_R) return s;
+  }
+  return 0.5;
+}
 function applyCurve(L) {
-  const sc = L.querySelector('.scroll.curved');
+  const sc = L.querySelector('.scroll');
   if (!sc) return;
-  sc.querySelectorAll('.ci').forEach(el => {
-    const c = el.offsetTop + el.offsetHeight / 2 - sc.scrollTop;
-    const d = clamp(Math.abs(c - 227) / 227);
-    el.style.transform = `scale(${(1 - 0.3 * d * d).toFixed(3)})`;
-    el.style.opacity = (1 - 0.75 * d * d * d).toFixed(3);
+  const scrolls = sc.scrollHeight > sc.clientHeight + 4;
+  if (!scrolls && !sc._curved) return;
+  sc._curved = scrolls;
+  curveTargets(sc).forEach(el => {
+    if (!scrolls) { el.style.transform = ''; el.style.opacity = ''; return; }
+    if (!el._fit) measureCurve(el);
+    const cy = el.offsetTop + el.offsetHeight / 2 - sc.scrollTop - 227;
+    const s = fitScale(cy, el._fit);
+    el.style.transform = s < 1 ? `scale(${s.toFixed(3)})` : '';
+    el.style.opacity = s < 0.9 ? clamp((s - 0.55) / 0.35).toFixed(3) : '';
   });
 }
 
@@ -812,7 +860,7 @@ SCREENS.home = () => {
   return {
     live: true, home: true, cls: 'is-home',
     ring: { frac: frac(), color: 'var(--primary)' },
-    body: `<div class="label muted">${DAY_SHORT[ev.day]} · ${clock(p.at)}${ev.place ? ' · ' + ev.place : ''}</div>
+    body: `<div class="label muted">${DAY_SHORT[ev.day]} · ${clock(p.at)}</div>
       <div class="title">${ev.title}</div>
       <div class="body muted mt8">Empieza a prepararte en</div>
       <div class="display" data-bind="cd">${durHTML(p.finish - S.now)}</div>

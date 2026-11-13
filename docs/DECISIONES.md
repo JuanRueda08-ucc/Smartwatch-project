@@ -55,3 +55,15 @@ El prototipo (`design/prototipo/index.html`) simula Wear OS Large Round: 454 px 
 SVG en línea que imitan Material Symbols Rounded, porque el archivo no carga recursos externos.
 En la app se usan los Material Symbols reales. En el estado 3 la lista de objetos se desplaza bajo el
 botón "Listo" (patrón de lista con botón inferior de Wear) para mantener objetivos táctiles de 48 dp.
+
+### D-011 · 2026-11-13 · Revisión del prototipo: botón inferior más pequeño y área segura
+En la revisión del prototipo (tarea 1.3), el usuario aprobó el diseño general, pero señaló que el botón
+principal ("Empezar ahora", "Listo", "Guardar") se veía demasiado grande y parecía salirse de la pantalla.
+Cambios:
+- El botón pasa de 70 % × 52 dp a 132 × 48 dp (el mínimo táctil), a 26 dp del borde inferior.
+- Se fija un área segura de 103 dp de radio para texto y controles en reposo, medida en cada pantalla del
+  prototipo arriba, en la mitad y al final del desplazamiento.
+- La medición encontró textos cortados en Detalle, Confirmar, Explicación, Lista, Rutinas, Ajustes y Resumen.
+  Ahora toda pantalla que se desplaza encoge cada fila lo justo para caber (como `TransformingLazyColumn`).
+- Inicio ya no muestra el lugar en la línea superior, que rozaba el anillo, y su contenido baja unos píxeles
+  para que los nombres de evento largos no lo toquen. Los ejemplos de "Crear por voz" se acortan a dos líneas.

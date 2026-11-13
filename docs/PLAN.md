@@ -15,7 +15,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 - [x] 1.2 Prototipo navegable en HTML (`design/prototipo/index.html`) con marco redondo de 454×454 px
       que muestre todas las pantallas de `DISENO_UI.md` y la navegación entre ellas, en tema claro
       por defecto y con un interruptor para ver el tema oscuro.
-- [ ] 1.3 Revisión del prototipo con el usuario; anotar cambios en `DECISIONES.md`.
+- [x] 1.3 Revisión del prototipo con el usuario; anotar cambios en `DECISIONES.md`.
 - [ ] 1.4 Definir los 4 patrones hápticos finales (tiempos en ms) en `DISENO_UI.md`.
 
 **Listo cuando:** el usuario aprueba el prototipo.
