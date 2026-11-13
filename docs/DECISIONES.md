@@ -111,3 +111,9 @@ también en tema claro, cada tema construye un `ColorScheme` completo: `backgrou
 `onState → onPrimary`, `late → error`, `state1Finish → tertiary`. Los colores de estado van aparte en
 `LocalStateColors` porque Material 3 no tiene roles equivalentes. La escala tipográfica (`AppType`) se
 asigna a los slots de la `Typography` de Wear y el cambio de tema anima cada color durante 300 ms.
+Hallazgos al probar en el emulador (aplican a toda la Fase 3):
+- Algunos componentes de Wear M3 (por ejemplo `RadioButton`) guardan sus colores predeterminados en caché y
+  no siguen el cambio de tema hasta volver a entrar a la pantalla. Para que el cambio sea instantáneo, a
+  esos componentes se les pasan colores explícitos desde `AppTheme.colors`.
+- El `TimeText` predeterminado se ve casi blanco sobre el fondo claro; `MainActivity` lo dibuja con
+  `onSurface`.

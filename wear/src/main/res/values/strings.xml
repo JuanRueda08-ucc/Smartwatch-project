@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">A Tiempo</string>
-    <string name="placeholder_getting_ready">Preparando A Tiempo…</string>
+
+    <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
+    <string name="home_title">Inicio</string>
+    <string name="home_placeholder">Próximo evento y cuenta regresiva para empezar a prepararte</string>
+    <string name="events_title">Eventos</string>
+    <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
+    <string name="detail_title">Detalle del evento</string>
+    <string name="detail_placeholder">Línea de tiempo de los 4 estados con sus horas</string>
+    <string name="voice_title">Crear por voz</string>
+    <string name="voice_placeholder">Dicta tu evento y aquí verás la onda mientras escucho</string>
+    <string name="confirm_title">Confirmar evento</string>
+    <string name="confirm_placeholder">Revisa lo que entendí antes de guardarlo</string>
+    <string name="prep_title">Preparación</string>
+    <string name="prep_placeholder">Los 4 estados, con anillo de progreso y botón Listo</string>
+    <string name="done_title">Resultado</string>
+    <string name="done_placeholder">Si saliste a tiempo y qué aprendí de tu rutina</string>
+    <string name="explain_title">¿Por qué te avisé antes?</string>
+    <string name="explain_placeholder">Las razones de cada ajuste, en minutos</string>
+    <string name="routine_edit_title">Ajustar estimaciones</string>
+    <string name="routine_edit_placeholder">Minutos de cada paso de la rutina</string>
+    <string name="routines_title">Rutinas</string>
+    <string name="routines_placeholder">Clase, Cita y Salida social</string>
+    <string name="summary_title">Resumen semanal</string>
+    <string name="summary_placeholder">Tus salidas a tiempo de la semana</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_placeholder">Tema y vibraciones</string>
+
+    <!-- Acciones -->
+    <string name="action_view_plan">Ver plan</string>
+    <string name="action_view_events">Ver eventos</string>
+    <string name="action_new_event">Nuevo evento</string>
+    <string name="action_view_event">Ver un evento</string>
+    <string name="action_routines">Rutinas</string>
+    <string name="action_summary">Resumen semanal</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="action_why_this_time">¿Por qué a esta hora?</string>
+    <string name="action_start_now">Empezar ahora</string>
+    <string name="action_continue">Continuar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_left">Ya salí</string>
+    <string name="action_done">Listo</string>
+    <string name="action_not_right">No es así</string>
+    <string name="action_adjust_routine">Ajustar Clase</string>
+
+    <!-- Ajustes -->
+    <string name="settings_theme">Tema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_auto">Automático</string>
 </resources>

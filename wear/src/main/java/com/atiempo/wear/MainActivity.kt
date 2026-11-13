@@ -3,25 +3,23 @@ package com.atiempo.wear
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.wear.compose.material3.Text
+import androidx.wear.compose.foundation.CurvedTextStyle
+import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.TimeText
+import androidx.wear.compose.material3.timeTextCurvedText
+import com.atiempo.wear.ui.theme.AppTheme
 import com.atiempo.wear.domain.ThemeResolver
 import com.atiempo.wear.domain.model.ThemeMode
+import com.atiempo.wear.ui.navigation.AppNavHost
 import com.atiempo.wear.ui.theme.ATiempoTheme
-import com.atiempo.wear.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 import java.time.LocalTime
 
-/** Única Activity de la app. Aplica el tema guardado en Ajustes; la navegación llega en la tarea 2.3. */
+/** Única Activity de la app: aplica el tema guardado en Ajustes y monta la navegación. */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,11 +28,11 @@ class MainActivity : ComponentActivity() {
             val mode by container.settings.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.LIGHT)
             val hour by currentHour()
             ATiempoTheme(dark = ThemeResolver.isDark(mode, hour)) {
-                Box(
-                    modifier = Modifier.fillMaxSize().background(AppTheme.colors.background),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(text = stringResource(R.string.placeholder_getting_ready), style = AppTheme.type.body)
+                // AppScaffold pone el TimeText curvo arriba en todas las pantallas. El color se fija
+                // a `onSurface`: el predeterminado de Wear se ve casi blanco sobre el fondo claro.
+                val timeStyle = CurvedTextStyle(AppTheme.type.timeText.copy(color = AppTheme.colors.onSurface))
+                AppScaffold(timeText = { TimeText { time -> timeTextCurvedText(time, timeStyle) } }) {
+                    AppNavHost(container)
                 }
             }
         }
