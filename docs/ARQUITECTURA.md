@@ -1,0 +1,133 @@
+# Arquitectura
+
+## Visión general
+
+App independiente para Wear OS (no requiere teléfono). Todo corre en el reloj: interfaz, motor de
+estados, avisos, historial y modelo de estimación.
+
+```
+┌─────────────────────────── wear (módulo único) ───────────────────────────┐
+│  ui/        Pantallas Compose + ViewModels (StateFlow)                     │
+│  domain/    PrepStateMachine, DurationEstimator, EventParser (Kotlin puro) │
+│  data/      Room (DAOs), DataStore, repositorios, ContextProvider falso    │
+│  alerts/    AlarmScheduler, AlertReceiver, Haptics                         │
+│  AppContainer   Dependencias creadas a mano                                │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Estructura de paquetes
+
+```
+wear/src/main/java/com/atiempo/wear/
+├── MainActivity.kt
+├── ATiempoApp.kt              # Application, crea AppContainer, siembra datos de ejemplo
+├── AppContainer.kt
+├── ui/
+│   ├── theme/                 # Color.kt (claro y oscuro), StateColors.kt, Type.kt, Shape.kt, Theme.kt
+│   ├── navigation/            # Routes.kt, AppNavHost.kt
+│   ├── components/            # StateRing, TimelineDot, CountdownText, ItemChip...
+│   ├── home/  events/  detail/  create/  prep/  explain/  routines/  summary/  settings/
+├── domain/
+│   ├── model/                 # PrepStep, PrepPlan, Adjustment, ParsedEvent
+│   ├── PrepStateMachine.kt
+│   ├── DurationEstimator.kt
+│   └── EventParser.kt
+├── data/
+│   ├── db/                    # AppDatabase, entidades, DAOs
+│   ├── repo/                  # EventRepository, RoutineRepository, HistoryRepository
+│   ├── context/               # ContextProvider (interfaz) + FakeContextProvider
+│   └── seed/                  # SampleData.kt
+└── alerts/
+    ├── AlarmScheduler.kt
+    ├── AlertReceiver.kt
+    └── Haptics.kt
+```
+
+El paquete `com.atiempo.wear` es provisional; se puede cambiar al crear el proyecto (anotar en DECISIONES.md).
+
+## Modelo de datos (Room)
+
+```kotlin
+@Entity data class Routine(
+    @PrimaryKey val id: Long,
+    val name: String,                 // "Clase", "Cita", "Salida social"
+    val items: List<String>,          // objetos a revisar (TypeConverter)
+    val manualFinishMin: Int?, val manualPrepareMin: Int?,
+    val manualCheckMin: Int?,  val manualTravelMin: Int?,
+)
+
+@Entity data class Event(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val title: String,
+    val startAt: Long,                // epoch millis
+    val routineId: Long,
+    val place: String?,
+    val baseTravelMin: Int,           // tiempo de desplazamiento base
+    val createdByVoice: Boolean,
+)
+
+@Entity data class PrepSession(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val eventId: Long,
+    val startedAt: Long,
+    val leftAt: Long?,                // cuando confirmó "Ya salí"
+    val minutesLate: Int?,            // negativo = salió con margen
+)
+
+@Entity data class StepRecord(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val sessionId: Long,
+    val routineId: Long,
+    val step: PrepStep,               // FINISH, PREPARE, CHECK, LEAVE
+    val dayOfWeek: Int,
+    val plannedMin: Int,
+    val actualMin: Int,
+)
+```
+
+## Motor de estados
+
+`PrepStateMachine` es una clase pura que recibe un `PrepPlan` (horas de inicio de cada paso) y eventos:
+`Tick(now)`, `Confirm`, `Skip`, `MovementDetected`. Emite el estado actual, minutos restantes y si va tarde.
+
+```
+IDLE → FINISH → PREPARE → CHECK → LEAVE → DONE
+          (Confirm o fin del tiempo avanza; Confirm registra la duración real)
+```
+
+Si el usuario confirma antes de tiempo, el siguiente paso empieza en ese momento y el plan se recalcula.
+La detección de movimiento (Activity Recognition) queda fuera de esta entrega; el evento
+`MovementDetected` existe en el motor para mostrar que el diseño lo contempla (D-004).
+
+## Avisos
+
+- `AlarmScheduler` programa con `AlarmManager.setExactAndAllowWhileIdle` una alarma por paso.
+  Permiso `SCHEDULE_EXACT_ALARM` / `USE_EXACT_ALARM`.
+- `AlertReceiver` lanza una notificación con `fullScreenIntent` que abre `prep/{sessionId}` y
+  ejecuta el patrón háptico del paso.
+- Permisos en el manifiesto: `VIBRATE`, `POST_NOTIFICATIONS`, `USE_FULL_SCREEN_INTENT`, `WAKE_LOCK`.
+  `RECORD_AUDIO` no hace falta porque `RecognizerIntent` usa el reconocedor del sistema.
+
+## Tema
+
+`SettingsRepository` expone `themeMode: Flow<ThemeMode>` (`LIGHT` por defecto, `DARK`, `AUTO`) desde
+DataStore. `MainActivity` lo observa y lo pasa a `ATiempoTheme(themeMode)`, que elige el `ColorScheme`
+y los `StateColors` correspondientes. En modo `AUTO` se recalcula cada minuto con la hora local.
+
+## Voz
+
+`RecognizerIntent.ACTION_RECOGNIZE_SPEECH` con `EXTRA_LANGUAGE = "es-CO"`. El texto pasa a `EventParser`,
+un intérprete por reglas (expresiones regulares) que reconoce:
+- Días: hoy, mañana, pasado mañana, lunes…domingo.
+- Horas: "a las 7", "a las 3 y media", "a las 15:30", "7 de la mañana/tarde/noche", "al mediodía".
+- Rutina por palabras clave: clase/parcial/universidad → Clase; cita/médico/reunión → Cita;
+  fiesta/cine/comida → Salida social.
+- Lugar: lo que sigue a "en" o "a la/al".
+Devuelve `ParsedEvent` con un nivel de confianza por campo para resaltar lo dudoso en la pantalla de confirmación.
+
+## Versiones
+
+Usar la última versión estable al crear el proyecto y fijarla en `gradle/libs.versions.toml`:
+Android Gradle Plugin, Kotlin 2.x con el plugin de Compose, `androidx.wear.compose:compose-material3`,
+`compose-foundation`, `compose-navigation`, `androidx.room` (con KSP), `androidx.datastore`,
+`androidx.wear:wear-tooling-preview`. `minSdk 30`, `targetSdk` y `compileSdk` el más reciente estable.
