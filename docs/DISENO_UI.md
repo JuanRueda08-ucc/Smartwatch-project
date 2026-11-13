@@ -177,16 +177,37 @@ Una sola pantalla que cambia según el estado activo:
 ## 4. Patrones hápticos
 
 Diseñados para distinguirse sin mirar el reloj. Implementar con `VibrationEffect.createWaveform`
-(tiempos en ms, alternando pausa y vibración, amplitudes 0–255).
+(tiempos en ms, alternando pausa y vibración, amplitudes 0–255, sin repetición: `repeat = -1`).
 
-| Estado | Patrón | Sensación |
-|---|---|---|
-| 1 Termina | `[0, 120]` amp `[0, 120]` | Un toque suave |
-| 2 Prepárate | `[0, 120, 100, 120]` amp `[0, 180, 0, 180]` | Dos toques |
-| 3 Revisa | `[0, 80, 80, 80, 80, 80]` amp `[0, 200, 0, 200, 0, 200]` | Tres toques rápidos |
-| 4 Sal ahora | `[0, 400, 150, 400]` amp `[0, 255, 0, 255]` | Dos vibraciones largas y fuertes |
-| Confirmación | `[0, 40]` amp `[0, 150]` | Clic breve |
-| Vas tarde | Patrón del estado 4 repetido cada 60 s, máximo 3 veces | Insistente pero limitado |
+**Patrones finales** (tarea 1.4):
+
+| Aviso | Tiempos (ms) | Amplitudes | Total | Sensación |
+|---|---|---|---|---|
+| 1 Termina | `[0, 150]` | `[0, 140]` | 150 ms | Un toque suave |
+| 2 Prepárate | `[0, 150, 150, 150]` | `[0, 180, 0, 180]` | 450 ms | Dos toques |
+| 3 Revisa | `[0, 90, 110, 90, 110, 90]` | `[0, 210, 0, 210, 0, 210]` | 490 ms | Tres toques rápidos |
+| 4 Sal ahora | `[0, 450, 200, 450]` | `[0, 255, 0, 255]` | 1100 ms | Dos vibraciones largas y fuertes |
+| Vas tarde | `[0, 450, 200, 450, 200, 450]` | `[0, 255, 0, 255, 0, 255]` | 1750 ms | Tres vibraciones largas; cada 60 s, máximo 3 veces |
+| Confirmación | `EFFECT_CLICK` (respaldo `[0, 40]` amp `[0, 160]`) | — | ~40 ms | Clic breve |
+
+Reglas que siguen los patrones:
+
+1. **Se distinguen por ritmo, no solo por fuerza.** La cantidad y la duración de los pulsos
+   (1 corto, 2 cortos, 3 rápidos, 2 largos, 3 largos) bastan para reconocerlos, así que también funcionan
+   en relojes sin control de amplitud (`Vibrator.hasAmplitudeControl() == false`), donde se llama a
+   `createWaveform(timings, -1)` y todo vibra con la fuerza predeterminada.
+2. **Pausas de al menos 110 ms entre pulsos.** Con menos, el motor del reloj no alcanza a detenerse y
+   los toques se sienten como uno solo.
+3. **La intensidad sube con la urgencia** (140 → 180 → 210 → 255) y solo los avisos de salir usan
+   pulsos largos.
+4. **"Vas tarde" se diferencia de "Sal ahora"** por un tercer pulso largo. Así, sin mirar, se sabe si es
+   el primer aviso de salida o un recordatorio de que ya va tarde.
+5. **Ningún aviso pasa de 2 s**, y la confirmación usa el efecto del sistema (`VibrationEffect.createPredefined(EFFECT_CLICK)`)
+   para sentirse igual que el resto de Wear OS.
+6. Si el usuario desactiva las vibraciones en Ajustes, no suena ninguno; la pantalla y la notificación sí aparecen.
+
+Verificación: el emulador de Wear OS no vibra. Los tiempos se revisan en el prototipo HTML (registro y
+animación del marco) y, si hay un reloj físico disponible, en la Fase 5.
 
 ## 5. Tono de los textos
 

@@ -67,3 +67,15 @@ Cambios:
   Ahora toda pantalla que se desplaza encoge cada fila lo justo para caber (como `TransformingLazyColumn`).
 - Inicio ya no muestra el lugar en la línea superior, que rozaba el anillo, y su contenido baja unos píxeles
   para que los nombres de evento largos no lo toquen. Los ejemplos de "Crear por voz" se acortan a dos líneas.
+
+### D-012 · 2026-11-13 · Patrones hápticos finales
+Se fijan los tiempos de `DISENO_UI.md` §4. Cambios frente a la primera versión:
+- Las pausas entre pulsos suben a 110 ms o más (el estado 3 tenía 80 ms). Con menos, el motor del reloj
+  no se detiene a tiempo y los toques se sienten como uno.
+- Los patrones se distinguen por cantidad y duración de pulsos, no solo por amplitud, para que también
+  funcionen en relojes sin control de amplitud.
+- "Vas tarde" deja de ser igual a "Sal ahora": suma un tercer pulso largo, para saber sin mirar si es el
+  primer aviso de salida o un recordatorio de que ya va tarde.
+- La confirmación usa `EFFECT_CLICK` del sistema (respaldo `[0, 40]`). Comparte "un pulso" con el estado 1,
+  pero dura 40 ms frente a 150 ms y siempre llega justo después de un toque en la pantalla.
+Pendiente: el emulador no vibra; si hay un reloj físico se prueban en la Fase 5.

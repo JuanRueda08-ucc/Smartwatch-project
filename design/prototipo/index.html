@@ -440,14 +440,14 @@ const STEPS = [
 ];
 const ADJ_NAMES = ['Termina lo que haces', 'Prepárate', 'Revisa tus cosas', 'Trayecto'];
 
-/* Patrones hápticos de DISENO_UI §4 (pausa, vibración, pausa, ...) */
+/* Patrones hápticos finales de DISENO_UI §4 (pausa, vibración, pausa, ...) */
 const HAPTICS = {
-  s0: { name: 'Estado 1 · Termina lo que haces', t: [0, 120], a: [0, 120], feel: 'Un toque suave', token: '--state1Finish' },
-  s1: { name: 'Estado 2 · Prepárate', t: [0, 120, 100, 120], a: [0, 180, 0, 180], feel: 'Dos toques', token: '--state2Prepare' },
-  s2: { name: 'Estado 3 · Revisa tus cosas', t: [0, 80, 80, 80, 80, 80], a: [0, 200, 0, 200, 0, 200], feel: 'Tres toques rápidos', token: '--state3Check' },
-  s3: { name: 'Estado 4 · Sal ahora', t: [0, 400, 150, 400], a: [0, 255, 0, 255], feel: 'Dos vibraciones largas y fuertes', token: '--state4Leave' },
-  confirm: { name: 'Confirmación', t: [0, 40], a: [0, 150], feel: 'Clic breve', token: '--primary' },
-  late: { name: 'Vas tarde', t: [0, 400, 150, 400], a: [0, 255, 0, 255], feel: 'Patrón del estado 4 repetido', token: '--late' },
+  s0: { name: 'Estado 1 · Termina lo que haces', t: [0, 150], a: [0, 140], feel: 'Un toque suave', token: '--state1Finish' },
+  s1: { name: 'Estado 2 · Prepárate', t: [0, 150, 150, 150], a: [0, 180, 0, 180], feel: 'Dos toques', token: '--state2Prepare' },
+  s2: { name: 'Estado 3 · Revisa tus cosas', t: [0, 90, 110, 90, 110, 90], a: [0, 210, 0, 210, 0, 210], feel: 'Tres toques rápidos', token: '--state3Check' },
+  s3: { name: 'Estado 4 · Sal ahora', t: [0, 450, 200, 450], a: [0, 255, 0, 255], feel: 'Dos vibraciones largas y fuertes', token: '--state4Leave' },
+  confirm: { name: 'Confirmación · EFFECT_CLICK', t: [0, 40], a: [0, 160], feel: 'Clic breve del sistema', token: '--primary' },
+  late: { name: 'Vas tarde', t: [0, 450, 200, 450, 200, 450], a: [0, 255, 0, 255, 0, 255], feel: 'Tres vibraciones largas', token: '--late' },
 };
 
 function initialRoutines() {

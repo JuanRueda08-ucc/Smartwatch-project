@@ -16,7 +16,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
       que muestre todas las pantallas de `DISENO_UI.md` y la navegación entre ellas, en tema claro
       por defecto y con un interruptor para ver el tema oscuro.
 - [x] 1.3 Revisión del prototipo con el usuario; anotar cambios en `DECISIONES.md`.
-- [ ] 1.4 Definir los 4 patrones hápticos finales (tiempos en ms) en `DISENO_UI.md`.
+- [x] 1.4 Definir los 4 patrones hápticos finales (tiempos en ms) en `DISENO_UI.md`.
 
 **Listo cuando:** el usuario aprueba el prototipo.
 
