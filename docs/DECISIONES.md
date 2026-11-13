@@ -92,3 +92,13 @@ Pendiente: el emulador no vibra; si hay un reloj físico se prueban en la Fase 5
   unidad de `display` en 18 sp y se prohíben los tamaños sueltos.
 - **Formas:** se documenta la tarjeta (esquinas de 18 dp, borde de 1 dp), que faltaba. El botón inferior
   y el área segura ya se definieron en D-011.
+
+### D-014 · 2026-11-13 · Versiones del proyecto y SDK
+Versiones estables más recientes al crear el proyecto, fijadas en `gradle/libs.versions.toml`:
+Gradle 9.9.1, AGP 9.5.1, Kotlin 2.4.21, KSP 2.3.14, Wear Compose 1.7.1, Compose BOM 2026.09.00,
+Room 2.8.5, DataStore 1.3.0, lifecycle 2.11.0, activity-compose 1.13.0. Sin alphas.
+- AGP 9 trae Kotlin integrado: el módulo no aplica `kotlin-android`. El plugin se declara en la raíz solo
+  para fijar Kotlin 2.4.21, igual que el plugin del compilador de Compose.
+- Las librerías actuales exigen `compileSdk` 37, así que se compila contra Android 37.2. `targetSdk` queda
+  en 36 (Wear OS 6) y `minSdk` en 30 (Wear OS 3).
+- Emulador: Wear OS 6 (API 36), perfil Large Round, AVD `ATiempo_Large_Round_API36`.

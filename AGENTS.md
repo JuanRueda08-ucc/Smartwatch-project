@@ -77,5 +77,6 @@ Emulador recomendado: **Wear OS Large Round** (API 34 o superior) en Android Stu
 
 ## Commits
 
-Mensajes cortos en español con prefijo: `feat:`, `fix:`, `ui:`, `docs:`, `test:`, `chore:`.
-Ejemplo: `ui: pantalla de estado "Prepárate" con anillo de progreso`.
+Mensajes cortos **en inglés** con prefijo: `feat:`, `fix:`, `ui:`, `docs:`, `test:`, `chore:`.
+Ejemplo: `ui: add "Get ready" state screen with progress ring`.
+(Los comentarios del código y la documentación siguen en español.)

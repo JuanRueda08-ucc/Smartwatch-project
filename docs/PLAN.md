@@ -22,7 +22,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 
 ## Fase 2. Base de la app Wear OS (sábado 14)
 
-- [ ] 2.1 Crear el proyecto Android: módulo `wear`, `minSdk 30`, Kotlin, Compose, version catalog.
+- [x] 2.1 Crear el proyecto Android: módulo `wear`, `minSdk 30`, Kotlin, Compose, version catalog.
 - [ ] 2.2 Tema: `ui/theme` con `ColorScheme` claro (predeterminado) y oscuro, `LocalStateColors`,
       tipografía y formas de `DISENO_UI.md`. Preferencia de tema en DataStore.
 - [ ] 2.3 Navegación (`SwipeDismissableNavHost`) con todas las rutas como pantallas vacías.

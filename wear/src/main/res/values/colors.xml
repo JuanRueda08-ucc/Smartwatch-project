@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Solo para el ícono del lanzador; las pantallas toman sus colores del tema. Es `primary` claro. -->
+    <color name="ic_launcher_background">#2F5BD3</color>
+</resources>

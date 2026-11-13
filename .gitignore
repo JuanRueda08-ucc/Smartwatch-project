@@ -2,19 +2,21 @@
 .gradle/
 build/
 */build/
-local.properties
+.kotlin/
 captures/
 .externalNativeBuild/
 .cxx/
 *.apk
 *.aab
+
+# Configuración local (no se sube: rutas del SDK, llaves)
+local.properties
 *.keystore
 *.jks
 
 # Android Studio / IntelliJ
 .idea/
 *.iml
-.kotlin/
 
 # SO
 .DS_Store
