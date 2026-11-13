@@ -117,3 +117,10 @@ Hallazgos al probar en el emulador (aplican a toda la Fase 3):
   esos componentes se les pasan colores explícitos desde `AppTheme.colors`.
 - El `TimeText` predeterminado se ve casi blanco sobre el fondo claro; `MainActivity` lo dibuja con
   `onSurface`.
+
+### D-016 · 2026-11-13 · `Routine` guarda duraciones por defecto
+`MODELO_ESTIMACION.md` dice que, sin historial, se usan "los valores por defecto de la rutina", pero la
+entidad `Routine` de `ARQUITECTURA.md` solo tenía los ajustes manuales. Se agregan
+`defaultFinishMin`, `defaultPrepareMin`, `defaultCheckMin` y `defaultTravelMin`. Además: claves foráneas
+con borrado en cascada (evento → sesiones → registros), índices para las consultas por fecha y por
+rutina y paso, `dayOfWeek` en formato ISO (1 = lunes) y el esquema exportado en `wear/schemas`.

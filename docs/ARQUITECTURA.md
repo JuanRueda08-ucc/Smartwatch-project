@@ -52,6 +52,8 @@ El paquete `com.atiempo.wear` es provisional; se puede cambiar al crear el proye
     @PrimaryKey val id: Long,
     val name: String,                 // "Clase", "Cita", "Salida social"
     val items: List<String>,          // objetos a revisar (TypeConverter)
+    val defaultFinishMin: Int, val defaultPrepareMin: Int,   // sin historial (D-016)
+    val defaultCheckMin: Int,  val defaultTravelMin: Int,
     val manualFinishMin: Int?, val manualPrepareMin: Int?,
     val manualCheckMin: Int?,  val manualTravelMin: Int?,
 )
