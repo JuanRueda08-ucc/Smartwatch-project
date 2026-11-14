@@ -4,6 +4,8 @@ import android.content.Context
 import com.atiempo.wear.alerts.AlarmScheduler
 import com.atiempo.wear.alerts.AlertNotifier
 import com.atiempo.wear.alerts.Haptics
+import com.atiempo.wear.data.context.ContextProvider
+import com.atiempo.wear.data.context.FakeContextProvider
 import com.atiempo.wear.data.db.AppDatabase
 import com.atiempo.wear.data.draft.DraftStore
 import com.atiempo.wear.data.repo.EventRepository
@@ -15,6 +17,7 @@ import com.atiempo.wear.domain.time.Clock
 import com.atiempo.wear.domain.time.DemoClock
 import com.atiempo.wear.domain.time.SystemClock
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.combine
 import java.time.ZoneId
 
 /** Dependencias de la app creadas a mano, sin Hilt (AGENTS.md). */
@@ -30,8 +33,13 @@ class AppContainer(context: Context, appScope: CoroutineScope) {
     val routines by lazy { RoutineRepository(database.routineDao()) }
     val history by lazy { HistoryRepository(database.prepSessionDao(), database.stepRecordDao()) }
 
-    /** Datos del estimador: historial (y, desde la tarea 4.2, el contexto). */
-    val estimation by lazy { history.estimationData(zone) }
+    /** Clima y tráfico simulados, elegidos en Ajustes con el modo demo (tarea 4.2, D-003). */
+    val contextProvider: ContextProvider = FakeContextProvider(settings.demoMode, settings.demoRain, settings.demoTraffic)
+
+    /** Datos del estimador: el historial y el contexto del día. */
+    val estimation by lazy {
+        combine(history.estimationData(zone), contextProvider.context) { data, context -> data.copy(context = context) }
+    }
 
     /** Evento dictado que espera confirmación (tareas 3.4 y 3.5). */
     val drafts = DraftStore()

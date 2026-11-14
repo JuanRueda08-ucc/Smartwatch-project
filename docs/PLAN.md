@@ -54,7 +54,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 ## Fase 4. Modelo de estimación (lunes 16)
 
 - [x] 4.1 `DurationEstimator` según `MODELO_ESTIMACION.md`, con pruebas.
-- [ ] 4.2 `ContextProvider` falso para clima y tráfico, con valores controlables desde el modo demo.
+- [x] 4.2 `ContextProvider` falso para clima y tráfico, con valores controlables desde el modo demo.
 - [ ] 4.3 Generar el texto de explicación de cada ajuste.
 - [ ] 4.4 Registrar duraciones reales al confirmar cada paso y recalcular.
 

@@ -231,6 +231,10 @@ Una sola pantalla que cambia según el estado activo:
   pasa en 5 s".
 - Con el modo demo activo: botón "Ir al próximo aviso", que salta a 3 s (de la demo) antes del siguiente aviso y
   vuelve a Inicio. Todo, incluida la hora de arriba, usa la hora acelerada.
+- Con el modo demo activo, sección "Simulación" (D-031): interruptor "Lluvia prevista · Suma tiempo al trayecto"
+  y botón "Tráfico bajo / medio / alto · Toca para cambiar" (ícono de semáforo en `primary`; cada toque pasa al
+  siguiente nivel). Cambian la hora de salida al instante y aparecen como razones en §3.8. Fuera del modo demo no
+  cuentan.
 - Se llega desde el final de la Lista de eventos.
 
 ## 4. Patrones hápticos

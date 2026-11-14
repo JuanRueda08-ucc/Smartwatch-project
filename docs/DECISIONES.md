@@ -303,3 +303,15 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
 - Probado en el emulador: "Cine con Laura" muestra "Últimamente tardas 28 min en llegar" (+3) y las demás razones
   aprendidas. Los registros de 1 a 3 min que dejaron las pruebas bajan la media de Clase: limpiar los datos de la
   app antes de la presentación (Fase 5).
+
+### D-031 · 2026-11-14 · Clima y tráfico simulados (tarea 4.2)
+- **`ContextProvider`** (interfaz) y **`FakeContextProvider`** en `data/context/`, como pide ARQUITECTURA: combina
+  el modo demo con la lluvia y el tráfico guardados en DataStore. 4 pruebas.
+- **Solo cuentan con el modo demo activo.** Fuera de él el día es tranquilo (sin lluvia, tráfico bajo), aunque haya
+  valores guardados: así una lluvia olvidada después de la presentación no adelanta los avisos de verdad.
+- **Controles en Ajustes** bajo "Simulación", visibles solo en modo demo: un interruptor de lluvia y un botón que
+  rota el tráfico bajo → medio → alto (un solo toque por cambio, sin abrir otra pantalla).
+- El contexto entra al estimador por `AppContainer.estimation`, así que Inicio, Eventos, Detalle, la explicación y
+  las alarmas cambian a la vez. El plan de una preparación en curso no se mueve (D-030).
+- Probado en el emulador: con lluvia y tráfico alto, "Reunión de grupo" pasa de salir a las 18:47 a las 18:42 y la
+  explicación muestra "Tráfico alto hacia Biblioteca" (+3) y "Hay lluvia prevista" (+2).

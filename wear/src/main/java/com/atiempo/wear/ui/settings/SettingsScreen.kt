@@ -56,6 +56,7 @@ import androidx.wear.compose.material3.lazy.transformedHeight
 import com.atiempo.wear.AppContainer
 import com.atiempo.wear.R
 import com.atiempo.wear.domain.model.ThemeMode
+import com.atiempo.wear.domain.model.TrafficLevel
 import com.atiempo.wear.ui.components.ATiempoPreview
 import com.atiempo.wear.ui.components.WearPreviews
 import com.atiempo.wear.ui.theme.AppColors
@@ -84,6 +85,8 @@ fun SettingsRoute(container: AppContainer, onJumpedToNextAlert: () -> Unit) {
         onUnlockDemo = viewModel::unlockDemo,
         onAllowFullScreen = { openFullScreenSettings(context) },
         onJumpToNextAlert = { if (container.jumpToNextAlert()) onJumpedToNextAlert() },
+        onRain = { viewModel.setRain(it) },
+        onNextTraffic = { viewModel.nextTraffic() },
     )
 }
 
@@ -101,6 +104,8 @@ fun SettingsScreen(
     onUnlockDemo: () -> Unit,
     onAllowFullScreen: () -> Unit,
     onJumpToNextAlert: () -> Unit = {},
+    onRain: (Boolean) -> Unit = {},
+    onNextTraffic: () -> Unit = {},
 ) {
     val listState = rememberTransformingLazyColumnState()
     val spec = rememberTransformationSpec()
@@ -185,6 +190,35 @@ fun SettingsScreen(
                         ),
                         icon = { Icon(painterResource(R.drawable.ic_timer), contentDescription = null, modifier = Modifier.size(20.dp)) },
                         label = { Text(text = stringResource(R.string.settings_demo_jump), style = AppTheme.type.button) },
+                    )
+                }
+                // Clima y tráfico simulados (D-003): cambian el trayecto y aparecen en "¿Por qué te avisé antes?".
+                item { SectionLabel(stringResource(R.string.settings_simulation)) }
+                item {
+                    Toggle(
+                        checked = state.rain,
+                        onCheckedChange = onRain,
+                        label = stringResource(R.string.settings_rain),
+                        detail = stringResource(R.string.settings_rain_detail),
+                        spec = spec,
+                    )
+                }
+                item {
+                    val level = stringResource(trafficLabel(state.traffic))
+                    Button(
+                        onClick = onNextTraffic,
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, spec),
+                        transformation = SurfaceTransformation(spec),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppTheme.colors.surface,
+                            contentColor = AppTheme.colors.onSurface,
+                            secondaryContentColor = AppTheme.colors.onSurfaceVariant,
+                            iconColor = AppTheme.colors.primary,
+                        ),
+                        border = BorderStroke(1.dp, AppTheme.colors.surfaceBright),
+                        icon = { Icon(painterResource(R.drawable.ic_traffic), contentDescription = null, modifier = Modifier.size(20.dp)) },
+                        label = { Text(text = stringResource(R.string.settings_traffic, level), style = AppTheme.type.button) },
+                        secondaryLabel = { Text(text = stringResource(R.string.settings_traffic_detail), style = AppTheme.type.caption) },
                     )
                 }
             }
@@ -305,6 +339,12 @@ private fun radioColors() = RadioButtonDefaults.radioButtonColors(
 
 private const val VERSION = "0.1"
 
+private fun trafficLabel(level: TrafficLevel): Int = when (level) {
+    TrafficLevel.LOW -> R.string.traffic_low
+    TrafficLevel.MEDIUM -> R.string.traffic_medium
+    TrafficLevel.HIGH -> R.string.traffic_high
+}
+
 /** Desde Android 14, abrirse a pantalla completa es un acceso especial que hay que conceder (D-028). */
 private fun canUseFullScreen(context: Context): Boolean =
     Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE ||
@@ -340,4 +380,13 @@ private fun SettingsLightPreview() = ATiempoPreview(dark = false) {
 @Composable
 private fun SettingsDarkPreview() = ATiempoPreview(dark = true) {
     SettingsScreen(SettingsUiState(themeMode = ThemeMode.DARK, demoUnlocked = true), fullScreenAllowed = true, {}, {}, {}, {}, {})
+}
+
+@WearPreviews
+@Composable
+private fun SettingsDemoLightPreview() = ATiempoPreview(dark = false) {
+    SettingsScreen(
+        SettingsUiState(demoMode = true, demoUnlocked = true, rain = true, traffic = TrafficLevel.HIGH),
+        fullScreenAllowed = true, {}, {}, {}, {}, {},
+    )
 }

@@ -200,6 +200,14 @@
     <string name="settings_demo">Modo demo</string>
     <string name="settings_demo_detail">1 min pasa en 5 s</string>
     <string name="settings_demo_jump">Ir al próximo aviso</string>
+    <string name="settings_simulation">Simulación</string>
+    <string name="settings_rain">Lluvia prevista</string>
+    <string name="settings_rain_detail">Suma tiempo al trayecto</string>
+    <string name="settings_traffic">Tráfico %1$s</string>
+    <string name="settings_traffic_detail">Toca para cambiar</string>
+    <string name="traffic_low">bajo</string>
+    <string name="traffic_medium">medio</string>
+    <string name="traffic_high">alto</string>
 
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>
