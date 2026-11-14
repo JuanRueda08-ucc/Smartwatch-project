@@ -106,6 +106,10 @@
     <string name="result_learn_on_time">Prepararte te tomó %1$d min. Ajusté tu rutina.</string>
     <string name="result_learn_late">Prepararte te tomó %1$d min. La próxima vez te aviso %2$d min antes.</string>
     <string name="action_back_to_alert">Volver al aviso</string>
+    <string name="notif_channel_name">Avisos de preparación</string>
+    <string name="notif_channel_description">Un aviso por cada estado, con su vibración, para salir a tiempo</string>
+    <string name="notif_text">%1$s · faltan %2$d min</string>
+    <string name="notif_text_late">%1$s · vas %2$d min tarde</string>
     <string name="a11y_checked">Revisado</string>
     <string name="a11y_unchecked">Sin revisar</string>
 

@@ -159,6 +159,41 @@ class PrepStateMachineTest {
     }
 
     @Test
+    fun `la proxima alarma sigue el plan`() {
+        assertEquals(at(7, 13), machine.nextWakeUp(PrepState(), at(7, 0)))
+        val (finish, _) = run(PrepEvent.Tick(at(7, 13)))
+        assertEquals(at(7, 23), machine.nextWakeUp(finish, at(7, 15)))
+        val (leave, _) = run(PrepEvent.Tick(at(7, 43)))
+        assertEquals(at(7, 48), machine.nextWakeUp(leave, at(7, 44))) // hora límite
+    }
+
+    @Test
+    fun `la proxima alarma de tarde es cada minuto hasta tres`() {
+        val (late1, _) = run(PrepEvent.Tick(at(7, 43)), PrepEvent.Tick(at(7, 48)))
+        assertEquals(at(7, 49), machine.nextWakeUp(late1, at(7, 48, 10)))
+        val (late3, _) = run(PrepEvent.Tick(at(7, 48)), PrepEvent.Tick(at(7, 49)), PrepEvent.Tick(at(7, 50)), from = late1)
+        assertNull(machine.nextWakeUp(late3, at(7, 50, 5)))
+    }
+
+    @Test
+    fun `sin alarmas despues de salir`() {
+        val (done, _) = run(PrepEvent.Tick(at(7, 43)), PrepEvent.Confirm(at(7, 44)))
+        assertNull(machine.nextWakeUp(done, at(7, 45)))
+    }
+
+    @Test
+    fun `al recuperar sigue en el paso que toca`() {
+        val resumed = machine.resume(sessionStartedAt = at(7, 13), now = at(7, 40))
+        assertEquals(PrepPhase.ACTIVE, resumed.phase)
+        assertEquals(CHECK, resumed.step)
+        assertEquals(at(7, 38), resumed.stepStartedAt)
+        // Si se empezó antes de tiempo ("Empezar ahora") y aún no llega el primer aviso, sigue en Termina.
+        val early = machine.resume(sessionStartedAt = at(7, 0), now = at(7, 5))
+        assertEquals(FINISH, early.step)
+        assertEquals(at(7, 0), early.stepStartedAt)
+    }
+
+    @Test
     fun `duraciones reales acotadas entre 1 y 90 minutos`() {
         assertEquals(1, PrepStateMachine.actualMinutes(at(7, 0), at(7, 0, 10)))
         assertEquals(90, PrepStateMachine.actualMinutes(at(7, 0), at(10, 0)))

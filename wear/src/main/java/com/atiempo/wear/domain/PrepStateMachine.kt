@@ -128,6 +128,42 @@ class PrepStateMachine(private val plan: PrepPlan) {
         )
     }
 
+    /**
+     * Próxima hora en que algo cambia sin que la persona toque nada: el primer aviso, el fin del paso, la
+     * hora límite o el siguiente recordatorio de "tarde". La alarma del reloj se programa a esa hora.
+     * null si ya no hay nada que avisar.
+     */
+    fun nextWakeUp(state: PrepState, now: Long): Long? = when (state.phase) {
+        PrepPhase.IDLE -> plan.finishAt.takeIf { it > now }
+        PrepPhase.DONE -> null
+        PrepPhase.ACTIVE -> when {
+            state.step != PrepStep.LEAVE -> maxOf(endOf(state.step ?: PrepStep.FINISH), now + 1)
+            now < lateAt -> lateAt
+            state.lateReminders >= MAX_LATE_REMINDERS -> null
+            // Pasada la hora límite sin recordatorio todavía: toca ya.
+            state.lateReminders == 0 || state.lastReminderAt == null -> now + 1
+            else -> maxOf(state.lastReminderAt + LATE_REMINDER_EVERY, now + 1)
+        }
+    }
+
+    /**
+     * Rehace el estado de una preparación guardada cuando el sistema cerró la app: el paso es el que toca
+     * según la hora (las confirmaciones hechas antes se pierden, pero sus duraciones ya están guardadas).
+     */
+    fun resume(sessionStartedAt: Long, now: Long): PrepState {
+        val firstStep = stepAt(sessionStartedAt)
+        val step = maxOf(stepAt(now), firstStep)
+        // Si sigue en el paso con que empezó, ese paso empezó cuando empezó la sesión (quizá antes de tiempo);
+        // si no, a la hora del plan.
+        val stepStart = if (step == firstStep) sessionStartedAt else maxOf(plan.startOf(step), sessionStartedAt)
+        return PrepState(
+            phase = PrepPhase.ACTIVE,
+            step = step,
+            stepStartedAt = stepStart.coerceAtMost(now),
+            sessionStartedAt = sessionStartedAt,
+        )
+    }
+
     // ---------- Transiciones ----------
 
     private fun onIdle(state: PrepState, event: PrepEvent): PrepTransition = when (event) {

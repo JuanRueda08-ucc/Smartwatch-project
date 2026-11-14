@@ -66,6 +66,10 @@ interface PrepSessionDao {
     @Query("SELECT * FROM prep_sessions WHERE eventId = :eventId ORDER BY id DESC LIMIT 1")
     suspend fun forEvent(eventId: Long): PrepSession?
 
+    /** La preparación más reciente que no terminó con "Ya salí" (para recuperarla al reiniciar). */
+    @Query("SELECT * FROM prep_sessions WHERE leftAt IS NULL ORDER BY startedAt DESC LIMIT 1")
+    suspend fun latestOpen(): PrepSession?
+
     /** Eventos cuya preparación ya terminó con "Ya salí". */
     @Query("SELECT DISTINCT eventId FROM prep_sessions WHERE leftAt IS NOT NULL")
     fun observeLeftEventIds(): Flow<List<Long>>

@@ -39,6 +39,14 @@ class AutoStartTest {
     }
 
     @Test
+    fun `proximo primer aviso para la alarma`() {
+        val events = listOf(event(1, at(8, 0)), event(2, at(9, 0)))
+        assertEquals(at(7, 13), AutoStart.nextFirstAlertAt(events, listOf(clase), at(7, 0), emptySet()))
+        assertEquals(at(8, 13), AutoStart.nextFirstAlertAt(events, listOf(clase), at(7, 0), setOf(1L)))
+        assertNull(AutoStart.nextFirstAlertAt(events, listOf(clase), at(9, 0), emptySet()))
+    }
+
+    @Test
     fun `entre varios elige el mas proximo`() {
         val events = listOf(event(2, at(8, 30)), event(1, at(8, 0)))
         assertEquals(1L, AutoStart.eventToStart(events, listOf(clase), at(7, 50), emptySet())?.id)

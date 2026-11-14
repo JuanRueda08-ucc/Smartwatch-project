@@ -41,7 +41,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 - [x] 3.5 Confirmar evento interpretado (editar título, hora, rutina, lugar).
 - [x] 3.6 Motor de estados (`PrepStateMachine`) con pruebas unitarias.
 - [x] 3.7 Pantallas de los 4 estados con anillo de progreso y botón "Listo".
-- [ ] 3.8 Avisos programados (`AlarmManager` + notificación de pantalla completa) y vibraciones
+- [x] 3.8 Avisos programados (`AlarmManager` + notificación de pantalla completa) y vibraciones
       con `VibrationEffect.createWaveform`.
 - [ ] 3.9 Pantalla "¿Por qué te avisé antes?".
 - [ ] 3.10 Ajuste manual de estimaciones por rutina y por paso.

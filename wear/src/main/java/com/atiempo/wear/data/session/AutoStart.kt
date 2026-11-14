@@ -18,4 +18,17 @@ object AutoStart {
             .filter { event -> routineById[event.routineId]?.planFor(event)?.let { now >= it.finishAt } == true }
             .minByOrNull { it.startAt }
     }
+
+    /**
+     * Hora del próximo primer aviso entre los eventos sin sesión (para la alarma cuando no hay preparación
+     * en curso). null si no hay ninguno por venir.
+     */
+    fun nextFirstAlertAt(events: List<Event>, routines: List<Routine>, now: Long, excluded: Set<Long>): Long? {
+        val routineById = routines.associateBy { it.id }
+        return events
+            .filter { it.id !in excluded && it.startAt > now }
+            .mapNotNull { event -> routineById[event.routineId]?.planFor(event)?.finishAt }
+            .filter { it > now }
+            .minOrNull()
+    }
 }

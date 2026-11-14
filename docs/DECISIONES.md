@@ -215,3 +215,19 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
 - **Pendiente:** la sesión activa vive en memoria; si el sistema mata el proceso se pierde (la sesión queda
   guardada sin salida y no vuelve a arrancar). Recuperarla al reiniciar va con las alarmas (3.8). La Lista de
   eventos todavía no marca los eventos terminados.
+
+### D-024 · 2026-11-14 · Avisos programados (tarea 3.8)
+- **Una sola alarma exacta** (`AlarmScheduler`, `USE_EXACT_ALARM`) a la próxima hora en que algo cambia:
+  primer aviso, fin de cada paso, hora límite y recordatorios de "tarde" (`PrepStateMachine.nextWakeUp`,
+  `AutoStart.nextFirstAlertAt`, con pruebas). Al sonar, `AlertReceiver` despierta la app, avanza el motor (que
+  vibra) y publica el aviso; luego programa la siguiente. Tras reiniciar o actualizar, `RescheduleReceiver`.
+- **Recuperación:** si el sistema cerró la app, al volver a abrirse retoma la sesión sin "Ya salí" de un evento
+  que aún no empieza (`PrepStateMachine.resume`), salvo que ese evento tenga una sesión más reciente.
+- **Aviso:** notificación de importancia alta, sin sonido ni vibración propios (la vibración es el patrón
+  háptico), con el título del estado, "Evento · faltan N min" y el color del estado. Tocarla abre la pantalla
+  del estado. Se pide permiso de notificaciones al abrir la app.
+- **Verificado en el emulador:** con la app cerrada y la pantalla apagada, la alarma despertó la app, arrancó la
+  preparación y publicó el aviso correcto.
+- **Pendiente:** abrirse solo a pantalla completa requiere el acceso especial `USE_FULL_SCREEN_INTENT`, que
+  Android 14+ concede por defecto solo a apps de alarma y llamadas; en el emulador quedó rechazado. Falta guiar
+  a la persona a concederlo en Ajustes (3.11b) y probar el tema oscuro de los avisos.

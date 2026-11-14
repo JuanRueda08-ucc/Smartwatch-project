@@ -3,8 +3,18 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
 
-    <!-- Patrones hápticos de los 4 estados. Los permisos de avisos llegan en la Fase 3. -->
+    <!-- Patrones hápticos de los 4 estados. -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Avisos de cada estado (tarea 3.8): notificación a pantalla completa y alarmas exactas. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Volver a programar las alarmas tras reiniciar el reloj. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Visibilidad de paquetes (Android 11+): para saber si hay entrada de voz y texto de Wear. -->
     <queries>
@@ -26,9 +36,27 @@
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
+        <!-- Alarma de cada estado: avanza la preparación aunque la app esté cerrada. -->
+        <receiver
+            android:name=".alerts.AlertReceiver"
+            android:exported="false" />
+
+        <!-- Tras reiniciar o actualizar, arrancar el proceso vuelve a programar las alarmas. -->
+        <receiver
+            android:name=".alerts.RescheduleReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
             android:taskAffinity="">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

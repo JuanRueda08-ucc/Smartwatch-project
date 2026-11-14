@@ -1,6 +1,8 @@
 package com.atiempo.wear
 
 import android.content.Context
+import com.atiempo.wear.alerts.AlarmScheduler
+import com.atiempo.wear.alerts.AlertNotifier
 import com.atiempo.wear.alerts.Haptics
 import com.atiempo.wear.data.db.AppDatabase
 import com.atiempo.wear.data.draft.DraftStore
@@ -30,7 +32,9 @@ class AppContainer(context: Context, appScope: CoroutineScope) {
     val drafts = DraftStore()
 
     val haptics = Haptics(context)
+    private val alarms = AlarmScheduler(context)
+    private val notifier = AlertNotifier(context)
 
-    /** Preparación en curso (tarea 3.7). */
-    val prep by lazy { PrepSessionManager(appScope, clock, zone, events, routines, history, haptics) }
+    /** Preparación en curso, con sus alarmas y avisos (tareas 3.7 y 3.8). */
+    val prep by lazy { PrepSessionManager(appScope, clock, zone, events, routines, history, haptics, alarms, notifier) }
 }

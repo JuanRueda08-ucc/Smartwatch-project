@@ -27,7 +27,11 @@ import com.atiempo.wear.ui.routines.RoutineEditScreen
 import com.atiempo.wear.ui.routines.RoutinesScreen
 import com.atiempo.wear.ui.settings.SettingsScreen
 import com.atiempo.wear.ui.summary.SummaryScreen
+import com.atiempo.wear.domain.PrepPhase
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 /** Id provisional mientras las pantallas no leen la base de datos (Fase 3). */
 private const val SAMPLE_ID = 1L
@@ -37,7 +41,7 @@ private const val SAMPLE_ID = 1L
  * (`design/prototipo/index.html`).
  */
 @Composable
-fun AppNavHost(container: AppContainer) {
+fun AppNavHost(container: AppContainer, openPrepRequest: Int = 0) {
     val nav = rememberSwipeDismissableNavController()
     val scope = rememberCoroutineScope()
 
@@ -47,6 +51,15 @@ fun AppNavHost(container: AppContainer) {
         container.prep.autoStarted.collect { sessionId ->
             if (nav.currentDestination?.route != Routes.PREP) nav.navigate(Routes.prep(sessionId))
         }
+    }
+    // Se tocó el aviso (o se abrió a pantalla completa): ir a la preparación en curso. Si la app estaba
+    // cerrada, la sesión se recupera en un momento; se espera hasta 3 s.
+    LaunchedEffect(openPrepRequest) {
+        if (openPrepRequest == 0) return@LaunchedEffect
+        val session = withTimeoutOrNull(3_000) {
+            container.prep.active.filterNotNull().first { it.state.phase == PrepPhase.ACTIVE }
+        } ?: return@LaunchedEffect
+        if (nav.currentDestination?.route != Routes.PREP) nav.navigate(Routes.prep(session.sessionId))
     }
 
     SwipeDismissableNavHost(navController = nav, startDestination = Routes.HOME) {

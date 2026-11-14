@@ -38,6 +38,7 @@ class HistoryRepository(private val sessions: PrepSessionDao, private val steps:
     suspend fun updateSession(session: PrepSession) = sessions.update(session)
     suspend fun session(id: Long): PrepSession? = sessions.get(id)
     suspend fun sessionForEvent(eventId: Long): PrepSession? = sessions.forEvent(eventId)
+    suspend fun openSession(): PrepSession? = sessions.latestOpen()
     /** Ids de eventos para los que la persona ya salió. */
     fun leftEventIds(): Flow<Set<Long>> = sessions.observeLeftEventIds().map { it.toSet() }
     suspend fun recordsFor(sessionId: Long): List<StepRecord> = steps.forSession(sessionId)
