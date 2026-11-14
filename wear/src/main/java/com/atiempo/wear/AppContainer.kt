@@ -12,6 +12,7 @@ import com.atiempo.wear.data.repo.RoutineRepository
 import com.atiempo.wear.data.session.PrepSessionManager
 import com.atiempo.wear.data.settings.SettingsRepository
 import com.atiempo.wear.domain.time.Clock
+import com.atiempo.wear.domain.time.DemoClock
 import com.atiempo.wear.domain.time.SystemClock
 import kotlinx.coroutines.CoroutineScope
 import java.time.ZoneId
@@ -19,8 +20,9 @@ import java.time.ZoneId
 /** Dependencias de la app creadas a mano, sin Hilt (AGENTS.md). */
 class AppContainer(context: Context, appScope: CoroutineScope) {
     val settings = SettingsRepository(context)
-    /** Reloj de la app; el modo demo (3.12) lo reemplazará por uno acelerado. */
-    val clock: Clock = SystemClock
+    /** Reloj de la app. En modo demo avanza 12 veces más rápido (tarea 3.12, D-029). */
+    val demoClock = DemoClock(SystemClock)
+    val clock: Clock = demoClock
     val zone: ZoneId get() = ZoneId.systemDefault()
     val database: AppDatabase by lazy { AppDatabase.create(context) }
 
@@ -37,4 +39,16 @@ class AppContainer(context: Context, appScope: CoroutineScope) {
 
     /** Preparación en curso, con sus alarmas y avisos (tareas 3.7 y 3.8). */
     val prep by lazy { PrepSessionManager(appScope, clock, zone, events, routines, history, haptics, alarms, notifier) }
+
+    /** Modo demo: salta a unos segundos antes del próximo aviso. false si no hay ninguno. */
+    fun jumpToNextAlert(): Boolean {
+        val next = prep.nextAlertAt() ?: return false
+        demoClock.jumpTo(next - JUMP_LEAD_MS)
+        return true
+    }
+
+    private companion object {
+        /** Llegar 3 s (de la demo) antes del aviso: se ve la cuenta regresiva llegar a cero. */
+        const val JUMP_LEAD_MS = 3_000L
+    }
 }

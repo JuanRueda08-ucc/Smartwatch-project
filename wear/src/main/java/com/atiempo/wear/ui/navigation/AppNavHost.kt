@@ -151,6 +151,10 @@ fun AppNavHost(container: AppContainer, openPrepRequest: Int = 0) {
             RoutineEditRoute(container, routineId)
         }
         composable(Routes.SUMMARY) { SummaryRoute(container) }
-        composable(Routes.SETTINGS) { SettingsRoute(container) }
+        composable(Routes.SETTINGS) {
+            SettingsRoute(container, onJumpedToNextAlert = {
+                if (!nav.popBackStack(Routes.HOME, inclusive = false)) nav.navigate(Routes.HOME)
+            })
+        }
     }
 }

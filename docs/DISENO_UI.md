@@ -229,6 +229,8 @@ Una sola pantalla que cambia según el estado activo:
   `state3Check`, que abre el ajuste del sistema (D-028).
 - Sección "Acerca de": "A Tiempo · versión 0.1". Mantenerla presionada descubre el interruptor "Modo demo · 1 min
   pasa en 5 s".
+- Con el modo demo activo: botón "Ir al próximo aviso", que salta a 3 s (de la demo) antes del siguiente aviso y
+  vuelve a Inicio. Todo, incluida la hora de arriba, usa la hora acelerada.
 - Se llega desde el final de la Lista de eventos.
 
 ## 4. Patrones hápticos

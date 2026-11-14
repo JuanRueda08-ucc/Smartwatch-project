@@ -271,3 +271,16 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   para revisar en un reloj real en la Fase 5.
 - **Modo demo:** se descubre manteniendo presionada la versión; su interruptor queda visible mientras esté activo.
   Acelerar el reloj es la tarea 3.12.
+
+### D-029 · 2026-11-14 · Modo demo (tarea 3.12)
+- **`DemoClock`** (Kotlin puro, 6 pruebas): con el modo demo activo, el reloj de la app avanza 12 veces más rápido
+  desde el momento en que se activa; al apagarlo vuelve a la hora real. `jumpTo` salta y sigue corriendo.
+- **Alarmas en hora real:** el gestor programa la alarma con `Clock.toWallTime`, así los avisos suenan a tiempo
+  también en la demo y con la app cerrada.
+- **"Ir al próximo aviso"** en Ajustes (solo en modo demo): salta a 3 s de la demo antes del siguiente aviso, para
+  presentar el flujo completo sin esperar. Equivale al "Saltar al siguiente aviso" del prototipo.
+- El `TimeText` muestra la hora del reloj de la app, en el mismo formato "7:05".
+- **Limitaciones:** si el sistema reinicia la app en modo demo, la hora acelerada vuelve a empezar desde la hora
+  real. El tema Automático sigue la hora real, no la de la demo.
+- Probado en el emulador: salto → el primer aviso se abre solo → avanza solo a "Prepárate" → Listo → Ya salí →
+  "Saliste a tiempo".

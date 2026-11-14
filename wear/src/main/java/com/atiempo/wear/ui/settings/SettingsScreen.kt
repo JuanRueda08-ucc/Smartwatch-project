@@ -65,7 +65,7 @@ import com.atiempo.wear.ui.theme.LightColors
 
 /** 3.12 Ajustes (`settings`). */
 @Composable
-fun SettingsRoute(container: AppContainer) {
+fun SettingsRoute(container: AppContainer, onJumpedToNextAlert: () -> Unit) {
     val viewModel: SettingsViewModel = viewModel(factory = viewModelFactory { initializer { SettingsViewModel(container.settings) } })
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -83,6 +83,7 @@ fun SettingsRoute(container: AppContainer) {
         onDemo = { viewModel.setDemo(it) },
         onUnlockDemo = viewModel::unlockDemo,
         onAllowFullScreen = { openFullScreenSettings(context) },
+        onJumpToNextAlert = { if (container.jumpToNextAlert()) onJumpedToNextAlert() },
     )
 }
 
@@ -99,6 +100,7 @@ fun SettingsScreen(
     onDemo: (Boolean) -> Unit,
     onUnlockDemo: () -> Unit,
     onAllowFullScreen: () -> Unit,
+    onJumpToNextAlert: () -> Unit = {},
 ) {
     val listState = rememberTransformingLazyColumnState()
     val spec = rememberTransformationSpec()
@@ -166,6 +168,23 @@ fun SettingsScreen(
                         label = stringResource(R.string.settings_demo),
                         detail = stringResource(R.string.settings_demo_detail),
                         spec = spec,
+                    )
+                }
+            }
+            if (state.demoMode) {
+                // Para presentar sin esperar: salta a unos segundos antes del próximo aviso (D-029).
+                item {
+                    Button(
+                        onClick = onJumpToNextAlert,
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, spec),
+                        transformation = SurfaceTransformation(spec),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppTheme.colors.primary,
+                            contentColor = AppTheme.colors.onState,
+                            iconColor = AppTheme.colors.onState,
+                        ),
+                        icon = { Icon(painterResource(R.drawable.ic_timer), contentDescription = null, modifier = Modifier.size(20.dp)) },
+                        label = { Text(text = stringResource(R.string.settings_demo_jump), style = AppTheme.type.button) },
                     )
                 }
             }

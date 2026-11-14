@@ -174,17 +174,25 @@ class PrepSessionManager(
         _active.value = ActiveSession(open.id, event, routine, plan, machine, machine.resume(open.startedAt, now))
     }
 
-    /** Deja programada la alarma a la próxima hora en que algo cambia; solo si cambió. */
-    private fun reschedule(now: Long) {
+    /** Próxima hora (del reloj de la app) en que algo cambia: un aviso, el fin de un paso o "tarde". */
+    fun nextAlertAt(now: Long = clock.now()): Long? {
         val session = _active.value
-        val next = when {
+        return when {
             session == null -> AutoStart.nextFirstAlertAt(upcoming, routineList, now, handledEvents)
             session.state.phase == PrepPhase.ACTIVE -> session.machine.nextWakeUp(session.state, now)
             else -> null
         }
-        if (next != scheduledAt) {
-            alarms.schedule(next)
-            scheduledAt = next
+    }
+
+    /**
+     * Deja programada la alarma a la próxima hora en que algo cambia; solo si cambió. Se programa en hora
+     * real del sistema: en modo demo el reloj de la app va más rápido (D-029).
+     */
+    private fun reschedule(now: Long) {
+        val wall = nextAlertAt(now)?.let { clock.toWallTime(it) }
+        if (wall != scheduledAt) {
+            alarms.schedule(wall)
+            scheduledAt = wall
         }
     }
 

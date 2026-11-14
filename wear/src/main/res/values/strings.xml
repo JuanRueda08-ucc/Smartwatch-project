@@ -199,7 +199,7 @@
     <string name="settings_version_hint">Mantén presionado para opciones de demo</string>
     <string name="settings_demo">Modo demo</string>
     <string name="settings_demo_detail">1 min pasa en 5 s</string>
-    <string name="settings_demo_unlocked">Modo demo disponible</string>
+    <string name="settings_demo_jump">Ir al próximo aviso</string>
 
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>

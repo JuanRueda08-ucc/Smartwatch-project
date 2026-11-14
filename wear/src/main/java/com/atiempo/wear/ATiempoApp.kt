@@ -24,5 +24,7 @@ class ATiempoApp : Application() {
         }
         // Las vibraciones siguen el interruptor de Ajustes.
         appScope.launch { container.settings.vibrationsEnabled.collect { container.haptics.enabled = it } }
+        // Modo demo: el reloj de la app va 12 veces más rápido mientras esté activo.
+        appScope.launch { container.settings.demoMode.collect { container.demoClock.setAccelerated(it) } }
     }
 }

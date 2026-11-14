@@ -116,6 +116,13 @@ por cada "Listo" y cerrar la `PrepSession` con `leftAt` y `minutesLate`. Si no h
 evento cuyo primer aviso llegó (`AutoStart`, Kotlin puro) y la navegación abre su pantalla. La sesión activa vive
 en memoria: si el sistema mata el proceso se pierde (pendiente para la tarea 3.8, D-023).
 
+## Reloj y modo demo
+
+Toda la app lee la hora de `domain/time/Clock`. En `AppContainer` es un `DemoClock`: normal, marca la hora del
+sistema; en modo demo avanza 12 veces más rápido (1 min en 5 s) y puede saltar al próximo aviso. Las alarmas se
+programan con `Clock.toWallTime`, así que también suenan a tiempo durante la demo, y el `TimeText` muestra la hora
+del reloj de la app (`ClockTimeSource`).
+
 ## Avisos
 
 - `AlarmScheduler` programa con `AlarmManager.setExactAndAllowWhileIdle` una alarma por paso.

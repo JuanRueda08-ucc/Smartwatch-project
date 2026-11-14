@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.foundation.CurvedTextStyle
@@ -22,6 +23,7 @@ import androidx.wear.compose.material3.TimeText
 import androidx.wear.compose.material3.timeTextCurvedText
 import com.atiempo.wear.domain.ThemeResolver
 import com.atiempo.wear.domain.model.ThemeMode
+import com.atiempo.wear.ui.components.ClockTimeSource
 import com.atiempo.wear.ui.navigation.AppNavHost
 import com.atiempo.wear.ui.theme.ATiempoTheme
 import com.atiempo.wear.ui.theme.AppTheme
@@ -46,7 +48,9 @@ class MainActivity : ComponentActivity() {
                 // AppScaffold pone el TimeText curvo arriba en todas las pantallas. El color se fija
                 // a `onSurface`: el predeterminado de Wear se ve casi blanco sobre el fondo claro.
                 val timeStyle = CurvedTextStyle(AppTheme.type.timeText.copy(color = AppTheme.colors.onSurface))
-                AppScaffold(timeText = { TimeText { time -> timeTextCurvedText(time, timeStyle) } }) {
+                // La hora sale del reloj de la app: en modo demo es la hora acelerada.
+                val timeSource = remember { ClockTimeSource(container.clock, container.zone) }
+                AppScaffold(timeText = { TimeText(timeSource = timeSource) { time -> timeTextCurvedText(time, timeStyle) } }) {
                     AppNavHost(container, openPrepRequest = openPrepRequests.intValue)
                 }
             }
