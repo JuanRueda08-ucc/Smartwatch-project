@@ -213,7 +213,9 @@ Una sola pantalla que cambia según el estado activo:
 
 ### 3.11 Resumen semanal (`summary`)
 - Arriba: porcentaje de salidas a tiempo en grande, con anillo de progreso.
-- Gráfico de 7 barras (lunes a domingo) coloreadas según puntualidad.
+- Gráfico de 7 barras de los **últimos 7 días incluido hoy** (D-027), en orden y con la inicial del día debajo.
+  A tiempo: `state4Leave`; tarde: `late` con rayas (nunca solo color); sin salidas: barra mínima `surfaceBright`.
+  El alto es el margen (o el retraso) promedio del día. Debajo, la leyenda "A tiempo / Tarde".
 - Una frase de tendencia: "Esta semana saliste a tiempo 5 de 6 veces. Tu mejor día fue el miércoles."
 
 ### 3.12 Ajustes (`settings`)

@@ -252,3 +252,12 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
 - **Corona:** no ajusta los minutos en esta entrega (la especificación la daba como alternativa).
 - **Para la demo:** las pruebas en el emulador dejaron duraciones reales de 1 min en el historial de Cita; borrar
   los datos de la app antes de presentar (Fase 5).
+
+### D-027 · 2026-11-14 · Resumen semanal (tarea 3.11)
+- **Últimos 7 días incluido hoy**, no la semana de lunes a domingo: el día de la entrega (martes) la semana
+  calendario tendría solo dos días, y así el resumen refleja también las salidas de la demo de ese día. Las barras
+  van del más antiguo a hoy, con la inicial del día.
+- Solo cuentan las salidas con "Ya salí"; 0 min tarde o menos es a tiempo. Un día con alguna salida tarde es día
+  tarde. El mejor día es el de más margen. Frase con plurales ("1 vez" / "6 veces").
+- **Corrección:** la recuperación de la sesión en curso (D-024) ignora una sesión que "empezó" después de ahora;
+  venía de cambiar la hora del reloj en las pruebas y dejaba una preparación fantasma en Inicio.

@@ -161,6 +161,8 @@ class PrepSessionManager(
         val now = clock.now()
         upcoming.forEach { event -> if (history.sessionForEvent(event.id) != null) handledEvents += event.id }
         val open = history.openSession() ?: return
+        // Una sesión que "empezó" después de ahora viene de un cambio de hora del reloj: no se recupera.
+        if (open.startedAt > now) return
         // Si ese evento tiene una sesión más reciente (por ejemplo, se empezó de nuevo y se terminó),
         // la abierta quedó abandonada: no se recupera.
         if (history.sessionForEvent(open.eventId)?.id != open.id) return

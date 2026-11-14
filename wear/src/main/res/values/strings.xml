@@ -153,6 +153,40 @@
     <string name="a11y_routine_bar">%1$s: %2$d min</string>
     <string name="a11y_step_minutes">%1$s: %2$d minutos</string>
 
+    <!-- 3.11 Resumen semanal -->
+    <string name="summary_period">Últimos 7 días</string>
+    <string name="summary_on_time_label">salidas a tiempo</string>
+    <string name="summary_percent_unit">%</string>
+    <string name="summary_legend_on_time">A tiempo</string>
+    <string name="summary_legend_late">Tarde</string>
+    <plurals name="summary_trend">
+        <item quantity="one">Saliste a tiempo %1$d de %2$d vez.</item>
+        <item quantity="other">Saliste a tiempo %1$d de %2$d veces.</item>
+    </plurals>
+    <string name="summary_best_day">Tu mejor día fue el %1$s.</string>
+    <string name="summary_none">Aún no hay salidas en los últimos 7 días.</string>
+    <string name="a11y_summary_day_none">%1$s: sin salidas</string>
+    <string name="a11y_summary_day_on_time">%1$s: a tiempo</string>
+    <string name="a11y_summary_day_late">%1$s: tarde</string>
+    <string-array name="weekday_initials">
+        <item>L</item>
+        <item>M</item>
+        <item>X</item>
+        <item>J</item>
+        <item>V</item>
+        <item>S</item>
+        <item>D</item>
+    </string-array>
+    <string-array name="weekdays_lower">
+        <item>lunes</item>
+        <item>martes</item>
+        <item>miércoles</item>
+        <item>jueves</item>
+        <item>viernes</item>
+        <item>sábado</item>
+        <item>domingo</item>
+    </string-array>
+
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>
     <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
@@ -161,7 +195,6 @@
     <string name="explain_title">¿Por qué te avisé antes?</string>
     <string name="routines_title">Rutinas</string>
     <string name="summary_title">Resumen semanal</string>
-    <string name="summary_placeholder">Tus salidas a tiempo de la semana</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_placeholder">Tema y vibraciones</string>
 
