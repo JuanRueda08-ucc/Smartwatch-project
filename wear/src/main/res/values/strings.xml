@@ -113,13 +113,40 @@
     <string name="a11y_checked">Revisado</string>
     <string name="a11y_unchecked">Sin revisar</string>
 
+    <!-- 3.8 ¿Por qué te avisé antes? -->
+    <string name="explain_minutes_plus">+%1$d min</string>
+    <string name="explain_minutes_minus">−%1$d min</string>
+    <string name="explain_total_before">En total te aviso %1$d min antes</string>
+    <string name="explain_total_after">En total te aviso %1$d min después</string>
+    <string name="explain_learned">Últimamente tardas %1$d min en %2$s</string>
+    <string name="explain_day">Los %1$s tardas más en %2$s</string>
+    <string name="explain_rain">Hay lluvia prevista</string>
+    <string name="explain_traffic_medium">Tráfico medio hacia %1$s</string>
+    <string name="explain_traffic_high">Tráfico alto hacia %1$s</string>
+    <string name="explain_traffic_somewhere">tu destino</string>
+    <string name="explain_manual">Tú ajustaste «%1$s» a %2$d min</string>
+    <string name="explain_margin">Margen para llegar con calma</string>
+    <string name="step_travel">Trayecto</string>
+    <string name="step_verb_finish">terminar lo que haces</string>
+    <string name="step_verb_prepare">prepararte</string>
+    <string name="step_verb_check">revisar tus cosas</string>
+    <string name="step_verb_leave">llegar</string>
+    <string-array name="weekdays_plural">
+        <item>lunes</item>
+        <item>martes</item>
+        <item>miércoles</item>
+        <item>jueves</item>
+        <item>viernes</item>
+        <item>sábados</item>
+        <item>domingos</item>
+    </string-array>
+
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>
     <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
     <string name="detail_title">Detalle del evento</string>
     <string name="detail_placeholder">Línea de tiempo de los 4 estados con sus horas</string>
     <string name="explain_title">¿Por qué te avisé antes?</string>
-    <string name="explain_placeholder">Las razones de cada ajuste, en minutos</string>
     <string name="routine_edit_title">Ajustar estimaciones</string>
     <string name="routine_edit_placeholder">Minutos de cada paso de la rutina</string>
     <string name="routines_title">Rutinas</string>

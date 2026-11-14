@@ -43,7 +43,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 - [x] 3.7 Pantallas de los 4 estados con anillo de progreso y botón "Listo".
 - [x] 3.8 Avisos programados (`AlarmManager` + notificación de pantalla completa) y vibraciones
       con `VibrationEffect.createWaveform`.
-- [ ] 3.9 Pantalla "¿Por qué te avisé antes?".
+- [x] 3.9 Pantalla "¿Por qué te avisé antes?".
 - [ ] 3.10 Ajuste manual de estimaciones por rutina y por paso.
 - [ ] 3.11 Resumen semanal de puntualidad.
 - [ ] 3.11b Ajustes: selector de tema (Claro / Oscuro / Automático) y vibraciones.

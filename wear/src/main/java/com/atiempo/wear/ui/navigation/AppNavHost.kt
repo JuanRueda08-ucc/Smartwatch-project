@@ -19,7 +19,7 @@ import com.atiempo.wear.ui.create.ConfirmTimeRoute
 import com.atiempo.wear.ui.create.CreateVoiceRoute
 import com.atiempo.wear.ui.detail.EventDetailRoute
 import com.atiempo.wear.ui.events.EventsRoute
-import com.atiempo.wear.ui.explain.ExplainScreen
+import com.atiempo.wear.ui.explain.ExplainRoute
 import com.atiempo.wear.ui.home.HomeRoute
 import com.atiempo.wear.ui.prep.PrepDoneRoute
 import com.atiempo.wear.ui.prep.PrepRoute
@@ -142,8 +142,9 @@ fun AppNavHost(container: AppContainer, openPrepRequest: Int = 0) {
                 if (!nav.popBackStack(Routes.HOME, inclusive = false)) nav.navigate(Routes.HOME)
             })
         }
-        composable(Routes.EXPLAIN) {
-            ExplainScreen(onNotRight = { nav.navigate(Routes.routineEdit(SAMPLE_ID)) })
+        composable(Routes.EXPLAIN) { entry ->
+            val eventId = entry.arguments?.getString(Routes.ARG_EVENT_ID)?.toLongOrNull() ?: return@composable
+            ExplainRoute(container, eventId, onNotRight = { routineId -> nav.navigate(Routes.routineEdit(routineId)) })
         }
         composable(Routes.ROUTINES) {
             RoutinesScreen(onEditRoutine = { nav.navigate(Routes.routineEdit(SAMPLE_ID)) })

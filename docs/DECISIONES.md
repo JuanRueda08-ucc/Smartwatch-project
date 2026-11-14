@@ -231,3 +231,13 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
 - **Pendiente:** abrirse solo a pantalla completa requiere el acceso especial `USE_FULL_SCREEN_INTENT`, que
   Android 14+ concede por defecto solo a apps de alarma y llamadas; en el emulador quedó rechazado. Falta guiar
   a la persona a concederlo en Ajustes (3.11b) y probar el tema oscuro de los avisos.
+
+### D-025 · 2026-11-14 · Pantalla "¿Por qué te avisé antes?" (tarea 3.9)
+- **Razones como datos** (`Adjustment` con `AdjustmentReason`: base aprendida, día, lluvia, tráfico, ajuste manual,
+  margen). La pantalla arma cada frase desde `strings.xml`, como pide AGENTS.md, y el estimador de la Fase 4
+  solo tendrá que producir esa lista.
+- **Fuente provisional:** hasta que exista el `DurationEstimator`, la lista sale de la rutina: cada ajuste manual
+  distinto del valor por defecto y el margen de seguridad. La preview ya muestra el ejemplo completo de
+  DISENO_UI §3.8 (lunes, tráfico, lluvia).
+- Probado en el emulador con un evento de Clase: "+5 min · Margen…", "−2 min · Tú ajustaste «Revisa tus cosas»
+  a 5 min" y "En total te aviso 3 min antes".
