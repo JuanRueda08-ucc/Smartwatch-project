@@ -241,3 +241,14 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   DISENO_UI §3.8 (lunes, tráfico, lluvia).
 - Probado en el emulador con un evento de Clase: "+5 min · Margen…", "−2 min · Tú ajustaste «Revisa tus cosas»
   a 5 min" y "En total te aviso 3 min antes".
+
+### D-026 · 2026-11-14 · Ajustar estimaciones y Rutinas (tarea 3.10)
+- **Base aprendida ya calculada:** `LearnedDuration.ema` (α = 0.3, MODELO_ESTIMACION) sobre el historial de cada
+  rutina y paso, con pruebas; el DurationEstimator de la Fase 4 la reutilizará.
+- **Valor que se muestra:** el ajuste manual, si no lo aprendido, si no el valor por defecto de la rutina; la lista de
+  Rutinas y el editor usan la misma regla. **Hasta la Fase 4 los avisos (el plan) todavía usan el ajuste manual o el
+  valor por defecto, no lo aprendido**: conectarlo es la tarea 4.1.
+- **Guardado al instante** con − y + (sin "Guardar"), de 1 a 90 min; "Usar lo aprendido" quita el ajuste.
+- **Corona:** no ajusta los minutos en esta entrega (la especificación la daba como alternativa).
+- **Para la demo:** las pruebas en el emulador dejaron duraciones reales de 1 min en el historial de Cita; borrar
+  los datos de la app antes de presentar (Fase 5).

@@ -44,7 +44,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 - [x] 3.8 Avisos programados (`AlarmManager` + notificación de pantalla completa) y vibraciones
       con `VibrationEffect.createWaveform`.
 - [x] 3.9 Pantalla "¿Por qué te avisé antes?".
-- [ ] 3.10 Ajuste manual de estimaciones por rutina y por paso.
+- [x] 3.10 Ajuste manual de estimaciones por rutina y por paso.
 - [ ] 3.11 Resumen semanal de puntualidad.
 - [ ] 3.11b Ajustes: selector de tema (Claro / Oscuro / Automático) y vibraciones.
 - [ ] 3.12 Modo demo: botón oculto que acelera el reloj (1 min = 5 s) para presentar el flujo completo.

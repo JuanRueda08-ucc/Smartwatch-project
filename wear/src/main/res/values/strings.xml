@@ -141,16 +141,25 @@
         <item>domingos</item>
     </string-array>
 
+    <!-- 3.9 / 3.10 Rutinas y Ajustar estimaciones -->
+    <string name="routines_total">%1$d min</string>
+    <string name="routine_edit_hint">Minutos de cada paso</string>
+    <string name="routine_learned">Aprendido: %1$d min</string>
+    <string name="routine_no_history">Aún sin historial</string>
+    <string name="routine_your_value">Tu ajuste: %1$d min</string>
+    <string name="routine_use_learned">Usar lo aprendido</string>
+    <string name="routine_less">Menos minutos</string>
+    <string name="routine_more">Más minutos</string>
+    <string name="a11y_routine_bar">%1$s: %2$d min</string>
+    <string name="a11y_step_minutes">%1$s: %2$d minutos</string>
+
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>
     <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
     <string name="detail_title">Detalle del evento</string>
     <string name="detail_placeholder">Línea de tiempo de los 4 estados con sus horas</string>
     <string name="explain_title">¿Por qué te avisé antes?</string>
-    <string name="routine_edit_title">Ajustar estimaciones</string>
-    <string name="routine_edit_placeholder">Minutos de cada paso de la rutina</string>
     <string name="routines_title">Rutinas</string>
-    <string name="routines_placeholder">Clase, Cita y Salida social</string>
     <string name="summary_title">Resumen semanal</string>
     <string name="summary_placeholder">Tus salidas a tiempo de la semana</string>
     <string name="settings_title">Ajustes</string>
@@ -171,7 +180,6 @@
     <string name="action_left">Ya salí</string>
     <string name="action_done">Listo</string>
     <string name="action_not_right">No es así</string>
-    <string name="action_adjust_routine">Ajustar Clase</string>
 
     <!-- Ajustes -->
     <string name="settings_theme">Tema</string>

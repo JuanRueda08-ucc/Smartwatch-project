@@ -23,8 +23,8 @@ import com.atiempo.wear.ui.explain.ExplainRoute
 import com.atiempo.wear.ui.home.HomeRoute
 import com.atiempo.wear.ui.prep.PrepDoneRoute
 import com.atiempo.wear.ui.prep.PrepRoute
-import com.atiempo.wear.ui.routines.RoutineEditScreen
-import com.atiempo.wear.ui.routines.RoutinesScreen
+import com.atiempo.wear.ui.routines.RoutineEditRoute
+import com.atiempo.wear.ui.routines.RoutinesRoute
 import com.atiempo.wear.ui.settings.SettingsScreen
 import com.atiempo.wear.ui.summary.SummaryScreen
 import com.atiempo.wear.domain.PrepPhase
@@ -32,9 +32,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-
-/** Id provisional mientras las pantallas no leen la base de datos (Fase 3). */
-private const val SAMPLE_ID = 1L
 
 /**
  * Grafo de navegación con deslizar para volver. Los enlaces siguen el prototipo aprobado
@@ -147,9 +144,12 @@ fun AppNavHost(container: AppContainer, openPrepRequest: Int = 0) {
             ExplainRoute(container, eventId, onNotRight = { routineId -> nav.navigate(Routes.routineEdit(routineId)) })
         }
         composable(Routes.ROUTINES) {
-            RoutinesScreen(onEditRoutine = { nav.navigate(Routes.routineEdit(SAMPLE_ID)) })
+            RoutinesRoute(container, onEditRoutine = { routineId -> nav.navigate(Routes.routineEdit(routineId)) })
         }
-        composable(Routes.ROUTINE_EDIT) { RoutineEditScreen() }
+        composable(Routes.ROUTINE_EDIT) { entry ->
+            val routineId = entry.arguments?.getString(Routes.ARG_ROUTINE_ID)?.toLongOrNull() ?: return@composable
+            RoutineEditRoute(container, routineId)
+        }
         composable(Routes.SUMMARY) { SummaryScreen() }
         composable(Routes.SETTINGS) {
             val mode by container.settings.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.LIGHT)

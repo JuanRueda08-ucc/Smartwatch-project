@@ -202,11 +202,14 @@ Una sola pantalla que cambia según el estado activo:
 
 ### 3.9 Ajustar estimaciones (`routine/{id}/edit`)
 - Por cada paso, un selector de minutos con botones − y + (o rotación de la corona/bisel).
-- Indica "Aprendido: 18 min" y "Tu ajuste: 15 min".
+- Indica "Aprendido: 18 min" (o "Aún sin historial") y, si hay ajuste, "Tu ajuste: 15 min" en el color del estado
+  con "Usar lo aprendido" para quitarlo. El valor que se ve es el ajuste, si no lo aprendido, si no el de la rutina.
+- Botones − y + de 48 dp. Cada toque se guarda al instante (sin botón "Guardar"); rango de 1 a 90 min.
 
 ### 3.10 Rutinas (`routines`)
-- Tres rutinas iniciales: **Clase**, **Cita**, **Salida social**. Cada una con sus 4 duraciones y su lista
-  de objetos.
+- Tres rutinas iniciales: **Clase**, **Cita**, **Salida social**. Cada tarjeta: nombre, total, una barra con un
+  tramo por paso en el color de su estado y largo proporcional a sus minutos, y la lista de objetos. Tocarla
+  abre Ajustar estimaciones.
 
 ### 3.11 Resumen semanal (`summary`)
 - Arriba: porcentaje de salidas a tiempo en grande, con anillo de progreso.
