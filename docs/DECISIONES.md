@@ -284,3 +284,22 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   real. El tema Automático sigue la hora real, no la de la demo.
 - Probado en el emulador: salto → el primer aviso se abre solo → avanza solo a "Prepárate" → Listo → Ya salí →
   "Saliste a tiempo".
+
+### D-030 · 2026-11-14 · Estimador de duraciones (tarea 4.1)
+- **`DurationEstimator`** (Kotlin puro, 10 pruebas) sigue `MODELO_ESTIMACION.md`: base = ajuste manual, si no la
+  media móvil (α = 0.3), si no el valor por defecto; efecto del día con 3 o más registros de ese día, limitado a
+  ±10 min; lluvia (+15 %, mínimo 2 min) y tráfico (+10 % / +25 %) solo en el trayecto. Cada término distinto de cero
+  es una razón (`Adjustment`), ordenadas de mayor a menor efecto. El margen lo sigue sumando `PrepPlanner`.
+- **Un ajuste manual no borra el día ni el contexto:** reemplaza la base y su razón dice cuánto movió respecto a lo
+  aprendido; el efecto del día y el clima se suman encima.
+- **Conectado en toda la app:** `Routine.planFor(event, data)` y `Routine.explain(event, data)` usan el estimador con
+  el historial real (`StepRecordDao.observeAll` → `EstimationData`, agrupado por rutina y paso). Inicio, Eventos,
+  Detalle, "¿Por qué te avisé antes?", el arranque automático y las alarmas ven los mismos tiempos. Cierra la
+  limitación de D-026.
+- **El plan se fija al empezar:** lo que se registre durante una preparación cuenta para la siguiente, no mueve los
+  avisos de la que está en curso.
+- El trayecto por defecto es el del evento (`baseTravelMin`, depende del lugar), no el de la rutina.
+- El contexto (clima y tráfico) llega vacío hasta la tarea 4.2.
+- Probado en el emulador: "Cine con Laura" muestra "Últimamente tardas 28 min en llegar" (+3) y las demás razones
+  aprendidas. Los registros de 1 a 3 min que dejaron las pruebas bajan la media de Clase: limpiar los datos de la
+  app antes de la presentación (Fase 5).

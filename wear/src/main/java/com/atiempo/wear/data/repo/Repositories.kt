@@ -44,4 +44,16 @@ class HistoryRepository(private val sessions: PrepSessionDao, private val steps:
     suspend fun recordsFor(sessionId: Long): List<StepRecord> = steps.forSession(sessionId)
     suspend fun record(step: StepRecord): Long = steps.insert(step)
     suspend fun history(routineId: Long, step: PrepStep): List<StepRecord> = steps.history(routineId, step)
+
+    /** El historial agrupado por rutina y paso, para el DurationEstimator. */
+    fun estimationData(zone: java.time.ZoneId): Flow<EstimationData> = steps.observeAll().map { records ->
+        EstimationData(
+            history = records.groupBy { it.routineId }.mapValues { (_, byRoutine) ->
+                byRoutine.groupBy { it.step }.mapValues { (_, list) ->
+                    list.map { com.atiempo.wear.domain.StepHistory(it.actualMin, it.dayOfWeek) }
+                }
+            },
+            zone = zone,
+        )
+    }
 }

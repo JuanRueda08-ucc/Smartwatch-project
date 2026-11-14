@@ -2,6 +2,7 @@ package com.atiempo.wear.ui.detail
 
 import com.atiempo.wear.data.db.Event
 import com.atiempo.wear.data.db.Routine
+import com.atiempo.wear.data.repo.EstimationData
 import com.atiempo.wear.data.repo.planFor
 import com.atiempo.wear.domain.model.PrepStep
 import java.time.DayOfWeek
@@ -36,10 +37,16 @@ sealed interface EventDetailUiState {
 /** Lógica pura del Detalle del evento (DISENO_UI §3.3). */
 object EventDetailStateMapper {
 
-    fun map(event: Event?, routines: List<Routine>, now: Long, zone: ZoneId): EventDetailUiState {
+    fun map(
+        event: Event?,
+        routines: List<Routine>,
+        now: Long,
+        zone: ZoneId,
+        data: EstimationData = EstimationData.NONE,
+    ): EventDetailUiState {
         val routine = event?.let { e -> routines.firstOrNull { it.id == e.routineId } }
             ?: return EventDetailUiState.NotFound
-        val plan = routine.planFor(event)
+        val plan = routine.planFor(event, data)
         val starts = PrepStep.entries.map { plan.startOf(it) }
         // Cada paso dura hasta que empieza el siguiente; el último, hasta la hora del evento.
         val ends = starts.drop(1) + plan.eventAt

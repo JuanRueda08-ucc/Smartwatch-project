@@ -70,7 +70,7 @@ fun EventDetailRoute(
     val viewModel: EventDetailViewModel = viewModel(
         key = "event-$eventId",
         factory = viewModelFactory {
-            initializer { EventDetailViewModel(eventId, container.events, container.routines, container.clock, container.zone) }
+            initializer { EventDetailViewModel(eventId, container.events, container.routines, container.clock, container.zone, container.estimation) }
         },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()

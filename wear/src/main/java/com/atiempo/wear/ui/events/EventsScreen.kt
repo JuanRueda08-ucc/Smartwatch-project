@@ -58,7 +58,7 @@ fun EventsRoute(
 ) {
     val viewModel: EventsViewModel = viewModel(
         factory = viewModelFactory {
-            initializer { EventsViewModel(container.events, container.routines, container.clock, container.zone) }
+            initializer { EventsViewModel(container.events, container.routines, container.clock, container.zone, container.estimation) }
         },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()

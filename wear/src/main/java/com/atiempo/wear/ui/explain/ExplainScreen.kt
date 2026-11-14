@@ -59,7 +59,7 @@ import kotlin.math.abs
 fun ExplainRoute(container: AppContainer, eventId: Long, onNotRight: (routineId: Long) -> Unit) {
     val viewModel: ExplainViewModel = viewModel(
         key = "explain-$eventId",
-        factory = viewModelFactory { initializer { ExplainViewModel(eventId, container.events, container.routines) } },
+        factory = viewModelFactory { initializer { ExplainViewModel(eventId, container.events, container.routines, container.estimation) } },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
     ExplainScreen(state, onNotRight)

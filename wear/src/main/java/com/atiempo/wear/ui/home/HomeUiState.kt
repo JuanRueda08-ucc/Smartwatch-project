@@ -2,6 +2,7 @@ package com.atiempo.wear.ui.home
 
 import com.atiempo.wear.data.db.Event
 import com.atiempo.wear.data.db.Routine
+import com.atiempo.wear.data.repo.EstimationData
 import com.atiempo.wear.data.repo.planFor
 import java.time.DayOfWeek
 import java.time.Instant
@@ -57,13 +58,14 @@ object HomeStateMapper {
         now: Long,
         zone: ZoneId,
         leftEventIds: Set<Long> = emptySet(),
+        data: EstimationData = EstimationData.NONE,
     ): HomeUiState {
         val routineById = routines.associateBy { it.id }
         val next = events
             .filter { it.startAt > now && it.routineId in routineById && it.id !in leftEventIds }
             .minByOrNull { it.startAt }
             ?: return HomeUiState.Empty
-        val plan = routineById.getValue(next.routineId).planFor(next)
+        val plan = routineById.getValue(next.routineId).planFor(next, data)
         val remainingMin = (plan.finishAt - now) / MINUTE
         val minutes = maxOf(0, ceil(remainingMin - 1e-9).toInt())
         val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()

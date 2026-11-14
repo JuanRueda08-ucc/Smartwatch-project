@@ -65,7 +65,7 @@ fun HomeRoute(
 ) {
     val viewModel: HomeViewModel = viewModel(
         factory = viewModelFactory {
-            initializer { HomeViewModel(container.events, container.routines, container.clock, container.zone, container.prep, container.history) }
+            initializer { HomeViewModel(container.events, container.routines, container.clock, container.zone, container.prep, container.history, container.estimation) }
         },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()

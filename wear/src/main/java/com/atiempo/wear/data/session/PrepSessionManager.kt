@@ -7,6 +7,7 @@ import com.atiempo.wear.data.db.Event
 import com.atiempo.wear.data.db.PrepSession
 import com.atiempo.wear.data.db.Routine
 import com.atiempo.wear.data.db.StepRecord
+import com.atiempo.wear.data.repo.EstimationData
 import com.atiempo.wear.data.repo.EventRepository
 import com.atiempo.wear.data.repo.HistoryRepository
 import com.atiempo.wear.data.repo.RoutineRepository
@@ -22,6 +23,7 @@ import com.atiempo.wear.domain.time.Clock
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -65,6 +67,7 @@ class PrepSessionManager(
     private val events: EventRepository,
     private val routines: RoutineRepository,
     private val history: HistoryRepository,
+    private val estimationData: Flow<EstimationData>,
     private val haptics: Haptics,
     private val alarms: AlarmScheduler,
     private val notifier: AlertNotifier,
@@ -80,6 +83,8 @@ class PrepSessionManager(
 
     private var upcoming: List<Event> = emptyList()
     private var routineList: List<Routine> = emptyList()
+    /** Historial y contexto para estimar los planes (tarea 4.1). */
+    private var estimation: EstimationData = EstimationData.NONE
     /** Eventos que ya tienen sesión, para no arrancarlos dos veces. */
     private val handledEvents = mutableSetOf<Long>()
     private var scheduledAt: Long? = null
@@ -90,12 +95,14 @@ class PrepSessionManager(
             val first = combine(events.upcoming(from = clock.now() - DAY_MS), routines.all()) { e, r -> e to r }.first()
             upcoming = first.first
             routineList = first.second
+            estimation = estimationData.first()
             mutex.withLock { restore() }
             ready.complete(Unit)
             scope.launch {
                 combine(events.upcoming(from = clock.now() - DAY_MS), routines.all()) { e, r -> e to r }
                     .collect { (e, r) -> upcoming = e; routineList = r }
             }
+            scope.launch { estimationData.collect { estimation = it } }
             while (true) {
                 tick()
                 delay(TICK_MS)
@@ -141,7 +148,7 @@ class PrepSessionManager(
         val now = clock.now()
         val current = _active.value
         if (current == null) {
-            val event = AutoStart.eventToStart(upcoming, routineList, now, handledEvents)
+            val event = AutoStart.eventToStart(upcoming, routineList, now, handledEvents, estimation)
             if (event != null) {
                 // Si ya tiene sesión guardada (por ejemplo, terminada antes de reiniciar la app), no se repite.
                 if (history.sessionForEvent(event.id) != null) {
@@ -168,7 +175,7 @@ class PrepSessionManager(
         if (history.sessionForEvent(open.eventId)?.id != open.id) return
         val event = events.get(open.eventId)?.takeIf { now < it.startAt } ?: return
         val routine = routineList.firstOrNull { it.id == event.routineId } ?: routines.get(event.routineId) ?: return
-        val plan = routine.planFor(event)
+        val plan = routine.planFor(event, estimation)
         val machine = PrepStateMachine(plan)
         handledEvents += event.id
         _active.value = ActiveSession(open.id, event, routine, plan, machine, machine.resume(open.startedAt, now))
@@ -178,7 +185,7 @@ class PrepSessionManager(
     fun nextAlertAt(now: Long = clock.now()): Long? {
         val session = _active.value
         return when {
-            session == null -> AutoStart.nextFirstAlertAt(upcoming, routineList, now, handledEvents)
+            session == null -> AutoStart.nextFirstAlertAt(upcoming, routineList, now, handledEvents, estimation)
             session.state.phase == PrepPhase.ACTIVE -> session.machine.nextWakeUp(session.state, now)
             else -> null
         }
@@ -198,7 +205,8 @@ class PrepSessionManager(
 
     private suspend fun begin(event: Event, manual: Boolean): Long? {
         val routine = routineList.firstOrNull { it.id == event.routineId } ?: routines.get(event.routineId) ?: return null
-        val plan = routine.planFor(event)
+        // El plan se fija al empezar: lo que se aprenda durante la preparación cuenta para la próxima.
+        val plan = routine.planFor(event, estimation)
         val machine = PrepStateMachine(plan)
         val now = clock.now()
         val transition = machine.reduce(PrepState(), if (manual) PrepEvent.Start(now) else PrepEvent.Tick(now))

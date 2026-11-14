@@ -2,6 +2,7 @@ package com.atiempo.wear.ui.events
 
 import com.atiempo.wear.data.db.Event
 import com.atiempo.wear.data.db.Routine
+import com.atiempo.wear.data.repo.EstimationData
 import com.atiempo.wear.data.repo.planFor
 import java.time.DayOfWeek
 import java.time.Instant
@@ -32,7 +33,13 @@ sealed interface EventsUiState {
 /** Lógica pura de la Lista de eventos (DISENO_UI §3.2). */
 object EventsStateMapper {
 
-    fun map(events: List<Event>, routines: List<Routine>, now: Long, zone: ZoneId): EventsUiState.Loaded {
+    fun map(
+        events: List<Event>,
+        routines: List<Routine>,
+        now: Long,
+        zone: ZoneId,
+        data: EstimationData = EstimationData.NONE,
+    ): EventsUiState.Loaded {
         val routineById = routines.associateBy { it.id }
         val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
         val groups = events
@@ -47,7 +54,7 @@ object EventsStateMapper {
                             id = event.id,
                             title = event.title,
                             startAt = event.startAt,
-                            leaveAt = routineById.getValue(event.routineId).planFor(event).leaveAt,
+                            leaveAt = routineById.getValue(event.routineId).planFor(event, data).leaveAt,
                             place = event.place,
                         )
                     },

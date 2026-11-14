@@ -94,6 +94,10 @@ interface StepRecordDao {
     @Query("SELECT * FROM step_records WHERE routineId = :routineId AND step = :step ORDER BY id")
     suspend fun history(routineId: Long, step: PrepStep): List<StepRecord>
 
+    /** Todo el historial, del más antiguo al más reciente (para el estimador). */
+    @Query("SELECT * FROM step_records ORDER BY id")
+    fun observeAll(): Flow<List<StepRecord>>
+
     @Query("SELECT * FROM step_records WHERE sessionId = :sessionId ORDER BY id")
     suspend fun forSession(sessionId: Long): List<StepRecord>
 

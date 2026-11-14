@@ -2,10 +2,12 @@ package com.atiempo.wear.ui.explain
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.atiempo.wear.data.repo.EstimationData
 import com.atiempo.wear.data.repo.EventRepository
 import com.atiempo.wear.data.repo.RoutineRepository
 import com.atiempo.wear.data.repo.explain
 import com.atiempo.wear.domain.model.Adjustment
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -24,11 +26,16 @@ sealed interface ExplainUiState {
     }
 }
 
-class ExplainViewModel(eventId: Long, events: EventRepository, routines: RoutineRepository) : ViewModel() {
+class ExplainViewModel(
+    eventId: Long,
+    events: EventRepository,
+    routines: RoutineRepository,
+    estimation: Flow<EstimationData>,
+) : ViewModel() {
 
-    val state: StateFlow<ExplainUiState> = combine(events.event(eventId), routines.all()) { event, routineList ->
+    val state: StateFlow<ExplainUiState> = combine(events.event(eventId), routines.all(), estimation) { event, routineList, data ->
         val routine = event?.let { e -> routineList.firstOrNull { it.id == e.routineId } }
         if (event == null || routine == null) ExplainUiState.NotFound
-        else ExplainUiState.Loaded(routine.id, routine.explain(event))
+        else ExplainUiState.Loaded(routine.id, routine.explain(event, data))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ExplainUiState.Loading)
 }

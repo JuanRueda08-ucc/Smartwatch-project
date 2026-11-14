@@ -30,6 +30,9 @@ class AppContainer(context: Context, appScope: CoroutineScope) {
     val routines by lazy { RoutineRepository(database.routineDao()) }
     val history by lazy { HistoryRepository(database.prepSessionDao(), database.stepRecordDao()) }
 
+    /** Datos del estimador: historial (y, desde la tarea 4.2, el contexto). */
+    val estimation by lazy { history.estimationData(zone) }
+
     /** Evento dictado que espera confirmación (tareas 3.4 y 3.5). */
     val drafts = DraftStore()
 
@@ -38,7 +41,7 @@ class AppContainer(context: Context, appScope: CoroutineScope) {
     private val notifier = AlertNotifier(context)
 
     /** Preparación en curso, con sus alarmas y avisos (tareas 3.7 y 3.8). */
-    val prep by lazy { PrepSessionManager(appScope, clock, zone, events, routines, history, haptics, alarms, notifier) }
+    val prep by lazy { PrepSessionManager(appScope, clock, zone, events, routines, history, estimation, haptics, alarms, notifier) }
 
     /** Modo demo: salta a unos segundos antes del próximo aviso. false si no hay ninguno. */
     fun jumpToNextAlert(): Boolean {
