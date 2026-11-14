@@ -97,7 +97,14 @@ IDLE → FINISH → PREPARE → CHECK → LEAVE → DONE
           (Confirm o fin del tiempo avanza; Confirm registra la duración real)
 ```
 
-Si el usuario confirma antes de tiempo, el siguiente paso empieza en ese momento y el plan se recalcula.
+Si el usuario confirma antes de tiempo, el siguiente paso empieza en ese momento y conserva su hora de fin
+del plan (el paso siguiente tiene más tiempo; la hora de salida no cambia).
+
+Detalles (D-022): es un reductor puro `reduce(estado, evento) → (estado nuevo, efectos)`. Los efectos
+(`StepStarted`, `StepCompleted`, `LateReminder`, `Finished`) los ejecuta quien lo usa: vibrar, guardar el
+`StepRecord`, cerrar la `PrepSession`. El paso LEAVE dura hasta la **hora límite** = salida + margen; pasada
+esa hora se va tarde, con recordatorios cada 60 s (máximo 3). `minutesLate` se mide contra la hora límite:
+0 o menos es a tiempo. Si la app estuvo dormida y se saltaron pasos, va directo al que toca con un solo aviso.
 La detección de movimiento (Activity Recognition) queda fuera de esta entrega; el evento
 `MovementDetected` existe en el motor para mostrar que el diseño lo contempla (D-004).
 

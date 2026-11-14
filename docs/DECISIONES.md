@@ -189,3 +189,14 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
 - **No verificado:** la versión oscura en el emulador (la entrada de voz del sistema se traba al cerrarla), el
   dictado de título y lugar (sin micrófono) y el caso "Esa hora ya pasó" en pantalla (sí está probado con
   pruebas unitarias).
+
+### D-022 · 2026-11-14 · Motor de estados (tarea 3.6)
+- **Reductor puro con efectos.** `PrepStateMachine.reduce(estado, evento)` devuelve el estado nuevo y una lista
+  de efectos; no vibra ni guarda nada. Así se prueba sin Android (15 pruebas) y la tarea 3.7/3.8 decide cómo
+  ejecutar cada efecto.
+- **Hora límite de salida = salida planeada + margen.** El estado 4 "Sal ahora" cuenta hasta esa hora (como el
+  prototipo: 7:40 a 7:42). Salir dentro del margen es "a tiempo"; `minutesLate` se mide contra la hora límite.
+- **Un solo aviso al ponerse al día.** Si la app estuvo dormida y pasaron varios pasos, salta al que toca y
+  vibra una vez, en lugar de encadenar varios patrones.
+- **Sin "Listo" no hay registro.** Solo los pasos confirmados guardan duración real (MODELO_ESTIMACION); los
+  que avanzan solos no se sabe cuánto duraron.
