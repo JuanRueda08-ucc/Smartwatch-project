@@ -2,6 +2,7 @@ package com.atiempo.wear
 
 import android.content.Context
 import com.atiempo.wear.data.db.AppDatabase
+import com.atiempo.wear.data.draft.DraftStore
 import com.atiempo.wear.data.repo.EventRepository
 import com.atiempo.wear.data.repo.HistoryRepository
 import com.atiempo.wear.data.repo.RoutineRepository
@@ -21,4 +22,7 @@ class AppContainer(context: Context) {
     val events by lazy { EventRepository(database.eventDao()) }
     val routines by lazy { RoutineRepository(database.routineDao()) }
     val history by lazy { HistoryRepository(database.prepSessionDao(), database.stepRecordDao()) }
+
+    /** Evento dictado que espera confirmación (tareas 3.4 y 3.5). */
+    val drafts = DraftStore()
 }

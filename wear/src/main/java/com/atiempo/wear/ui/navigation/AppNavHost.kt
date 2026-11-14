@@ -10,7 +10,7 @@ import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.atiempo.wear.AppContainer
 import com.atiempo.wear.domain.model.ThemeMode
 import com.atiempo.wear.ui.create.ConfirmEventScreen
-import com.atiempo.wear.ui.create.CreateVoiceScreen
+import com.atiempo.wear.ui.create.CreateVoiceRoute
 import com.atiempo.wear.ui.detail.EventDetailRoute
 import com.atiempo.wear.ui.events.EventsRoute
 import com.atiempo.wear.ui.explain.ExplainScreen
@@ -65,7 +65,7 @@ fun AppNavHost(container: AppContainer) {
             )
         }
         composable(Routes.CREATE_VOICE) {
-            CreateVoiceScreen(onHeard = {
+            CreateVoiceRoute(container, onParsed = {
                 nav.navigate(Routes.CREATE_CONFIRM) { popUpTo(Routes.CREATE_VOICE) { inclusive = true } }
             })
         }

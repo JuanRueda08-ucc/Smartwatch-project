@@ -6,6 +6,13 @@
     <!-- Patrones hápticos de los 4 estados. Los permisos de avisos llegan en la Fase 3. -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- Visibilidad de paquetes (Android 11+): para saber si hay entrada de voz y texto de Wear. -->
+    <queries>
+        <intent>
+            <action android:name="android.support.wearable.input.action.REMOTE_INPUT" />
+        </intent>
+    </queries>
+
     <application
         android:name=".ATiempoApp"
         android:allowBackup="true"

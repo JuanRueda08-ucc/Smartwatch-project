@@ -55,13 +55,25 @@
     <string name="a11y_step_past">%1$s, %2$s, ya pasó</string>
     <string name="a11y_step_upcoming">%1$s, %2$s</string>
 
+    <!-- 3.4 Crear por voz -->
+    <string name="voice_title">Dicta tu evento</string>
+    <string name="voice_prompt">¿Qué tienes y a qué hora?</string>
+    <string name="voice_speak">Hablar</string>
+    <string name="voice_try_example">O toca un ejemplo</string>
+    <string name="voice_unavailable">La voz no está disponible aquí. Toca un ejemplo.</string>
+    <string name="voice_heard">Entendí</string>
+    <string name="voice_not_understood">No te entendí. Intenta de nuevo o toca un ejemplo.</string>
+    <string name="voice_quote">«%1$s»</string>
+    <string name="voice_example_class">Clase de cálculo mañana a las 7</string>
+    <string name="voice_example_appointment">Cita médica el jueves a las 3 y media</string>
+    <string name="voice_example_social">Cine con Laura el sábado a las 6 de la tarde</string>
+    <string name="a11y_listening">Escuchando</string>
+
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>
     <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
     <string name="detail_title">Detalle del evento</string>
     <string name="detail_placeholder">Línea de tiempo de los 4 estados con sus horas</string>
-    <string name="voice_title">Crear por voz</string>
-    <string name="voice_placeholder">Dicta tu evento y aquí verás la onda mientras escucho</string>
     <string name="confirm_title">Confirmar evento</string>
     <string name="confirm_placeholder">Revisa lo que entendí antes de guardarlo</string>
     <string name="prep_title">Preparación</string>

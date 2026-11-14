@@ -146,8 +146,14 @@ Cada pantalla lleva su ruta de navegación entre paréntesis.
   (no fijo abajo: fijo tapaba la línea de tiempo, D-019). No aparece si el evento ya empezó.
 
 ### 3.4 Crear por voz (`create/voice`)
-- Lanza `RecognizerIntent`. Mientras escucha, onda animada con el color `primary`.
-- Ejemplos debajo: "Clase de cálculo mañana a las 7", "Cita médica el jueves a las 3 y media".
+- Al entrar abre la entrada de texto de Wear (`RemoteInput`: dictado primero, teclado como alternativa,
+  D-020). Mientras está abierta, onda animada de 7 barras en `primary`; en reposo, la onda queda quieta.
+- Título "Dicta tu evento", botón "Hablar" con micrófono para volver a intentarlo.
+- Ejemplos debajo, **tocables**: "Clase de cálculo mañana a las 7", "Cita médica el jueves a las 3 y media",
+  "Cine con Laura el sábado a las 6 de la tarde". Pasan por el mismo intérprete que la voz; sirven de respaldo
+  si la voz falla en la demo.
+- Al entender: check en círculo, "Entendí" y la frase entre comillas durante 1,4 s; luego pasa a Confirmar.
+- Si la entrada vuelve sin texto: "No te entendí. Intenta de nuevo o toca un ejemplo."
 
 ### 3.5 Confirmar evento (`create/confirm`)
 - Muestra lo interpretado en tarjetas editables: título, día y hora, rutina, lugar.

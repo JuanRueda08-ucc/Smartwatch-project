@@ -108,7 +108,7 @@ La detección de movimiento (Activity Recognition) queda fuera de esta entrega; 
 - `AlertReceiver` lanza una notificación con `fullScreenIntent` que abre `prep/{sessionId}` y
   ejecuta el patrón háptico del paso.
 - Permisos en el manifiesto: `VIBRATE`, `POST_NOTIFICATIONS`, `USE_FULL_SCREEN_INTENT`, `WAKE_LOCK`.
-  `RECORD_AUDIO` no hace falta porque `RecognizerIntent` usa el reconocedor del sistema.
+  `RECORD_AUDIO` no hace falta porque la entrada de voz la hace el sistema (`RemoteInput`).
 
 ## Tema
 
@@ -118,7 +118,8 @@ y los `StateColors` correspondientes. En modo `AUTO` se recalcula cada minuto co
 
 ## Voz
 
-`RecognizerIntent.ACTION_RECOGNIZE_SPEECH` con `EXTRA_LANGUAGE = "es-CO"`. El texto pasa a `EventParser`,
+Entrada de texto de Wear con `RemoteInput` (`androidx.wear:wear-input`): dictado o teclado del sistema,
+sin permiso de micrófono (D-020). El texto pasa a `EventParser`,
 un intérprete por reglas (expresiones regulares) que reconoce:
 - Días: hoy, mañana, pasado mañana, lunes…domingo.
 - Horas: "a las 7", "a las 3 y media", "a las 15:30", "7 de la mañana/tarde/noche", "al mediodía".

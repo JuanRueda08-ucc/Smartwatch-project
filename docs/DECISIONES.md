@@ -158,3 +158,18 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   `SurfaceTransformation` (botones, tarjetas, encabezados). En un texto suelto encoge la fila pero no el
   contenido, y el texto se monta sobre la fila vecina al llegar al borde. Corregido también en Eventos.
 - **Provisional:** "Empezar ahora" navega a `prep/{eventId}` hasta que la tarea 3.6 cree sesiones reales.
+
+### D-020 · 2026-11-14 · Crear por voz con RemoteInput y ejemplos tocables (tarea 3.4)
+- **RemoteInput en lugar de RecognizerIntent.** En Wear, `RecognizerIntent` lo atiende Gboard y devuelve una
+  lista vacía cuando la persona escribe con el teclado en vez de dictar. `RemoteInput` (la entrada estándar
+  de Wear, `androidx.wear:wear-input` 1.2.0) ofrece dictado y teclado y devuelve el texto en ambos casos.
+  Tampoco necesita permiso de micrófono.
+- **Ejemplos tocables.** Los ejemplos de la pantalla pasan por el mismo intérprete que la voz. Son el
+  respaldo de la demo si la voz falla, como prevé el recorte 4 de `PLAN.md`.
+- **No verificado en el emulador:** el emulador no tiene micrófono, y su teclado del sistema no devolvió el
+  texto escrito (ni con `RecognizerIntent` ni con `RemoteInput`). Sí se verificó que la entrada se abre con la
+  pregunta de la app, que cancelar vuelve a la pantalla y que los ejemplos llegan a Confirmar. Probar el
+  dictado en un reloj real en la Fase 5.
+- **Intérprete (`EventParser`):** por reglas, sin tildes ni mayúsculas para comparar, con 15 pruebas. La hora
+  sin "de la mañana/tarde" se asume: de 1 a 6, de la tarde; de 7 a 12, como se dijo. Esas horas, el día
+  deducido, la rutina por defecto y el lugar ausente quedan marcados como dudosos para "Revisa esto" (3.5).
