@@ -113,7 +113,7 @@ fun EventsScreen(
                             style = AppTheme.type.body,
                             color = AppTheme.colors.onSurfaceVariant,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth().transformedHeight(this, spec).padding(vertical = 12.dp),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                         )
                     }
                 }
@@ -150,7 +150,6 @@ private fun TransformingLazyColumnItemScope.SectionLabel(text: String, spec: Tra
         color = AppTheme.colors.onSurfaceVariant,
         modifier = Modifier
             .fillMaxWidth()
-            .transformedHeight(this, spec)
             .padding(start = 12.dp, top = 8.dp, bottom = 2.dp),
     )
 }

@@ -146,3 +146,15 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
 - **Corona:** dentro de `SwipeDismissableNavHost` una pantalla solo recibe la corona si pide el foco con
   `requestFocusOnHierarchyActive()`; un `requestFocus()` normal no funciona. Aplica a todas las pantallas.
 - **Emulador:** zona horaria puesta en America/Bogota.
+
+### D-019 · 2026-11-14 · Detalle del evento (tarea 3.3) y listas que se curvan
+- **"Empezar ahora" va al final de la lista**, no fijo abajo. Fijo tapaba casi media pantalla y el primer
+  vistazo mostraba un solo paso de la línea de tiempo. Es una acción secundaria (lo normal es esperar el
+  aviso), así que el primer vistazo se lo queda la línea de tiempo.
+- **Paso resaltado por la hora:** si ya empezó la ventana de preparación, la fila del paso que toca según el
+  reloj va resaltada y las anteriores llevan check. Cuando exista el motor de estados (3.6) se usará el estado
+  real de la sesión.
+- **Regla de `TransformingLazyColumn`:** `transformedHeight` solo va en elementos que también reciben
+  `SurfaceTransformation` (botones, tarjetas, encabezados). En un texto suelto encoge la fila pero no el
+  contenido, y el texto se monta sobre la fila vecina al llegar al borde. Corregido también en Eventos.
+- **Provisional:** "Empezar ahora" navega a `prep/{eventId}` hasta que la tarea 3.6 cree sesiones reales.

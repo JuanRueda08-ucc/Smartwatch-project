@@ -138,8 +138,12 @@ Cada pantalla lleva su ruta de navegación entre paréntesis.
 ### 3.3 Detalle del evento (`event/{id}`)
 - Línea de tiempo vertical de 4 puntos con el color de cada estado y su hora:
   "7:05 Termina lo que haces · 7:15 Prepárate · 7:35 Revisa tus cosas · 7:40 Sal".
+- Cada fila: punto del color del estado, hora (`title`, cifras tabulares) y nombre (`label`). Si ya empezó la
+  preparación, el paso que toca va sobre su color al 12 % con borde y los pasados llevan check y texto atenuado.
+- Debajo, "Llegas a las 7:55".
 - Chip "¿Por qué a esta hora?" → Explicación.
-- Botón "Empezar ahora" para iniciar la secuencia antes de tiempo.
+- Botón "Empezar ahora" para iniciar la secuencia antes de tiempo, como **último elemento de la lista**
+  (no fijo abajo: fijo tapaba la línea de tiempo, D-019). No aparece si el evento ya empezó.
 
 ### 3.4 Crear por voz (`create/voice`)
 - Lanza `RecognizerIntent`. Mientras escucha, onda animada con el color `primary`.

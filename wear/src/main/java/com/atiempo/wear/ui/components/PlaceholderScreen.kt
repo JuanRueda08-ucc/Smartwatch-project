@@ -53,7 +53,7 @@ fun PlaceholderScreen(
                     style = AppTheme.type.label,
                     color = AppTheme.colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().transformedHeight(this, spec).padding(bottom = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                 )
             }
             links.forEach { link ->

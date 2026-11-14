@@ -5,6 +5,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.Brush
+import androidx.wear.compose.material3.SurfaceTransformation
 import com.atiempo.wear.ui.theme.TINT_ALPHA
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -78,12 +80,35 @@ fun BoxScope.BottomActionButton(
     )
 }
 
+/**
+ * Degradado al color de fondo detrás del botón inferior: el contenido que se desplaza se desvanece
+ * antes de pasar bajo el botón (como en el prototipo).
+ */
+@Composable
+fun BoxScope.BottomFade() {
+    val background = AppTheme.colors.background
+    Box(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .fillMaxWidth()
+            .height(BottomAction.ReservedHeight + 16.dp)
+            .background(Brush.verticalGradient(0f to background.copy(alpha = 0f), 0.45f to background)),
+    )
+}
+
 /** Chip en píldora sobre `surface`, para acciones secundarias como "Ver plan". */
 @Composable
-fun ChipButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier, @DrawableRes icon: Int? = null) {
+fun ChipButton(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    @DrawableRes icon: Int? = null,
+    transformation: SurfaceTransformation? = null,
+) {
     Button(
         onClick = onClick,
         modifier = modifier.height(48.dp),
+        transformation = transformation,
         colors = ButtonDefaults.buttonColors(
             containerColor = AppTheme.colors.surface,
             contentColor = AppTheme.colors.onSurface,

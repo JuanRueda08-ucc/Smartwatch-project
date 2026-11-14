@@ -11,7 +11,7 @@ import com.atiempo.wear.AppContainer
 import com.atiempo.wear.domain.model.ThemeMode
 import com.atiempo.wear.ui.create.ConfirmEventScreen
 import com.atiempo.wear.ui.create.CreateVoiceScreen
-import com.atiempo.wear.ui.detail.EventDetailScreen
+import com.atiempo.wear.ui.detail.EventDetailRoute
 import com.atiempo.wear.ui.events.EventsRoute
 import com.atiempo.wear.ui.explain.ExplainScreen
 import com.atiempo.wear.ui.home.HomeRoute
@@ -54,10 +54,14 @@ fun AppNavHost(container: AppContainer) {
                 onSettings = { nav.navigate(Routes.SETTINGS) },
             )
         }
-        composable(Routes.EVENT_DETAIL) {
-            EventDetailScreen(
-                onWhyThisTime = { nav.navigate(Routes.explain(SAMPLE_ID)) },
-                onStartNow = { nav.navigate(Routes.prep(SAMPLE_ID)) },
+        composable(Routes.EVENT_DETAIL) { entry ->
+            val eventId = entry.arguments?.getString(Routes.ARG_EVENT_ID)?.toLongOrNull() ?: return@composable
+            EventDetailRoute(
+                container = container,
+                eventId = eventId,
+                onWhyThisTime = { id -> nav.navigate(Routes.explain(id)) },
+                // Provisional: la sesión de preparación se crea en la tarea 3.6; por ahora va el id del evento.
+                onStartNow = { id -> nav.navigate(Routes.prep(id)) },
             )
         }
         composable(Routes.CREATE_VOICE) {
