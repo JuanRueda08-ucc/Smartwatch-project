@@ -222,7 +222,13 @@ Una sola pantalla que cambia según el estado activo:
 - Selector de **Tema** con tres opciones: Claro (predeterminado), Oscuro, Automático. Cada opción muestra
   una miniatura circular del reloj con ese tema. El cambio se aplica al instante con una transición suave
   de color (300 ms).
-- Interruptor de vibraciones y acceso al modo demo (oculto: mantener presionado el número de versión).
+- La miniatura es un reloj de 28 dp con el fondo, el anillo del estado 2 y dos manecillas del tema; la de
+  Automático va partida mitad clara y mitad oscura, con "Oscuro de 19:00 a 5:59" debajo.
+- Sección "Avisos": interruptor de vibraciones ("Un patrón distinto por estado"). Si el sistema no permite abrir
+  los avisos a pantalla completa, aparece "Avisos a pantalla completa · Toca para permitirlos" con borde
+  `state3Check`, que abre el ajuste del sistema (D-028).
+- Sección "Acerca de": "A Tiempo · versión 0.1". Mantenerla presionada descubre el interruptor "Modo demo · 1 min
+  pasa en 5 s".
 - Se llega desde el final de la Lista de eventos.
 
 ## 4. Patrones hápticos

@@ -25,7 +25,7 @@ import com.atiempo.wear.ui.prep.PrepDoneRoute
 import com.atiempo.wear.ui.prep.PrepRoute
 import com.atiempo.wear.ui.routines.RoutineEditRoute
 import com.atiempo.wear.ui.routines.RoutinesRoute
-import com.atiempo.wear.ui.settings.SettingsScreen
+import com.atiempo.wear.ui.settings.SettingsRoute
 import com.atiempo.wear.ui.summary.SummaryRoute
 import com.atiempo.wear.domain.PrepPhase
 import kotlinx.coroutines.flow.filterNotNull
@@ -151,9 +151,6 @@ fun AppNavHost(container: AppContainer, openPrepRequest: Int = 0) {
             RoutineEditRoute(container, routineId)
         }
         composable(Routes.SUMMARY) { SummaryRoute(container) }
-        composable(Routes.SETTINGS) {
-            val mode by container.settings.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.LIGHT)
-            SettingsScreen(themeMode = mode, onThemeModeChange = { scope.launch { container.settings.setThemeMode(it) } })
-        }
+        composable(Routes.SETTINGS) { SettingsRoute(container) }
     }
 }

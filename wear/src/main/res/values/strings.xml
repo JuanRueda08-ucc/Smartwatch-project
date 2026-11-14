@@ -187,6 +187,20 @@
         <item>domingo</item>
     </string-array>
 
+    <!-- 3.12 Ajustes -->
+    <string name="settings_alerts">Avisos</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_vibrations">Vibraciones</string>
+    <string name="settings_vibrations_detail">Un patrón distinto por estado</string>
+    <string name="settings_auto_detail">Oscuro de 19:00 a 5:59</string>
+    <string name="settings_full_screen">Avisos a pantalla completa</string>
+    <string name="settings_full_screen_detail">Toca para permitirlos</string>
+    <string name="settings_version">A Tiempo · versión %1$s</string>
+    <string name="settings_version_hint">Mantén presionado para opciones de demo</string>
+    <string name="settings_demo">Modo demo</string>
+    <string name="settings_demo_detail">1 min pasa en 5 s</string>
+    <string name="settings_demo_unlocked">Modo demo disponible</string>
+
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>
     <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
@@ -196,7 +210,6 @@
     <string name="routines_title">Rutinas</string>
     <string name="summary_title">Resumen semanal</string>
     <string name="settings_title">Ajustes</string>
-    <string name="settings_placeholder">Tema y vibraciones</string>
 
     <!-- Acciones -->
     <string name="action_view_plan">Ver plan</string>

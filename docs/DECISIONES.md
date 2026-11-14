@@ -261,3 +261,13 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   tarde. El mejor día es el de más margen. Frase con plurales ("1 vez" / "6 veces").
 - **Corrección:** la recuperación de la sesión en curso (D-024) ignora una sesión que "empezó" después de ahora;
   venía de cambiar la hora del reloj en las pruebas y dejaba una preparación fantasma en Inicio.
+
+### D-028 · 2026-11-14 · Ajustes (tarea 3.11b)
+- Componentes de Wear (`RadioButton` con la miniatura como ícono y `SwitchButton`) con colores explícitos del tema,
+  para que el cambio de tema se vea al instante (D-015). Todo se guarda en DataStore al tocar.
+- **Avisos a pantalla completa:** la fila solo aparece si `canUseFullScreenIntent()` es falso, y abre el ajuste del
+  sistema (con alternativas, porque en Wear algunas pantallas del sistema no existen). En el emulador el permiso
+  figura como concedido; el aviso de la prueba de D-024 no se abrió solo porque el reloj estaba en reposo. Queda
+  para revisar en un reloj real en la Fase 5.
+- **Modo demo:** se descubre manteniendo presionada la versión; su interruptor queda visible mientras esté activo.
+  Acelerar el reloj es la tarea 3.12.
