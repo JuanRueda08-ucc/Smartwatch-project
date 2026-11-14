@@ -5,6 +5,7 @@
     <!-- Tiempo -->
     <string name="unit_min">min</string>
     <string name="unit_h">h</string>
+    <string name="unit_days">d</string>
     <string name="day_today">Hoy</string>
     <string name="day_tomorrow">Mañana</string>
     <string-array name="weekdays">
@@ -91,15 +92,28 @@
     <string name="a11y_field">%1$s: %2$s</string>
     <string name="a11y_field_check">%1$s: %2$s. Revisa esto</string>
 
+    <!-- 3.6 / 3.7 Estados de preparación y resultado -->
+    <string name="step_leave">Sal ahora</string>
+    <string name="prep_msg_finish">Cierra lo que tienes abierto</string>
+    <string name="prep_msg_prepare">Vístete y alístate</string>
+    <string name="prep_late">Vas %1$d min tarde</string>
+    <string name="prep_checked">Revisados %1$d de %2$d</string>
+    <string name="prep_all_checked">Todo listo</string>
+    <string name="a11y_prep_left">%1$s. Faltan %2$d min</string>
+    <string name="a11y_prep_late">%1$s. Vas %2$d min tarde</string>
+    <string name="result_on_time">Saliste a tiempo</string>
+    <string name="result_late">Saliste %1$d min tarde</string>
+    <string name="result_learn_on_time">Prepararte te tomó %1$d min. Ajusté tu rutina.</string>
+    <string name="result_learn_late">Prepararte te tomó %1$d min. La próxima vez te aviso %2$d min antes.</string>
+    <string name="action_back_to_alert">Volver al aviso</string>
+    <string name="a11y_checked">Revisado</string>
+    <string name="a11y_unchecked">Sin revisar</string>
+
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>
     <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
     <string name="detail_title">Detalle del evento</string>
     <string name="detail_placeholder">Línea de tiempo de los 4 estados con sus horas</string>
-    <string name="prep_title">Preparación</string>
-    <string name="prep_placeholder">Los 4 estados, con anillo de progreso y botón Listo</string>
-    <string name="done_title">Resultado</string>
-    <string name="done_placeholder">Si saliste a tiempo y qué aprendí de tu rutina</string>
     <string name="explain_title">¿Por qué te avisé antes?</string>
     <string name="explain_placeholder">Las razones de cada ajuste, en minutos</string>
     <string name="routine_edit_title">Ajustar estimaciones</string>

@@ -16,6 +16,18 @@ sealed interface HomeUiState {
     /** No hay eventos próximos: ilustración y botón "Crear con voz". */
     data object Empty : HomeUiState
 
+    /** Hay una preparación en curso: Inicio muestra el estado actual y "Volver al aviso". */
+    data class Active(
+        val sessionId: Long,
+        val title: String,
+        val eventAt: Long,
+        val step: com.atiempo.wear.domain.model.PrepStep,
+        val minutesLeft: Int,
+        val remainingFraction: Float,
+        val isLate: Boolean,
+        val minutesLate: Int,
+    ) : HomeUiState
+
     data class Upcoming(
         val eventId: Long,
         val title: String,
@@ -39,10 +51,16 @@ object HomeStateMapper {
     const val RING_WINDOW_MIN = 60
     private const val MINUTE = 60_000.0
 
-    fun map(events: List<Event>, routines: List<Routine>, now: Long, zone: ZoneId): HomeUiState {
+    fun map(
+        events: List<Event>,
+        routines: List<Routine>,
+        now: Long,
+        zone: ZoneId,
+        leftEventIds: Set<Long> = emptySet(),
+    ): HomeUiState {
         val routineById = routines.associateBy { it.id }
         val next = events
-            .filter { it.startAt > now && it.routineId in routineById }
+            .filter { it.startAt > now && it.routineId in routineById && it.id !in leftEventIds }
             .minByOrNull { it.startAt }
             ?: return HomeUiState.Empty
         val plan = routineById.getValue(next.routineId).planFor(next)

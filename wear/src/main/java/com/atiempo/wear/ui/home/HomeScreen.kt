@@ -46,7 +46,10 @@ import com.atiempo.wear.ui.components.ChipButton
 import com.atiempo.wear.ui.components.Countdown
 import com.atiempo.wear.ui.components.TintedIcon
 import com.atiempo.wear.ui.components.WearPreviews
+import com.atiempo.wear.ui.components.clockText
 import com.atiempo.wear.ui.components.eventWhen
+import com.atiempo.wear.ui.components.stepColor
+import com.atiempo.wear.ui.components.title
 import com.atiempo.wear.ui.theme.AppTheme
 import java.time.DayOfWeek
 import java.time.ZoneId
@@ -58,14 +61,15 @@ fun HomeRoute(
     onViewPlan: (eventId: Long) -> Unit,
     onViewEvents: () -> Unit,
     onCreateByVoice: () -> Unit,
+    onBackToAlert: (sessionId: Long) -> Unit,
 ) {
     val viewModel: HomeViewModel = viewModel(
         factory = viewModelFactory {
-            initializer { HomeViewModel(container.events, container.routines, container.clock, container.zone) }
+            initializer { HomeViewModel(container.events, container.routines, container.clock, container.zone, container.prep, container.history) }
         },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
-    HomeScreen(state, container.zone, onViewPlan, onViewEvents, onCreateByVoice)
+    HomeScreen(state, container.zone, onViewPlan, onViewEvents, onCreateByVoice, onBackToAlert)
 }
 
 @Composable
@@ -75,6 +79,7 @@ fun HomeScreen(
     onViewPlan: (eventId: Long) -> Unit,
     onViewEvents: () -> Unit,
     onCreateByVoice: () -> Unit,
+    onBackToAlert: (sessionId: Long) -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -86,6 +91,7 @@ fun HomeScreen(
             HomeUiState.Loading -> Unit
             HomeUiState.Empty -> EmptyHome(onCreateByVoice)
             is HomeUiState.Upcoming -> UpcomingHome(state, zone, onViewPlan, onViewEvents)
+            is HomeUiState.Active -> ActiveHome(state, zone, onBackToAlert, onViewEvents)
         }
     }
 }
@@ -156,6 +162,69 @@ private fun UpcomingHome(
             ChipButton(label = stringResource(R.string.action_view_plan), onClick = { onViewPlan(state.eventId) })
         }
         // Flecha hacia arriba: pista visual del gesto que abre la lista de eventos.
+        IconButton(
+            onClick = onViewEvents,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 2.dp).size(48.dp),
+            colors = IconButtonDefaults.iconButtonColors(contentColor = AppTheme.colors.onSurfaceVariant),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_keyboard_arrow_up),
+                contentDescription = stringResource(R.string.action_view_events),
+                modifier = Modifier.size(24.dp),
+            )
+        }
+    }
+}
+
+/** Preparación en curso: el estado actual con su color y "Volver al aviso". */
+@Composable
+private fun ActiveHome(
+    state: HomeUiState.Active,
+    zone: ZoneId,
+    onBackToAlert: (Long) -> Unit,
+    onViewEvents: () -> Unit,
+) {
+    val color = stepColor(state.step, state.isLate)
+    Box(modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator(
+            progress = { if (state.isLate) 1f else state.remainingFraction },
+            modifier = Modifier.fillMaxSize().padding(2.dp),
+            colors = ProgressIndicatorDefaults.colors(indicatorColor = color, trackColor = AppTheme.colors.surfaceBright),
+            strokeWidth = 5.dp,
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = safeHorizontalPadding(), vertical = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+        ) {
+            Text(
+                text = stringResource(R.string.event_when, state.title, clockText(state.eventAt, zone)),
+                style = AppTheme.type.label,
+                color = AppTheme.colors.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = stringResource(state.step.title()),
+                style = AppTheme.type.title,
+                color = color,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+            )
+            if (state.isLate) {
+                Text(
+                    text = stringResource(R.string.prep_late, state.minutesLate),
+                    style = AppTheme.type.body,
+                    color = AppTheme.stateColors.late,
+                )
+            } else {
+                Countdown(minutes = state.minutesLeft)
+            }
+            Spacer(Modifier.height(6.dp))
+            ChipButton(label = stringResource(R.string.action_back_to_alert), onClick = { onBackToAlert(state.sessionId) })
+        }
         IconButton(
             onClick = onViewEvents,
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 2.dp).size(48.dp),

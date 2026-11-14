@@ -81,7 +81,7 @@ Fuente del sistema (Roboto Flex vía Material 3 de Wear). Escala:
 
 | Estilo | Tamaño | Uso |
 |---|---|---|
-| `display` | 40 sp, peso 600, cifras tabulares; unidad ("min", "h", "%") a 18 sp en `onSurfaceVariant` | Cuenta regresiva principal |
+| `display` | 40 sp, peso 600, cifras tabulares; unidad ("min", "h", "d", "%") a 18 sp en `onSurfaceVariant`. Menos de una hora: "12 min"; menos de un día: "1:05 h"; más: "3 d" | Cuenta regresiva principal |
 | `title` | 20 sp, peso 600 | Nombre del estado o del evento |
 | `body` | 15 sp | Texto general |
 | `button` | 15 sp, peso 600 | Texto de botones, chips y nombres en tarjetas |
@@ -169,8 +169,10 @@ Cada pantalla lleva su ruta de navegación entre paréntesis.
 ### 3.6 Estados de preparación (`prep/{sessionId}`)
 Una sola pantalla que cambia según el estado activo:
 - Fondo `background`, anillo de progreso completo en el color del estado (tiempo restante de ese paso).
-- Centro: ícono del estado, nombre del estado (`title`), minutos restantes (`display`).
-- Estado 3 muestra la lista de objetos de la rutina como chips marcables (llaves, billetera, carné…).
+- Centro: ícono del estado (22 dp, sin círculo, para que todo quepa aunque el nombre ocupe dos líneas),
+  nombre del estado (`title`, en el color del estado), minutos restantes (`display`) y el mensaje en `label`.
+- Estado 3 muestra "Revisados 1 de 4" y la lista de objetos de la rutina como botones marcables (círculo
+  con check; marcado = fondo y borde del color del estado). La lista se desplaza bajo "Listo".
 - Botón inferior "Listo" (o "Ya salí" en el estado 4). Al tocarlo: vibración corta de confirmación y
   transición al siguiente estado con animación de barrido del anillo.
 - Si el tiempo del paso se acaba sin confirmar, el anillo cambia a `late` y el texto a "Vas X min tarde".

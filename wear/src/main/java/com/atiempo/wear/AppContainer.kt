@@ -1,18 +1,21 @@
 package com.atiempo.wear
 
 import android.content.Context
+import com.atiempo.wear.alerts.Haptics
 import com.atiempo.wear.data.db.AppDatabase
 import com.atiempo.wear.data.draft.DraftStore
 import com.atiempo.wear.data.repo.EventRepository
 import com.atiempo.wear.data.repo.HistoryRepository
 import com.atiempo.wear.data.repo.RoutineRepository
+import com.atiempo.wear.data.session.PrepSessionManager
 import com.atiempo.wear.data.settings.SettingsRepository
 import com.atiempo.wear.domain.time.Clock
 import com.atiempo.wear.domain.time.SystemClock
+import kotlinx.coroutines.CoroutineScope
 import java.time.ZoneId
 
 /** Dependencias de la app creadas a mano, sin Hilt (AGENTS.md). */
-class AppContainer(context: Context) {
+class AppContainer(context: Context, appScope: CoroutineScope) {
     val settings = SettingsRepository(context)
     /** Reloj de la app; el modo demo (3.12) lo reemplazará por uno acelerado. */
     val clock: Clock = SystemClock
@@ -25,4 +28,9 @@ class AppContainer(context: Context) {
 
     /** Evento dictado que espera confirmación (tareas 3.4 y 3.5). */
     val drafts = DraftStore()
+
+    val haptics = Haptics(context)
+
+    /** Preparación en curso (tarea 3.7). */
+    val prep by lazy { PrepSessionManager(appScope, clock, zone, events, routines, history, haptics) }
 }

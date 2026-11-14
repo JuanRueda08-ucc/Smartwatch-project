@@ -62,6 +62,14 @@ interface PrepSessionDao {
     @Query("SELECT * FROM prep_sessions WHERE id = :id")
     suspend fun get(id: Long): PrepSession?
 
+    /** La sesión de un evento, si ya se empezó a preparar. */
+    @Query("SELECT * FROM prep_sessions WHERE eventId = :eventId ORDER BY id DESC LIMIT 1")
+    suspend fun forEvent(eventId: Long): PrepSession?
+
+    /** Eventos cuya preparación ya terminó con "Ya salí". */
+    @Query("SELECT DISTINCT eventId FROM prep_sessions WHERE leftAt IS NOT NULL")
+    fun observeLeftEventIds(): Flow<List<Long>>
+
     /** Sesiones iniciadas entre `from` y `to` (epoch ms), para el resumen semanal. */
     @Query("SELECT * FROM prep_sessions WHERE startedAt >= :from AND startedAt < :to ORDER BY startedAt")
     fun observeBetween(from: Long, to: Long): Flow<List<PrepSession>>

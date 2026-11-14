@@ -108,6 +108,14 @@ esa hora se va tarde, con recordatorios cada 60 s (máximo 3). `minutesLate` se 
 La detección de movimiento (Activity Recognition) queda fuera de esta entrega; el evento
 `MovementDetected` existe en el motor para mostrar que el diseño lo contempla (D-004).
 
+## Preparación en curso
+
+`data/session/PrepSessionManager` (en `AppContainer`) mantiene la preparación activa, una a la vez. Cada
+segundo le pasa un `Tick` al motor y ejecuta sus efectos: vibrar con `alerts/Haptics`, guardar un `StepRecord`
+por cada "Listo" y cerrar la `PrepSession` con `leftAt` y `minutesLate`. Si no hay sesión, arranca sola la del
+evento cuyo primer aviso llegó (`AutoStart`, Kotlin puro) y la navegación abre su pantalla. La sesión activa vive
+en memoria: si el sistema mata el proceso se pierde (pendiente para la tarea 3.8, D-023).
+
 ## Avisos
 
 - `AlarmScheduler` programa con `AlarmManager.setExactAndAllowWhileIdle` una alarma por paso.

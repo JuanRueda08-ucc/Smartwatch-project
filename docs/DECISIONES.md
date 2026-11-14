@@ -200,3 +200,18 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   vibra una vez, en lugar de encadenar varios patrones.
 - **Sin "Listo" no hay registro.** Solo los pasos confirmados guardan duración real (MODELO_ESTIMACION); los
   que avanzan solos no se sabe cuánto duraron.
+
+### D-023 · 2026-11-14 · Pantallas de los 4 estados y sesión en curso (tarea 3.7)
+- **Gestor de la sesión en curso** (`PrepSessionManager`): ejecuta los efectos del motor (vibrar, guardar cada
+  "Listo", cerrar la sesión) y, con la app abierta, arranca sola la preparación del evento cuyo primer aviso
+  llegó y abre su pantalla. Con la app cerrada lo hará la alarma de la tarea 3.8.
+- **Vibraciones ya activas con la app abierta**: los patrones de §4 al empezar cada estado, el clic al tocar
+  "Listo" seguido del patrón del estado nuevo, y "Vas tarde". Siguen el interruptor de Ajustes.
+- **Pantalla de estado compacta**: con el nombre en dos líneas ("Termina lo que haces") el mensaje quedaba bajo
+  el botón. El ícono va a 22 dp sin círculo y los mensajes en `label`, como en el prototipo.
+- **Inicio durante la preparación**: muestra el estado actual con su color, los minutos y "Volver al aviso".
+  Al terminar, Inicio se salta los eventos para los que ya se salió.
+- **Cuenta regresiva en días** a más de 24 horas ("3 d"): "71:58 h" no se lee de un vistazo.
+- **Pendiente:** la sesión activa vive en memoria; si el sistema mata el proceso se pierde (la sesión queda
+  guardada sin salida y no vuelve a arrancar). Recuperarla al reiniciar va con las alarmas (3.8). La Lista de
+  eventos todavía no marca los eventos terminados.

@@ -16,9 +16,13 @@ class ATiempoApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        container = AppContainer(this)
+        container = AppContainer(this, appScope)
         appScope.launch(Dispatchers.IO) {
             Seeder(container.database, container.settings).seedIfNeeded()
+            // La preparación arranca después de sembrar, para no tomar un evento a medio crear.
+            container.prep.launch()
         }
+        // Las vibraciones siguen el interruptor de Ajustes.
+        appScope.launch { container.settings.vibrationsEnabled.collect { container.haptics.enabled = it } }
     }
 }

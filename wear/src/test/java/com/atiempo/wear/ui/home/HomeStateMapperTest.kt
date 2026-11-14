@@ -78,6 +78,13 @@ class HomeStateMapperTest {
     }
 
     @Test
+    fun `se salta los eventos para los que ya salio`() {
+        val events = listOf(event(1, at(16, 8)), event(2, at(16, 14)))
+        val state = HomeStateMapper.map(events, listOf(clase), now, zone, leftEventIds = setOf(1L)) as HomeUiState.Upcoming
+        assertEquals(2L, state.eventId)
+    }
+
+    @Test
     fun `ignora eventos con rutina desconocida`() {
         val orphan = event(1, at(16, 8)).copy(routineId = 99)
         assertEquals(HomeUiState.Empty, HomeStateMapper.map(listOf(orphan), listOf(clase), now, zone))
