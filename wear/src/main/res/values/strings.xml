@@ -114,17 +114,19 @@
     <string name="a11y_unchecked">Sin revisar</string>
 
     <!-- 3.8 ¿Por qué te avisé antes? -->
-    <string name="explain_minutes_plus">+%1$d min</string>
-    <string name="explain_minutes_minus">−%1$d min</string>
-    <string name="explain_total_before">En total te aviso %1$d min antes</string>
-    <string name="explain_total_after">En total te aviso %1$d min después</string>
-    <string name="explain_learned">Últimamente tardas %1$d min en %2$s</string>
-    <string name="explain_day">Los %1$s tardas más en %2$s</string>
+    <string name="explain_minutes_plus">+%1$d min</string>
+    <string name="explain_minutes_minus">−%1$d min</string>
+    <string name="explain_total_before">En total te aviso %1$d min antes</string>
+    <string name="explain_total_after">En total te aviso %1$d min después</string>
+    <string name="explain_total_same">Te aviso a la hora de siempre</string>
+    <string name="explain_learned">Últimamente tardas %1$d min en %2$s</string>
+    <string name="explain_day_more">Los %1$s tardas %2$d min más en %3$s</string>
+    <string name="explain_day_less">Los %1$s tardas %2$d min menos en %3$s</string>
     <string name="explain_rain">Hay lluvia prevista</string>
     <string name="explain_traffic_medium">Tráfico medio hacia %1$s</string>
     <string name="explain_traffic_high">Tráfico alto hacia %1$s</string>
     <string name="explain_traffic_somewhere">tu destino</string>
-    <string name="explain_manual">Tú ajustaste «%1$s» a %2$d min</string>
+    <string name="explain_manual">Tú ajustaste «%1$s» a %2$d min</string>
     <string name="explain_margin">Margen para llegar con calma</string>
     <string name="step_travel">Trayecto</string>
     <string name="step_verb_finish">terminar lo que haces</string>
@@ -215,6 +217,7 @@
     <string name="detail_title">Detalle del evento</string>
     <string name="detail_placeholder">Línea de tiempo de los 4 estados con sus horas</string>
     <string name="explain_title">¿Por qué te avisé antes?</string>
+    <string name="explain_title_later">¿Por qué te aviso más tarde?</string>
     <string name="routines_title">Rutinas</string>
     <string name="summary_title">Resumen semanal</string>
     <string name="settings_title">Ajustes</string>

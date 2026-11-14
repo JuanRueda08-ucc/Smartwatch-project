@@ -315,3 +315,16 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   las alarmas cambian a la vez. El plan de una preparación en curso no se mueve (D-030).
 - Probado en el emulador: con lluvia y tráfico alto, "Reunión de grupo" pasa de salir a las 18:47 a las 18:42 y la
   explicación muestra "Tráfico alto hacia Biblioteca" (+3) y "Hay lluvia prevista" (+2).
+
+### D-032 · 2026-11-14 · Texto de la explicación (tarea 4.3)
+- **`ReasonPhrases`** (lógica pura, 7 pruebas) decide la frase de cada razón y sus datos (`Phrase` con el texto de
+  `strings.xml` y sus argumentos); la pantalla solo la resuelve. Así la elección de la frase se prueba sin Android.
+- **Efecto del día con minutos:** "Los martes tardas 3 min más en prepararte", como pide MODELO_ESTIMACION. Si ese
+  día eres más rápido: "… min menos en …". Ninguna frase lleva cifras negativas; el signo va en el efecto.
+- **Título y total siguen el signo:** con total negativo el título es "¿Por qué te aviso más tarde?" y el total
+  "En total te aviso N min después"; con cero, "Te aviso a la hora de siempre".
+- **Orden:** de mayor a menor efecto con signo, como dice el modelo: primero lo que adelanta el aviso y al final lo
+  que lo atrasa.
+- Espacio que no se corta entre la cifra y "min", para que "3" y "min" no queden en líneas distintas.
+- Probado en el emulador con "Cita médica" (martes): aparecen los efectos del martes con sus minutos y el título
+  "¿Por qué te aviso más tarde?" (el total es negativo por los registros cortos de las pruebas; ver D-030).

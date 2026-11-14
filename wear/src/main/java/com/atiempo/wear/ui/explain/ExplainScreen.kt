@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -52,7 +51,6 @@ import com.atiempo.wear.ui.components.WearPreviews
 import com.atiempo.wear.ui.theme.AppTheme
 import com.atiempo.wear.ui.theme.CardCorner
 import java.time.DayOfWeek
-import kotlin.math.abs
 
 /** 3.8 ¿Por qué te avisé antes? (`explain/{eventId}`): conecta la pantalla con su ViewModel. */
 @Composable
@@ -83,7 +81,7 @@ fun ExplainScreen(state: ExplainUiState, onNotRight: (routineId: Long) -> Unit) 
             item {
                 ListHeader(modifier = Modifier.fillMaxWidth().transformedHeight(this, spec), transformation = SurfaceTransformation(spec)) {
                     Text(
-                        text = stringResource(R.string.explain_title),
+                        text = stringResource(ReasonPhrases.title(loaded.totalMinutes)),
                         style = AppTheme.type.title,
                         color = AppTheme.colors.onSurface,
                         textAlign = TextAlign.Center,
@@ -94,10 +92,8 @@ fun ExplainScreen(state: ExplainUiState, onNotRight: (routineId: Long) -> Unit) 
                 item { ReasonCard(adjustment) }
             }
             item {
-                val total = loaded.totalMinutes
                 Text(
-                    text = if (total >= 0) stringResource(R.string.explain_total_before, total)
-                    else stringResource(R.string.explain_total_after, abs(total)),
+                    text = ReasonPhrases.total(loaded.totalMinutes).resolve(),
                     style = AppTheme.type.label,
                     color = AppTheme.colors.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -125,9 +121,8 @@ fun ExplainScreen(state: ExplainUiState, onNotRight: (routineId: Long) -> Unit) 
 /** Una razón: ícono, efecto en minutos y la frase, en una tarjeta. No es tocable. */
 @Composable
 private fun ReasonCard(adjustment: Adjustment) {
-    val text = reasonText(adjustment.reason)
-    val minutes = if (adjustment.minutes >= 0) stringResource(R.string.explain_minutes_plus, adjustment.minutes)
-    else stringResource(R.string.explain_minutes_minus, abs(adjustment.minutes))
+    val text = ReasonPhrases.reason(adjustment).resolve()
+    val minutes = ReasonPhrases.effect(adjustment.minutes).resolve()
     val shape = RoundedCornerShape(CardCorner)
     Column(
         modifier = Modifier
@@ -157,43 +152,6 @@ private fun AdjustmentReason.icon(): Int = when (this) {
     is AdjustmentReason.Manual -> R.drawable.ic_edit
     AdjustmentReason.SafetyMargin -> R.drawable.ic_timer
 }
-
-/** La frase de cada razón, en términos de la persona (DISENO_UI §5). */
-@Composable
-private fun reasonText(reason: AdjustmentReason): String = when (reason) {
-    is AdjustmentReason.Learned -> stringResource(R.string.explain_learned, reason.learnedMin, stepVerb(reason.step))
-    is AdjustmentReason.DayEffect ->
-        stringResource(R.string.explain_day, stringArrayResource(R.array.weekdays_plural)[reason.day.value - 1], stepVerb(reason.step))
-    AdjustmentReason.Rain -> stringResource(R.string.explain_rain)
-    is AdjustmentReason.Traffic -> {
-        val place = reason.place ?: stringResource(R.string.explain_traffic_somewhere)
-        if (reason.level == TrafficLevel.HIGH) stringResource(R.string.explain_traffic_high, place)
-        else stringResource(R.string.explain_traffic_medium, place)
-    }
-    is AdjustmentReason.Manual -> stringResource(R.string.explain_manual, stepName(reason.step), reason.manualMin)
-    AdjustmentReason.SafetyMargin -> stringResource(R.string.explain_margin)
-}
-
-@Composable
-private fun stepVerb(step: PrepStep): String = stringResource(
-    when (step) {
-        PrepStep.FINISH -> R.string.step_verb_finish
-        PrepStep.PREPARE -> R.string.step_verb_prepare
-        PrepStep.CHECK -> R.string.step_verb_check
-        PrepStep.LEAVE -> R.string.step_verb_leave
-    },
-)
-
-/** Nombre del paso tal como se ajusta: el último es el trayecto. */
-@Composable
-private fun stepName(step: PrepStep): String = stringResource(
-    when (step) {
-        PrepStep.FINISH -> R.string.step_finish
-        PrepStep.PREPARE -> R.string.step_prepare
-        PrepStep.CHECK -> R.string.step_check
-        PrepStep.LEAVE -> R.string.step_travel
-    },
-)
 
 // ---------- Previews ----------
 

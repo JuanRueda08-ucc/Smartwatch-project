@@ -195,9 +195,11 @@ Una sola pantalla que cambia según el estado activo:
   - "Tráfico alto hacia la universidad" (+5)
 - Cada razón en una tarjeta (no tocable): ícono en círculo tintado de `primary`, efecto en minutos ("+6 min",
   `button` en `primary`) y la frase en `body`. Ordenadas de mayor a menor efecto.
-- Debajo, el total: "En total te aviso 13 min antes".
+- Debajo, el total: "En total te aviso 13 min antes" (o "… min después", o "Te aviso a la hora de siempre").
+  Si el total es negativo, el título pasa a "¿Por qué te aviso más tarde?" (D-032).
 - Razones posibles: base aprendida, efecto del día, lluvia, tráfico, ajuste manual y margen de seguridad.
-  Hasta la Fase 4 solo hay ajustes manuales y margen (D-025).
+  Las frases nunca llevan cifras negativas: un día más rápido dice "Los viernes tardas 4 min menos en…" y el
+  signo va solo en el efecto ("−4 min"). Entre la cifra y "min" va un espacio que no se corta.
 - Botón "No es así" → Ajustar estimaciones de esa rutina.
 
 ### 3.9 Ajustar estimaciones (`routine/{id}/edit`)
