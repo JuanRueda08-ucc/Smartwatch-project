@@ -128,9 +128,12 @@ Cada pantalla lleva su ruta de navegación entre paréntesis.
 - Girar la corona en el sentido en que avanzan las listas también abre la Lista de eventos.
 
 ### 3.2 Lista de eventos (`events`)
-- `TransformingLazyColumn` con tarjetas: hora de inicio, título, hora de salida estimada.
+- `TransformingLazyColumn` con tarjetas: hora de inicio (`title`, cifras tabulares), título (`body`) y
+  "Sal a las 7:43 · lugar" (`label`). Agrupadas por día con un encabezado: "Hoy", "Mañana" o "Jueves 19".
 - Primer elemento: botón "Nuevo evento" con ícono de micrófono.
-- Últimos elementos: accesos a "Rutinas", "Resumen semanal" y "Ajustes".
+- Últimos elementos, bajo el encabezado "Más": accesos a "Rutinas", "Resumen semanal" y "Ajustes"
+  sobre `surface`, con el ícono en `primary`.
+- Sin eventos próximos: "No tienes eventos próximos" entre "Nuevo evento" y "Más".
 
 ### 3.3 Detalle del evento (`event/{id}`)
 - Línea de tiempo vertical de 4 puntos con el color de cada estado y su hora:

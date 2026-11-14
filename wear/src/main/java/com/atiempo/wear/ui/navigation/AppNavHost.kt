@@ -12,7 +12,7 @@ import com.atiempo.wear.domain.model.ThemeMode
 import com.atiempo.wear.ui.create.ConfirmEventScreen
 import com.atiempo.wear.ui.create.CreateVoiceScreen
 import com.atiempo.wear.ui.detail.EventDetailScreen
-import com.atiempo.wear.ui.events.EventsScreen
+import com.atiempo.wear.ui.events.EventsRoute
 import com.atiempo.wear.ui.explain.ExplainScreen
 import com.atiempo.wear.ui.home.HomeRoute
 import com.atiempo.wear.ui.prep.PrepDoneScreen
@@ -45,9 +45,10 @@ fun AppNavHost(container: AppContainer) {
             )
         }
         composable(Routes.EVENTS) {
-            EventsScreen(
+            EventsRoute(
+                container = container,
                 onNewEvent = { nav.navigate(Routes.CREATE_VOICE) },
-                onOpenEvent = { nav.navigate(Routes.eventDetail(SAMPLE_ID)) },
+                onOpenEvent = { eventId -> nav.navigate(Routes.eventDetail(eventId)) },
                 onRoutines = { nav.navigate(Routes.ROUTINES) },
                 onSummary = { nav.navigate(Routes.SUMMARY) },
                 onSettings = { nav.navigate(Routes.SETTINGS) },

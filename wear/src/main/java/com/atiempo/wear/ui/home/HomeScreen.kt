@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -47,11 +46,10 @@ import com.atiempo.wear.ui.components.ChipButton
 import com.atiempo.wear.ui.components.Countdown
 import com.atiempo.wear.ui.components.TintedIcon
 import com.atiempo.wear.ui.components.WearPreviews
+import com.atiempo.wear.ui.components.eventWhen
 import com.atiempo.wear.ui.theme.AppTheme
 import java.time.DayOfWeek
-import java.time.Instant
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 /** 3.1 Inicio (`home`): conecta la pantalla con su ViewModel. */
 @Composable
@@ -203,20 +201,6 @@ private fun EmptyHome(onCreateByVoice: () -> Unit) {
         BottomActionButton(label = stringResource(R.string.home_create_voice), onClick = onCreateByVoice)
     }
 }
-
-/** "Hoy · 8:00", "Mañana · 8:00" o "Jueves · 15:30". */
-@Composable
-private fun eventWhen(dayOffset: Int, weekday: DayOfWeek, eventAt: Long, zone: ZoneId): String {
-    val day = when (dayOffset) {
-        0 -> stringResource(R.string.day_today)
-        1 -> stringResource(R.string.day_tomorrow)
-        else -> stringArrayResource(R.array.weekdays)[weekday.value - 1]
-    }
-    val time = TIME_FORMAT.format(Instant.ofEpochMilli(eventAt).atZone(zone))
-    return stringResource(R.string.event_when, day, time)
-}
-
-private val TIME_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("H:mm")
 
 /** Margen seguro del 10 % a cada lado en pantallas redondas (DISENO_UI §1). */
 @Composable

@@ -31,6 +31,14 @@
         <item quantity="other">Empieza a prepararte en %d minutos</item>
     </plurals>
 
+    <!-- 3.2 Lista de eventos -->
+    <string name="events_empty">No tienes eventos próximos</string>
+    <string name="events_leave_at">Sal a las %1$s</string>
+    <string name="events_leave_at_place">Sal a las %1$s · %2$s</string>
+    <!-- Encabezado de un día lejano, por ejemplo "Jueves 19" -->
+    <string name="day_with_number">%1$s %2$d</string>
+    <string name="events_more">Más</string>
+
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>
     <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
