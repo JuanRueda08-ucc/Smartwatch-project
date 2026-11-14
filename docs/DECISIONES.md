@@ -173,3 +173,19 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
 - **Intérprete (`EventParser`):** por reglas, sin tildes ni mayúsculas para comparar, con 15 pruebas. La hora
   sin "de la mañana/tarde" se asume: de 1 a 6, de la tarde; de 7 a 12, como se dijo. Esas horas, el día
   deducido, la rutina por defecto y el lugar ausente quedan marcados como dudosos para "Revisa esto" (3.5).
+
+### D-021 · 2026-11-14 · Confirmar evento (tarea 3.5)
+- **Componentes de Wear para editar:** `DatePicker` y `TimePicker` (24 horas, igual que el resto de la app),
+  opciones de radio para la rutina y la entrada de texto de Wear para título y lugar. El lugar también ofrece
+  "Sin lugar", porque es opcional.
+- **Selectores como pantallas de la navegación**, no como capas: así deslizar para volver regresa a la
+  confirmación y no saca de todo el flujo. Todos editan el mismo borrador (`DraftStore`).
+- **Guardar** queda fijo abajo porque es la acción principal de la pantalla (a diferencia de "Empezar ahora",
+  D-019). Se deshabilita si la hora ya pasó. Al guardar, el evento usa el trayecto por defecto de su rutina y
+  aparece la confirmación animada de Wear.
+- **Rutinas:** cada tipo del intérprete corresponde a una de las 3 rutinas sembradas (ids 1, 2 y 3).
+- **Textos del sistema:** los selectores muestran sus etiquetas ("Hour") en el idioma del reloj; el emulador
+  está en inglés.
+- **No verificado:** la versión oscura en el emulador (la entrada de voz del sistema se traba al cerrarla), el
+  dictado de título y lugar (sin micrófono) y el caso "Esa hora ya pasó" en pantalla (sí está probado con
+  pruebas unitarias).

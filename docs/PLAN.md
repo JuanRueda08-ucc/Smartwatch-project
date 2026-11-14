@@ -37,8 +37,8 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 - [x] 3.1 Inicio: próximo evento con cuenta regresiva a "empieza a prepararte".
 - [x] 3.2 Lista de eventos (`TransformingLazyColumn`).
 - [x] 3.3 Detalle del evento: línea de tiempo de los 4 estados con horas calculadas.
-- [x] 3.4 Crear evento por voz (`RecognizerIntent`) + intérprete de frases en español.
-- [ ] 3.5 Confirmar evento interpretado (editar título, hora, rutina, lugar).
+- [x] 3.4 Crear evento por voz (`RemoteInput`, D-020) + intérprete de frases en español.
+- [x] 3.5 Confirmar evento interpretado (editar título, hora, rutina, lugar).
 - [ ] 3.6 Motor de estados (`PrepStateMachine`) con pruebas unitarias.
 - [ ] 3.7 Pantallas de los 4 estados con anillo de progreso y botón "Listo".
 - [ ] 3.8 Avisos programados (`AlarmManager` + notificación de pantalla completa) y vibraciones

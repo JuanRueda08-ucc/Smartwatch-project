@@ -24,6 +24,12 @@ fun dayName(dayOffset: Int, weekday: DayOfWeek): String = when (dayOffset) {
     else -> stringArrayResource(R.array.weekdays)[weekday.value - 1]
 }
 
+/** "Hoy", "Mañana" o, para días más lejanos, "Jueves 19". */
+@Composable
+fun dayWithNumber(dayOffset: Int, weekday: DayOfWeek, dayOfMonth: Int): String =
+    if (dayOffset in 0..1) dayName(dayOffset, weekday)
+    else stringResource(R.string.day_with_number, dayName(dayOffset, weekday), dayOfMonth)
+
 /** "Hoy · 8:00", "Mañana · 8:00" o "Jueves · 15:30". */
 @Composable
 fun eventWhen(dayOffset: Int, weekday: DayOfWeek, eventAt: Long, zone: ZoneId): String =

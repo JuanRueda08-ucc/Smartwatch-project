@@ -9,7 +9,12 @@ import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.atiempo.wear.AppContainer
 import com.atiempo.wear.domain.model.ThemeMode
-import com.atiempo.wear.ui.create.ConfirmEventScreen
+import com.atiempo.wear.ui.create.ConfirmDateRoute
+import com.atiempo.wear.ui.create.ConfirmEventRoute
+import com.atiempo.wear.ui.create.ConfirmField
+import com.atiempo.wear.ui.create.ConfirmPlaceRoute
+import com.atiempo.wear.ui.create.ConfirmRoutineRoute
+import com.atiempo.wear.ui.create.ConfirmTimeRoute
 import com.atiempo.wear.ui.create.CreateVoiceRoute
 import com.atiempo.wear.ui.detail.EventDetailRoute
 import com.atiempo.wear.ui.events.EventsRoute
@@ -70,8 +75,32 @@ fun AppNavHost(container: AppContainer) {
             })
         }
         composable(Routes.CREATE_CONFIRM) {
-            ConfirmEventScreen(onSave = { nav.popBackStack(Routes.EVENTS, inclusive = false) })
+            // Tras guardar se vuelve a la lista. Si se llegó desde Inicio vacío, la lista no está atrás:
+            // se abre encima de Inicio.
+            val toEvents = {
+                if (!nav.popBackStack(Routes.EVENTS, inclusive = false)) {
+                    nav.navigate(Routes.EVENTS) { popUpTo(Routes.HOME) }
+                }
+            }
+            ConfirmEventRoute(
+                container = container,
+                onEdit = { field ->
+                    when (field) {
+                        ConfirmField.DATE -> nav.navigate(Routes.CONFIRM_DATE)
+                        ConfirmField.TIME -> nav.navigate(Routes.CONFIRM_TIME)
+                        ConfirmField.ROUTINE -> nav.navigate(Routes.CONFIRM_ROUTINE)
+                        ConfirmField.PLACE -> nav.navigate(Routes.CONFIRM_PLACE)
+                        ConfirmField.TITLE -> Unit // se edita con la entrada de texto, en la misma pantalla
+                    }
+                },
+                onSaved = { toEvents() },
+                onNothingToConfirm = { toEvents() },
+            )
         }
+        composable(Routes.CONFIRM_DATE) { ConfirmDateRoute(container, onDone = { nav.popBackStack() }) }
+        composable(Routes.CONFIRM_TIME) { ConfirmTimeRoute(container, onDone = { nav.popBackStack() }) }
+        composable(Routes.CONFIRM_ROUTINE) { ConfirmRoutineRoute(container, onDone = { nav.popBackStack() }) }
+        composable(Routes.CONFIRM_PLACE) { ConfirmPlaceRoute(container, onDone = { nav.popBackStack() }) }
         composable(Routes.PREP) {
             PrepScreen(onLeft = {
                 nav.navigate(Routes.prepDone(SAMPLE_ID)) { popUpTo(Routes.PREP) { inclusive = true } }

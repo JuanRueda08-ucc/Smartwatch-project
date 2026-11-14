@@ -69,13 +69,33 @@
     <string name="voice_example_social">Cine con Laura el sábado a las 6 de la tarde</string>
     <string name="a11y_listening">Escuchando</string>
 
+    <!-- 3.5 Confirmar evento -->
+    <string name="confirm_question">¿Lo guardo así?</string>
+    <string name="confirm_hint">Toca un dato para cambiarlo</string>
+    <string name="confirm_field_title">Título</string>
+    <string name="confirm_field_day">Día</string>
+    <string name="confirm_field_time">Hora</string>
+    <string name="confirm_field_routine">Rutina</string>
+    <string name="confirm_field_place">Lugar</string>
+    <string name="confirm_no_place">Sin lugar</string>
+    <string name="confirm_check_this">Revisa esto</string>
+    <string name="confirm_time_passed">Esa hora ya pasó</string>
+    <string name="confirm_saved">Guardado</string>
+    <string name="confirm_nothing">No hay nada por confirmar</string>
+    <string name="confirm_title_prompt">¿Cómo se llama?</string>
+    <string name="confirm_place_prompt">¿Dónde es?</string>
+    <string name="confirm_place_dictate">Dictar lugar</string>
+    <string name="routine_class">Clase</string>
+    <string name="routine_appointment">Cita</string>
+    <string name="routine_social">Salida social</string>
+    <string name="a11y_field">%1$s: %2$s</string>
+    <string name="a11y_field_check">%1$s: %2$s. Revisa esto</string>
+
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
     <string name="events_title">Eventos</string>
     <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
     <string name="detail_title">Detalle del evento</string>
     <string name="detail_placeholder">Línea de tiempo de los 4 estados con sus horas</string>
-    <string name="confirm_title">Confirmar evento</string>
-    <string name="confirm_placeholder">Revisa lo que entendí antes de guardarlo</string>
     <string name="prep_title">Preparación</string>
     <string name="prep_placeholder">Los 4 estados, con anillo de progreso y botón Listo</string>
     <string name="done_title">Resultado</string>

@@ -156,9 +156,15 @@ Cada pantalla lleva su ruta de navegación entre paréntesis.
 - Si la entrada vuelve sin texto: "No te entendí. Intenta de nuevo o toca un ejemplo."
 
 ### 3.5 Confirmar evento (`create/confirm`)
-- Muestra lo interpretado en tarjetas editables: título, día y hora, rutina, lugar.
-- Campos con baja confianza resaltados con borde `state3Check` y texto "Revisa esto".
-- Botón "Guardar".
+- "¿Lo guardo así?" y "Toca un dato para cambiarlo".
+- Tarjetas editables: título, día ("Hoy", "Mañana", "Sábado 21"), hora, rutina y lugar.
+- Campos con baja confianza: borde de 2 dp y fondo al 12 % en `state3Check`, con ícono de advertencia y
+  "Revisa esto". Al editar un dato, la marca desaparece.
+- Cómo se edita cada dato (D-021): título con la entrada de texto de Wear; día con `DatePicker` (de hoy a un
+  año); hora con `TimePicker` de 24 horas; rutina con 3 opciones de radio; lugar con "Dictar lugar" o
+  "Sin lugar". Cada selector es una pantalla aparte: deslizar para volver regresa a la confirmación.
+- Si la fecha y hora ya pasaron: la hora dice "Esa hora ya pasó" y "Guardar" queda deshabilitado.
+- Botón "Guardar" fijo abajo. Al guardar, confirmación animada de Wear con "Guardado" y vuelta a la Lista.
 
 ### 3.6 Estados de preparación (`prep/{sessionId}`)
 Una sola pantalla que cambia según el estado activo:

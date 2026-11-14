@@ -1,14 +1,6 @@
 package com.atiempo.wear.ui.create
 
-import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.app.RemoteInput
-import android.view.inputmethod.EditorInfo
-import androidx.wear.input.RemoteInputIntentHelper
-import androidx.wear.input.wearableExtender
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -25,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,14 +49,12 @@ import com.atiempo.wear.ui.components.ATiempoPreview
 import com.atiempo.wear.ui.components.TintedIcon
 import com.atiempo.wear.ui.components.VoiceWave
 import com.atiempo.wear.ui.components.WearPreviews
+import com.atiempo.wear.ui.components.rememberTextInput
 import com.atiempo.wear.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 
 /** Ejemplos de DISENO_UI §3.4. Se pueden tocar: pasan por el mismo intérprete que la voz. */
 private val EXAMPLES = listOf(R.string.voice_example_class, R.string.voice_example_appointment, R.string.voice_example_social)
-
-/** Clave del texto en el resultado de RemoteInput. */
-private const val INPUT_KEY = "event_phrase"
 
 /** Tiempo que se muestra "Entendí" antes de pasar a confirmar. */
 private const val HEARD_PAUSE_MS = 1_400L
@@ -78,39 +67,17 @@ fun CreateVoiceRoute(container: AppContainer, onParsed: () -> Unit) {
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val prompt = stringResource(R.string.voice_prompt)
-    // RemoteInput abre la entrada de texto de Wear (dictado primero, teclado como alternativa) y devuelve
-    // el texto en ambos casos. RecognizerIntent devolvía vacío si se escribía con el teclado (D-020).
-    val intent = remember {
-        val remoteInput = RemoteInput.Builder(INPUT_KEY)
-            .setLabel(prompt)
-            .wearableExtender {
-                setEmojisAllowed(false)
-                setInputActionType(EditorInfo.IME_ACTION_DONE)
-            }
-            .build()
-        RemoteInputIntentHelper.createActionRemoteInputIntent().also {
-            RemoteInputIntentHelper.putRemoteInputsExtra(it, listOf(remoteInput))
-            RemoteInputIntentHelper.putTitleExtra(it, prompt)
-        }
-    }
-    var voiceAvailable by remember { mutableStateOf(intent.resolveActivity(context.packageManager) != null) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val text = result.data?.let { RemoteInput.getResultsFromIntent(it) }?.getCharSequence(INPUT_KEY)?.toString()
-        when {
-            !text.isNullOrBlank() -> viewModel.onTranscript(text)
-            result.resultCode == Activity.RESULT_OK -> viewModel.onNotUnderstood()
-            else -> viewModel.onCancelled()
-        }
-    }
+    // Entrada de texto de Wear: dictado o teclado (D-020).
+    val input = rememberTextInput(
+        prompt = stringResource(R.string.voice_prompt),
+        onText = viewModel::onTranscript,
+        onEmpty = viewModel::onNotUnderstood,
+        onCancel = viewModel::onCancelled,
+    )
+    val voiceAvailable = input.available
     val listen = {
-        try {
-            viewModel.onListening()
-            launcher.launch(intent)
-        } catch (e: ActivityNotFoundException) {
-            voiceAvailable = false
-            viewModel.onCancelled()
-        }
+        viewModel.onListening()
+        input.launch()
     }
     // Al entrar se abre el reconocedor una sola vez; si se cancela, queda la pantalla con los ejemplos.
     var autoLaunched by rememberSaveable { mutableStateOf(false) }

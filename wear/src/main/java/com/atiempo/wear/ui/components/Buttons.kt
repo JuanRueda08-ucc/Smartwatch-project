@@ -53,9 +53,11 @@ fun BoxScope.BottomActionButton(
     onClick: () -> Unit,
     @DrawableRes icon: Int? = null,
     color: Color = AppTheme.colors.primary,
+    enabled: Boolean = true,
 ) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         modifier = Modifier
             .align(Alignment.BottomCenter)
             .padding(bottom = BottomAction.BottomGap)
@@ -65,6 +67,9 @@ fun BoxScope.BottomActionButton(
             containerColor = color,
             contentColor = AppTheme.colors.onState,
             iconColor = AppTheme.colors.onState,
+            disabledContainerColor = AppTheme.colors.surfaceBright,
+            disabledContentColor = AppTheme.colors.onSurfaceVariant,
+            disabledIconColor = AppTheme.colors.onSurfaceVariant,
         ),
         contentPadding = PaddingValues(horizontal = 12.dp),
         icon = icon?.let { { Icon(painterResource(it), contentDescription = null, modifier = Modifier.size(20.dp)) } },

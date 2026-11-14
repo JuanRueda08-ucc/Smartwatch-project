@@ -41,7 +41,7 @@ import com.atiempo.wear.R
 import com.atiempo.wear.ui.components.ATiempoPreview
 import com.atiempo.wear.ui.components.WearPreviews
 import com.atiempo.wear.ui.components.clockText
-import com.atiempo.wear.ui.components.dayName
+import com.atiempo.wear.ui.components.dayWithNumber
 import com.atiempo.wear.ui.theme.AppTheme
 import java.time.DayOfWeek
 import java.time.ZoneId
@@ -138,9 +138,7 @@ fun EventsScreen(
 
 /** Encabezado de grupo: "Hoy", "Mañana" o "Jueves 19". */
 @Composable
-private fun dayHeader(day: DayLabel): String =
-    if (day.dayOffset <= 1) dayName(day.dayOffset, day.weekday)
-    else stringResource(R.string.day_with_number, dayName(day.dayOffset, day.weekday), day.dayOfMonth)
+private fun dayHeader(day: DayLabel): String = dayWithNumber(day.dayOffset, day.weekday, day.dayOfMonth)
 
 @Composable
 private fun TransformingLazyColumnItemScope.SectionLabel(text: String, spec: TransformationSpec) {

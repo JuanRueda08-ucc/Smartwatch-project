@@ -17,6 +17,11 @@ class DraftStore {
         _draft.value = event
     }
 
+    /** Aplica un cambio de la persona al borrador, si existe. */
+    fun update(transform: (ParsedEvent) -> ParsedEvent) {
+        _draft.value = _draft.value?.let(transform)
+    }
+
     fun clear() {
         _draft.value = null
     }
