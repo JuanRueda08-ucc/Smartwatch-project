@@ -14,7 +14,7 @@ import com.atiempo.wear.ui.create.CreateVoiceScreen
 import com.atiempo.wear.ui.detail.EventDetailScreen
 import com.atiempo.wear.ui.events.EventsScreen
 import com.atiempo.wear.ui.explain.ExplainScreen
-import com.atiempo.wear.ui.home.HomeScreen
+import com.atiempo.wear.ui.home.HomeRoute
 import com.atiempo.wear.ui.prep.PrepDoneScreen
 import com.atiempo.wear.ui.prep.PrepScreen
 import com.atiempo.wear.ui.routines.RoutineEditScreen
@@ -37,9 +37,11 @@ fun AppNavHost(container: AppContainer) {
 
     SwipeDismissableNavHost(navController = nav, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
-            HomeScreen(
-                onViewPlan = { nav.navigate(Routes.eventDetail(SAMPLE_ID)) },
+            HomeRoute(
+                container = container,
+                onViewPlan = { eventId -> nav.navigate(Routes.eventDetail(eventId)) },
                 onViewEvents = { nav.navigate(Routes.EVENTS) },
+                onCreateByVoice = { nav.navigate(Routes.CREATE_VOICE) },
             )
         }
         composable(Routes.EVENTS) {

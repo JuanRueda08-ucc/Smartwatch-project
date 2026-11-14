@@ -133,3 +133,16 @@ reciente queda con 6 salidas, 5 a tiempo, el jueves tarde y el miércoles como m
 del prototipo. Los datos son deterministas (semilla fija) y relativos a la fecha del primer arranque; el
 primer evento queda unas 2 horas después del arranque para que la demo muestre una cuenta regresiva.
 Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en America/Bogota.
+
+### D-018 · 2026-11-14 · Pantalla de Inicio (tarea 3.1)
+- **Plan:** `PrepPlanner` (Kotlin puro) calcula las horas de cada estado hacia atrás desde el evento, con el
+  margen de `MODELO_ESTIMACION.md` (10 % del total, mínimo 3 min). Mientras no exista el estimador (Fase 4),
+  las duraciones salen de la rutina (ajuste manual o valor por defecto) y el trayecto, del evento.
+- **Reloj:** toda la app lee la hora de `Clock` (en `AppContainer`), para que el modo demo pueda acelerarla.
+- **Anillo:** se llena durante los últimos 60 min antes de empezar a prepararse.
+- **Estado vacío:** "Crear con voz" con ícono no cabe en el botón de 132 dp y ensancharlo lo sacaría del área
+  segura (D-011). El micrófono pasa a ser la ilustración, el botón queda solo con texto y el título se acorta a
+  "Sin eventos" para que todo quepa sobre el botón.
+- **Corona:** dentro de `SwipeDismissableNavHost` una pantalla solo recibe la corona si pide el foco con
+  `requestFocusOnHierarchyActive()`; un `requestFocus()` normal no funciona. Aplica a todas las pantallas.
+- **Emulador:** zona horaria puesta en America/Bogota.

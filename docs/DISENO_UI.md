@@ -89,7 +89,8 @@ Fuente del sistema (Roboto Flex vía Material 3 de Wear). Escala:
 | `caption` | 12 sp, peso 500 | Insignias, subtítulos de fila, línea de aprendizaje. Nunca más pequeño |
 
 Las cifras de tiempo usan `fontFeatureSettings = "tnum"` para que no "bailen" al cambiar.
-No se usan tamaños fuera de esta escala.
+No se usan tamaños fuera de esta escala. `title` y `body` usan corte de línea balanceado
+(`LineBreak.Heading`) para no dejar una palabra sola en la última línea.
 
 ### Formas y espaciado
 
@@ -121,7 +122,10 @@ Cada pantalla lleva su ruta de navegación entre paréntesis.
   grande (`display`).
 - Anillo exterior que se llena a medida que se acerca el inicio de la preparación.
 - Abajo: chip "Ver plan" → Detalle. Desliza hacia arriba → Lista de eventos.
-- Sin eventos: ilustración simple + botón de micrófono "Crear con voz".
+- Sin eventos: micrófono en un círculo tintado como ilustración, "Sin eventos", "Dime qué tienes y a qué hora"
+  y el botón inferior "Crear con voz" (solo texto: con ícono no cabe en 132 dp, D-018).
+- La cuenta regresiva muestra "Ahora" cuando ya es hora de empezar a prepararse.
+- Girar la corona en el sentido en que avanzan las listas también abre la Lista de eventos.
 
 ### 3.2 Lista de eventos (`events`)
 - `TransformingLazyColumn` con tarjetas: hora de inicio, título, hora de salida estimada.

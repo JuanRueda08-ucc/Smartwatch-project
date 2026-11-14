@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.material3.Typography
@@ -17,8 +18,9 @@ data class AppType(
     val display: TextStyle = TextStyle(fontSize = 40.sp, lineHeight = 44.sp, fontWeight = FontWeight.SemiBold, fontFeatureSettings = TABULAR),
     /** Unidad que acompaña a `display`: "min", "h", "%". */
     val displayUnit: TextStyle = TextStyle(fontSize = 18.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold),
-    val title: TextStyle = TextStyle(fontSize = 20.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold),
-    val body: TextStyle = TextStyle(fontSize = 15.sp, lineHeight = 19.sp),
+    // Títulos y texto con corte de línea balanceado: en pantallas redondas evita palabras sueltas.
+    val title: TextStyle = TextStyle(fontSize = 20.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, lineBreak = LineBreak.Heading),
+    val body: TextStyle = TextStyle(fontSize = 15.sp, lineHeight = 19.sp, lineBreak = LineBreak.Heading),
     val button: TextStyle = TextStyle(fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.SemiBold),
     val label: TextStyle = TextStyle(fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
     val caption: TextStyle = TextStyle(fontSize = 12.sp, lineHeight = 15.sp, fontWeight = FontWeight.Medium),

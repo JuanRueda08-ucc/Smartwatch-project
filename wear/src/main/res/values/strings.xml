@@ -2,9 +2,36 @@
 <resources>
     <string name="app_name">A Tiempo</string>
 
+    <!-- Tiempo -->
+    <string name="unit_min">min</string>
+    <string name="unit_h">h</string>
+    <string name="day_today">Hoy</string>
+    <string name="day_tomorrow">Mañana</string>
+    <string-array name="weekdays">
+        <item>Lunes</item>
+        <item>Martes</item>
+        <item>Miércoles</item>
+        <item>Jueves</item>
+        <item>Viernes</item>
+        <item>Sábado</item>
+        <item>Domingo</item>
+    </string-array>
+    <!-- Día y hora de un evento, por ejemplo "Hoy · 8:00" -->
+    <string name="event_when">%1$s · %2$s</string>
+
+    <!-- 3.1 Inicio -->
+    <string name="home_prepare_in">Empieza a prepararte en</string>
+    <string name="home_time_to_prepare">Es hora de prepararte</string>
+    <string name="home_now">Ahora</string>
+    <string name="home_empty_title">Sin eventos</string>
+    <string name="home_empty_body">Dime qué tienes y a qué hora</string>
+    <string name="home_create_voice">Crear con voz</string>
+    <plurals name="a11y_prepare_in">
+        <item quantity="one">Empieza a prepararte en %d minuto</item>
+        <item quantity="other">Empieza a prepararte en %d minutos</item>
+    </plurals>
+
     <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
-    <string name="home_title">Inicio</string>
-    <string name="home_placeholder">Próximo evento y cuenta regresiva para empezar a prepararte</string>
     <string name="events_title">Eventos</string>
     <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
     <string name="detail_title">Detalle del evento</string>
