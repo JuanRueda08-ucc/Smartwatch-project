@@ -328,3 +328,20 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
 - Espacio que no se corta entre la cifra y "min", para que "3" y "min" no queden en líneas distintas.
 - Probado en el emulador con "Cita médica" (martes): aparecen los efectos del martes con sus minutos y el título
   "¿Por qué te aviso más tarde?" (el total es negativo por los registros cortos de las pruebas; ver D-030).
+
+### D-033 · 2026-11-15 · Aprender de cada preparación (tarea 4.4)
+- **Registro:** ya existía desde la tarea 3.7. Cada "Listo" guarda un `StepRecord` con la duración real, acotada
+  entre 1 y 90 min. Un paso que avanza solo o se salta no se registra, para no aprender de olvidos. El trayecto
+  tampoco se registra, porque sin ubicación (D-004) no se sabe cuándo llegaste; su valor aprendido sale de los datos
+  de ejemplo.
+- **Recalcular:** los planes ya se recalculan solos al cambiar el historial (D-030). Lo nuevo es que el resultado
+  diga la verdad: `nextTimeShift` (5 pruebas) compara el plan del mismo evento con el historial sin y con los
+  registros de la sesión, sin clima ni tráfico. Antes la línea decía "Ajusté tu rutina" aunque nada cambiara, o
+  usaba el retraso como si fuera el cambio.
+- **Textos:** "La próxima vez te aviso N min antes / después" o "Tu rutina sigue igual". Si el paso tiene un ajuste
+  manual, lo aprendido no lo mueve y la línea lo dice.
+- **"Llegas a las" del estado 4** ahora es la hora actual más el trayecto. Antes, si salías antes de la hora del
+  plan, mostraba la llegada del plan y no coincidía con la del resultado.
+- **Datos del emulador:** se borraron los datos de la app (`pm clear`) para quitar la sesión fantasma y los registros
+  cortos de las pruebas. Se sembraron de nuevo; la prueba de esta tarea dejó una sesión de Clase.
+- Probado en el emulador en modo demo: "Prepararte te tomó 13 min. La próxima vez te aviso 3 min después."

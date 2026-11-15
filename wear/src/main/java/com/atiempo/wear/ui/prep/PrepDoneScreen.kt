@@ -28,9 +28,11 @@ import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
 import com.atiempo.wear.AppContainer
 import com.atiempo.wear.R
+import com.atiempo.wear.data.repo.EstimationData
 import com.atiempo.wear.data.repo.EventRepository
 import com.atiempo.wear.data.repo.HistoryRepository
 import com.atiempo.wear.data.repo.RoutineRepository
+import com.atiempo.wear.data.repo.nextTimeShift
 import com.atiempo.wear.data.repo.stepDurations
 import com.atiempo.wear.data.session.PrepSessionManager
 import com.atiempo.wear.domain.model.PrepStep
@@ -40,9 +42,11 @@ import com.atiempo.wear.ui.components.BottomActionButton
 import com.atiempo.wear.ui.components.WearPreviews
 import com.atiempo.wear.ui.components.clockText
 import com.atiempo.wear.ui.theme.AppTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import kotlin.math.roundToInt
@@ -56,6 +60,8 @@ sealed interface ResultUiState {
         val arriveAt: Long,
         /** Minutos que tomó prepararse: el paso "Prepárate" si se confirmó, si no toda la preparación. */
         val prepareMin: Int,
+        /** Cuánto se movió el próximo aviso por lo aprendido: + antes, − después, 0 igual (tarea 4.4). */
+        val nextShiftMin: Int = 0,
     ) : ResultUiState {
         val onTime: Boolean get() = minutesLate <= 0
     }
@@ -67,6 +73,8 @@ class PrepDoneViewModel(
     events: EventRepository,
     routines: RoutineRepository,
     manager: PrepSessionManager,
+    estimation: Flow<EstimationData>,
+    zone: ZoneId,
 ) : ViewModel() {
     private val _state = MutableStateFlow<ResultUiState>(ResultUiState.Loading)
     val state: StateFlow<ResultUiState> = _state.asStateFlow()
@@ -77,13 +85,18 @@ class PrepDoneViewModel(
             val leftAt = session.leftAt ?: return@launch
             val event = events.get(session.eventId)
             val routine = event?.let { routines.get(it.routineId) }
-            val travel = if (event != null && routine != null) routine.stepDurations(event).travel else 0
+            // El trayecto con lo aprendido y el contexto, igual que el "Llegas a las" del estado 4.
+            val travel = if (event != null && routine != null) routine.stepDurations(event, estimation.first()).travel else 0
+            val shift = if (event != null && routine != null) {
+                routine.nextTimeShift(event, history.allRecords(), sessionId, zone)
+            } else 0
             val prepare = history.recordsFor(sessionId).firstOrNull { it.step == PrepStep.PREPARE }?.actualMin
                 ?: ((leftAt - session.startedAt) / 60_000.0).roundToInt().coerceAtLeast(1)
             _state.value = ResultUiState.Loaded(
                 minutesLate = session.minutesLate ?: 0,
                 arriveAt = leftAt + travel * 60_000L,
                 prepareMin = prepare,
+                nextShiftMin = shift,
             )
             // El resultado ya quedó leído: la sesión se libera para el próximo evento.
             manager.dismissFinished(sessionId)
@@ -97,7 +110,12 @@ fun PrepDoneRoute(container: AppContainer, sessionId: Long, onDone: () -> Unit) 
     val viewModel: PrepDoneViewModel = viewModel(
         key = "done-$sessionId",
         factory = viewModelFactory {
-            initializer { PrepDoneViewModel(sessionId, container.history, container.events, container.routines, container.prep) }
+            initializer {
+                PrepDoneViewModel(
+                    sessionId, container.history, container.events, container.routines, container.prep,
+                    container.estimation, container.zone,
+                )
+            }
         },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -149,8 +167,11 @@ fun PrepDoneScreen(state: ResultUiState, zone: ZoneId, onDone: () -> Unit) {
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = if (result.onTime) stringResource(R.string.result_learn_on_time, result.prepareMin)
-                else stringResource(R.string.result_learn_late, result.prepareMin, result.minutesLate),
+                text = when {
+                    result.nextShiftMin > 0 -> stringResource(R.string.result_learn_earlier, result.prepareMin, result.nextShiftMin)
+                    result.nextShiftMin < 0 -> stringResource(R.string.result_learn_later, result.prepareMin, -result.nextShiftMin)
+                    else -> stringResource(R.string.result_learn_same, result.prepareMin)
+                },
                 style = AppTheme.type.caption,
                 color = AppTheme.colors.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -167,7 +188,7 @@ private val previewZone: ZoneId = ZoneId.of("America/Bogota")
 @WearPreviews
 @Composable
 private fun ResultOnTimeLightPreview() = ATiempoPreview(dark = false) {
-    PrepDoneScreen(ResultUiState.Loaded(minutesLate = -2, arriveAt = 1_794_833_880_000, prepareMin = 22), previewZone) {}
+    PrepDoneScreen(ResultUiState.Loaded(minutesLate = -2, arriveAt = 1_794_833_880_000, prepareMin = 22, nextShiftMin = 0), previewZone) {}
 }
 
 @WearPreviews

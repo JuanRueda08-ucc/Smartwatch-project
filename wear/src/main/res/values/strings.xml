@@ -103,8 +103,9 @@
     <string name="a11y_prep_late">%1$s. Vas %2$d min tarde</string>
     <string name="result_on_time">Saliste a tiempo</string>
     <string name="result_late">Saliste %1$d min tarde</string>
-    <string name="result_learn_on_time">Prepararte te tomó %1$d min. Ajusté tu rutina.</string>
-    <string name="result_learn_late">Prepararte te tomó %1$d min. La próxima vez te aviso %2$d min antes.</string>
+    <string name="result_learn_same">Prepararte te tomó %1$d min. Tu rutina sigue igual.</string>
+    <string name="result_learn_earlier">Prepararte te tomó %1$d min. La próxima vez te aviso %2$d min antes.</string>
+    <string name="result_learn_later">Prepararte te tomó %1$d min. La próxima vez te aviso %2$d min después.</string>
     <string name="action_back_to_alert">Volver al aviso</string>
     <string name="notif_channel_name">Avisos de preparación</string>
     <string name="notif_channel_description">Un aviso por cada estado, con su vibración, para salir a tiempo</string>

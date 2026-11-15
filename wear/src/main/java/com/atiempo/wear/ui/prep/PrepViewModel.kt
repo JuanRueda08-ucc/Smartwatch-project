@@ -62,7 +62,8 @@ class PrepViewModel(
             remainingFraction = view.remainingFraction,
             isLate = view.isLate,
             minutesLate = view.minutesLate,
-            arriveAt = maxOf(now, session.plan.leaveAt) + travel,
+            // "Sal ahora · Llegas a las…": si sale ya, aunque sea antes de la hora del plan (igual que el resultado).
+            arriveAt = now + travel,
             items = session.routine.items,
             checkedItems = session.checkedItems,
         )

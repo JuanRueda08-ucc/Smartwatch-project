@@ -186,7 +186,8 @@ Una sola pantalla que cambia según el estado activo:
 
 ### 3.7 Resultado (`prep/{sessionId}/done`)
 - "Saliste a tiempo" con check verde, o "Saliste 4 min tarde" sin regaños.
-- Una línea de aprendizaje: "Prepararte te tomó 22 min. Ajusté tu rutina."
+- Una línea de aprendizaje con el cambio real para la próxima vez (D-033): "Prepararte te tomó 22 min. La próxima
+  vez te aviso 3 min antes." (o "… min después", o "Tu rutina sigue igual.").
 
 ### 3.8 ¿Por qué te avisé antes? (`explain/{eventId}`)
 - Lista de razones con su efecto en minutos, por ejemplo:

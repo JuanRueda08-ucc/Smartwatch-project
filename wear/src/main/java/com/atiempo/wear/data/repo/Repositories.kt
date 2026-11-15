@@ -10,6 +10,7 @@ import com.atiempo.wear.data.db.StepRecord
 import com.atiempo.wear.data.db.StepRecordDao
 import com.atiempo.wear.domain.model.PrepStep
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /*
@@ -46,14 +47,9 @@ class HistoryRepository(private val sessions: PrepSessionDao, private val steps:
     suspend fun history(routineId: Long, step: PrepStep): List<StepRecord> = steps.history(routineId, step)
 
     /** El historial agrupado por rutina y paso, para el DurationEstimator. */
-    fun estimationData(zone: java.time.ZoneId): Flow<EstimationData> = steps.observeAll().map { records ->
-        EstimationData(
-            history = records.groupBy { it.routineId }.mapValues { (_, byRoutine) ->
-                byRoutine.groupBy { it.step }.mapValues { (_, list) ->
-                    list.map { com.atiempo.wear.domain.StepHistory(it.actualMin, it.dayOfWeek) }
-                }
-            },
-            zone = zone,
-        )
-    }
+    fun estimationData(zone: java.time.ZoneId): Flow<EstimationData> =
+        steps.observeAll().map { records -> records.toEstimationData(zone) }
+
+    /** Todo el historial ahora mismo, del más antiguo al más reciente. */
+    suspend fun allRecords(): List<StepRecord> = steps.observeAll().first()
 }
