@@ -10,6 +10,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,11 +22,17 @@ import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.TimeText
 import androidx.wear.compose.material3.timeTextCurvedText
+import androidx.wear.ambient.AmbientLifecycleObserver
 import com.atiempo.wear.domain.ThemeResolver
 import com.atiempo.wear.domain.model.ThemeMode
+import com.atiempo.wear.ui.components.AmbientClock
+import com.atiempo.wear.ui.components.AmbientState
 import com.atiempo.wear.ui.components.ClockTimeSource
+import com.atiempo.wear.ui.components.LocalAmbient
+import com.atiempo.wear.ui.components.clockText
 import com.atiempo.wear.ui.navigation.AppNavHost
 import com.atiempo.wear.ui.theme.ATiempoTheme
+import com.atiempo.wear.ui.theme.AmbientColors
 import com.atiempo.wear.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 import java.time.LocalTime
@@ -36,9 +43,26 @@ class MainActivity : ComponentActivity() {
     /** Cambia cada vez que se pide abrir el aviso en curso (al tocar la notificación). */
     private val openPrepRequests = mutableIntStateOf(0)
 
+    /** Modo ambiente (D-034): la preparación sigue a la vista con el reloj en reposo. */
+    private val ambientState = AmbientState()
+    private val ambientCallback = object : AmbientLifecycleObserver.AmbientLifecycleCallback {
+        override fun onEnterAmbient(ambientDetails: AmbientLifecycleObserver.AmbientDetails) {
+            ambientState.isAmbient = true
+        }
+
+        override fun onExitAmbient() {
+            ambientState.isAmbient = false
+        }
+
+        override fun onUpdateAmbient() {
+            ambientState.minuteTicks++
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val container = (application as ATiempoApp).container
+        lifecycle.addObserver(AmbientLifecycleObserver(this, ambientCallback))
         handleIntent(intent)
         setContent {
             val mode by container.settings.themeMode.collectAsStateWithLifecycle(initialValue = ThemeMode.LIGHT)
@@ -50,8 +74,27 @@ class MainActivity : ComponentActivity() {
                 val timeStyle = CurvedTextStyle(AppTheme.type.timeText.copy(color = AppTheme.colors.onSurface))
                 // La hora sale del reloj de la app: en modo demo es la hora acelerada.
                 val timeSource = remember { ClockTimeSource(container.clock, container.zone) }
-                AppScaffold(timeText = { TimeText(timeSource = timeSource) { time -> timeTextCurvedText(time, timeStyle) } }) {
-                    AppNavHost(container, openPrepRequest = openPrepRequests.intValue)
+                CompositionLocalProvider(LocalAmbient provides ambientState) {
+                    // En reposo la hora va en blanco sobre negro, sin la píldora clara (D-034).
+                    val ambientTimeStyle = CurvedTextStyle(AppTheme.type.timeText.copy(color = AmbientColors.onBackground))
+                    AppScaffold(
+                        timeText = {
+                            if (ambientState.isAmbient) {
+                                TimeText(timeSource = timeSource, backgroundColor = AmbientColors.background) { time ->
+                                    timeTextCurvedText(time, ambientTimeStyle)
+                                }
+                            } else {
+                                TimeText(timeSource = timeSource) { time -> timeTextCurvedText(time, timeStyle) }
+                            }
+                        },
+                    ) {
+                        AppNavHost(container, openPrepRequest = openPrepRequests.intValue)
+                    }
+                    // En reposo, las pantallas sin versión ambiente se tapan con la hora en blanco sobre negro.
+                    if (ambientState.isAmbient && ambientState.ambientAwareScreens == 0) {
+                        val time = remember(ambientState.minuteTicks) { clockText(container.clock.now(), container.zone) }
+                        AmbientClock(time)
+                    }
                 }
             }
         }

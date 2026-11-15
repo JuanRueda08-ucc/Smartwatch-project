@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.wear.compose.ui.tooling)
     implementation(libs.wear.tooling.preview)
     implementation(libs.wear.input)
+    implementation(libs.wear)
 
     implementation(libs.activity.compose)
     implementation(libs.lifecycle.runtime.compose)

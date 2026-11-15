@@ -6,6 +6,7 @@ ksp = "2.3.14"
 wearCompose = "1.7.1"
 wearToolingPreview = "1.0.0"
 wearInput = "1.2.0"
+wear = "1.4.0"
 composeBom = "2026.09.00"
 activityCompose = "1.13.0"
 lifecycle = "2.11.0"
@@ -26,6 +27,7 @@ wear-compose-navigation = { group = "androidx.wear.compose", name = "compose-nav
 wear-compose-ui-tooling = { group = "androidx.wear.compose", name = "compose-ui-tooling", version.ref = "wearCompose" }
 wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
 wear-input = { group = "androidx.wear", name = "wear-input", version.ref = "wearInput" }
+wear = { group = "androidx.wear", name = "wear", version.ref = "wear" }
 
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }

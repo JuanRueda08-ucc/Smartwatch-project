@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,6 +45,7 @@ import com.atiempo.wear.ui.components.BottomAction
 import com.atiempo.wear.ui.components.BottomActionButton
 import com.atiempo.wear.ui.components.ChipButton
 import com.atiempo.wear.ui.components.Countdown
+import com.atiempo.wear.ui.components.FitColumn
 import com.atiempo.wear.ui.components.TintedIcon
 import com.atiempo.wear.ui.components.WearPreviews
 import com.atiempo.wear.ui.components.clockText
@@ -114,12 +116,10 @@ private fun UpcomingHome(
             ),
             strokeWidth = 5.dp,
         )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = safeHorizontalPadding(), vertical = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+        // Si no cabe (pantalla pequeña o texto grande) se reduce para verse completo; Inicio no se desplaza (D-034).
+        FitColumn(
+            padding = PaddingValues(horizontal = safeHorizontalPadding(), vertical = 30.dp),
+            scrollable = false,
         ) {
             Text(
                 text = eventWhen(state.dayOffset, state.weekday, state.eventAt, zone),
@@ -192,12 +192,10 @@ private fun ActiveHome(
             colors = ProgressIndicatorDefaults.colors(indicatorColor = color, trackColor = AppTheme.colors.surfaceBright),
             strokeWidth = 5.dp,
         )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = safeHorizontalPadding(), vertical = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+        // Si no cabe (pantalla pequeña o texto grande) se reduce para verse completo; Inicio no se desplaza (D-034).
+        FitColumn(
+            padding = PaddingValues(horizontal = safeHorizontalPadding(), vertical = 30.dp),
+            scrollable = false,
         ) {
             Text(
                 text = stringResource(R.string.event_when, state.title, clockText(state.eventAt, zone)),

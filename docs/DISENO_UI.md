@@ -106,6 +106,28 @@ No se usan tamaños fuera de esta escala. `title` y `body` usan corte de línea 
   desvanece al acercarse al borde (comportamiento de `TransformingLazyColumn`), no solo en las listas.
 - Espaciado base 4 dp; separaciones comunes 8, 12, 16 dp.
 - Objetivos táctiles ≥ 48 dp.
+- **Pantallas más pequeñas (D-034):** el diseño se hizo para Large Round (227 dp). En pantallas menores la escala
+  tipográfica completa y el ancho y la distancia al borde del botón inferior se multiplican por
+  `ancho / 227` (Small Round 192 dp → 0,85; cuadrada 180 dp → 0,8, el mínimo). El alto del botón sigue en 48 dp.
+- **Pantallas fijas** (estados, resultado): el contenido va centrado; si no cabe (pantalla pequeña o texto grande)
+  se desplaza con el dedo o la corona, y un degradado sobre el botón indica que hay más. El anillo del estado se
+  dibuja encima, siempre completo.
+
+### Modo ambiente (D-034)
+
+Con el reloj en reposo la app sigue visible, pero cambia a una versión de bajo consumo, igual en los dos temas:
+- **Estados de preparación:** fondo negro y anillo fino (2 dp) de contorno blanco con el tiempo que queda.
+  Debajo, el nombre del paso y los minutos en blanco (unidad en gris). Sin ícono, sin colores de estado y sin
+  botón.
+- **Las demás pantallas:** solo la hora en `display`, blanca sobre negro.
+- La hora de arriba va en blanco, sin píldora.
+
+| Token ambiente | Valor |
+|---|---|
+| fondo | `#000000` |
+| texto | `#FFFFFF` |
+| texto secundario | `#B4B4BE` |
+| pista del anillo | `#3A3A42` |
 
 ### Iconografía
 
@@ -176,6 +198,7 @@ Una sola pantalla que cambia según el estado activo:
 - Botón inferior "Listo" (o "Ya salí" en el estado 4). Al tocarlo: vibración corta de confirmación y
   transición al siguiente estado con animación de barrido del anillo.
 - Si el tiempo del paso se acaba sin confirmar, el anillo cambia a `late` y el texto a "Vas X min tarde".
+- En reposo, versión ambiente (ver §2, Modo ambiente).
 
 | # | Nombre en pantalla | Mensaje secundario |
 |---|---|---|

@@ -52,5 +52,16 @@ val DarkColors = AppColors(
     onState = Color(0xFF000000),
 )
 
+/**
+ * Modo ambiente (reloj en reposo, D-034): igual en los dos temas. Fondo negro, texto blanco y gris, sin colores
+ * de estado ni rellenos, como piden las guías de Wear OS para cuidar la batería y la pantalla.
+ */
+object AmbientColors {
+    val background = Color(0xFF000000)
+    val onBackground = Color(0xFFFFFFFF)
+    val onBackgroundVariant = Color(0xFFB4B4BE)
+    val track = Color(0xFF3A3A42)
+}
+
 /** Opacidad de los fondos suaves de tarjeta con el color de un estado (DISENO_UI §2). */
 const val TINT_ALPHA = 0.12f

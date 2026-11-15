@@ -31,6 +31,24 @@ data class AppType(
 val LocalAppType = staticCompositionLocalOf { AppType() }
 
 /**
+ * La escala completa multiplicada por `factor` (tamaño y alto de línea). Se usa para que las pantallas
+ * pequeñas conserven las proporciones de la grande (D-034). La hora del TimeText no cambia.
+ */
+fun AppType.scaled(factor: Float): AppType {
+    if (factor == 1f) return this
+    fun TextStyle.s() = copy(fontSize = fontSize * factor, lineHeight = lineHeight * factor)
+    return copy(
+        display = display.s(),
+        displayUnit = displayUnit.s(),
+        title = title.s(),
+        body = body.s(),
+        button = button.s(),
+        label = label.s(),
+        caption = caption.s(),
+    )
+}
+
+/**
  * Asigna la escala propia a los slots de la tipografía de Wear Material 3, para que los
  * componentes estándar (botones, tarjetas, TimeText) ya usen nuestros tamaños.
  */

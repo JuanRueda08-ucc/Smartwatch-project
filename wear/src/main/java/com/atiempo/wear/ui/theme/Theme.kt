@@ -1,5 +1,8 @@
 package com.atiempo.wear.ui.theme
 
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -19,8 +22,10 @@ private const val THEME_FADE_MS = 300
 @Composable
 fun ATiempoTheme(dark: Boolean, content: @Composable () -> Unit) {
     val colors = animatedColors(if (dark) DarkColors else LightColors)
-    val type = AppType()
+    val scale = screenScale(LocalConfiguration.current.screenWidthDp)
+    val type = remember(scale) { AppType().scaled(scale) }
     CompositionLocalProvider(
+        LocalScreenScale provides scale,
         LocalAppColors provides colors,
         LocalStateColors provides colors.toStateColors(),
         LocalAppType provides type,
@@ -34,6 +39,17 @@ fun ATiempoTheme(dark: Boolean, content: @Composable () -> Unit) {
     }
 }
 
+/** Ancho de referencia del diseño: Large Round (454 px a 320 dpi). */
+const val REFERENCE_SCREEN_DP = 227f
+
+/**
+ * Cuánto se reduce el diseño en pantallas más pequeñas que la de referencia (Small Round: 192 dp → 0,85).
+ * Nunca agranda; nunca baja de 0,8 para que el texto siga legible (D-034).
+ */
+fun screenScale(screenWidthDp: Int): Float = (screenWidthDp / REFERENCE_SCREEN_DP).coerceIn(0.8f, 1f)
+
+val LocalScreenScale = staticCompositionLocalOf { 1f }
+
 /** Acceso a los tokens propios desde cualquier pantalla. */
 object AppTheme {
     val colors: AppColors
@@ -42,6 +58,9 @@ object AppTheme {
         @Composable @ReadOnlyComposable get() = LocalStateColors.current
     val type: AppType
         @Composable @ReadOnlyComposable get() = LocalAppType.current
+    /** 1 en Large Round; menos en pantallas pequeñas. Para medidas fijas en dp que deben seguir la pantalla. */
+    val scale: Float
+        @Composable @ReadOnlyComposable get() = LocalScreenScale.current
 }
 
 /**

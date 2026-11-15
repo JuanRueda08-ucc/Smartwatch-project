@@ -16,7 +16,12 @@ import com.atiempo.wear.ui.theme.AppTheme
  * (DISENO_UI §2, `display`). El tiempo es el protagonista de cada pantalla.
  */
 @Composable
-fun Countdown(minutes: Int, modifier: Modifier = Modifier, color: Color = AppTheme.colors.onSurface) {
+fun Countdown(
+    minutes: Int,
+    modifier: Modifier = Modifier,
+    color: Color = AppTheme.colors.onSurface,
+    unitColor: Color = AppTheme.colors.onSurfaceVariant,
+) {
     val safe = minutes.coerceAtLeast(0)
     val (number, unit) = when {
         safe < 60 -> safe.toString() to stringResource(R.string.unit_min)
@@ -29,7 +34,7 @@ fun Countdown(minutes: Int, modifier: Modifier = Modifier, color: Color = AppThe
         Text(
             text = unit,
             style = AppTheme.type.displayUnit,
-            color = AppTheme.colors.onSurfaceVariant,
+            color = unitColor,
             modifier = Modifier.alignByBaseline().padding(start = 3.dp),
         )
     }

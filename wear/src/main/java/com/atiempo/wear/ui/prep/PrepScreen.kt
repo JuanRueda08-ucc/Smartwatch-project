@@ -62,12 +62,17 @@ import com.atiempo.wear.ui.components.BottomAction
 import com.atiempo.wear.ui.components.BottomActionButton
 import com.atiempo.wear.ui.components.BottomFade
 import com.atiempo.wear.ui.components.Countdown
+import com.atiempo.wear.ui.components.DrawsOwnAmbient
+import com.atiempo.wear.ui.components.FitColumn
+import com.atiempo.wear.ui.components.TIME_TEXT_CLEARANCE
+import com.atiempo.wear.ui.components.LocalAmbient
 import com.atiempo.wear.ui.components.TintedIcon
 import com.atiempo.wear.ui.components.WearPreviews
 import com.atiempo.wear.ui.components.clockText
 import com.atiempo.wear.ui.components.icon
 import com.atiempo.wear.ui.components.stepColor
 import com.atiempo.wear.ui.components.title
+import com.atiempo.wear.ui.theme.AmbientColors
 import com.atiempo.wear.ui.theme.AppTheme
 import com.atiempo.wear.ui.theme.TINT_ALPHA
 import java.time.ZoneId
@@ -85,7 +90,10 @@ fun PrepRoute(container: AppContainer, sessionId: Long, onFinished: () -> Unit, 
         PrepUiState.Missing -> LaunchedEffect(Unit) { onMissing() }
         else -> Unit
     }
-    PrepScreen(state, container.zone, onConfirm = viewModel::onConfirm, onToggleItem = viewModel::onToggleItem)
+    // La preparación tiene su propia versión en reposo (D-034): sigue a la vista con la muñeca abajo.
+    DrawsOwnAmbient()
+    val ambient = LocalAmbient.current.isAmbient
+    PrepScreen(state, container.zone, onConfirm = viewModel::onConfirm, onToggleItem = viewModel::onToggleItem, ambient = ambient)
 }
 
 /**
@@ -94,17 +102,28 @@ fun PrepRoute(container: AppContainer, sessionId: Long, onFinished: () -> Unit, 
  * Si se acaba el tiempo de salir, el anillo y los textos pasan a `late`.
  */
 @Composable
-fun PrepScreen(state: PrepUiState, zone: ZoneId, onConfirm: () -> Unit, onToggleItem: (Int) -> Unit) {
+fun PrepScreen(
+    state: PrepUiState,
+    zone: ZoneId,
+    onConfirm: () -> Unit,
+    onToggleItem: (Int) -> Unit,
+    ambient: Boolean = false,
+) {
+    if (ambient) {
+        AmbientPrep(state as? PrepUiState.Active)
+        return
+    }
     Box(modifier = Modifier.fillMaxSize().background(AppTheme.colors.background)) {
         val active = state as? PrepUiState.Active ?: return@Box
         val color = stepColor(active.step, active.isLate)
-        StepRing(active.step, if (active.isLate) 1f else active.remainingFraction, color)
         if (active.step == PrepStep.CHECK) {
             CheckContent(active, color, onToggleItem)
             BottomFade()
         } else {
             StandardContent(active, color, zone)
         }
+        // El anillo va encima del contenido y de su degradado: siempre se ve completo. No es tocable.
+        StepRing(active.step, if (active.isLate) 1f else active.remainingFraction, color)
         val leave = active.step == PrepStep.LEAVE
         BottomActionButton(
             label = stringResource(if (leave) R.string.action_left else R.string.action_done),
@@ -140,13 +159,9 @@ private fun StandardContent(state: PrepUiState.Active, color: Color, zone: ZoneI
     val name = stringResource(state.step.title())
     val description = if (state.isLate) stringResource(R.string.a11y_prep_late, name, state.minutesLate)
     else stringResource(R.string.a11y_prep_left, name, state.minutesLeft)
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 26.dp)
-            .padding(top = 20.dp, bottom = BottomAction.Height + BottomAction.BottomGap + 2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    FitColumn(
+        padding = PaddingValues(start = 26.dp * AppTheme.scale, end = 26.dp * AppTheme.scale, top = TIME_TEXT_CLEARANCE, bottom = BottomAction.Height + BottomAction.BottomGap),
+        modifier = Modifier.fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -267,6 +282,42 @@ private fun CheckContent(state: PrepUiState.Active, color: Color, onToggleItem: 
     }
 }
 
+/**
+ * En reposo (D-034): fondo negro, anillo fino de contorno en blanco con lo que queda, nombre del paso y minutos.
+ * Sin ícono relleno, sin colores de estado y sin botón; al levantar la muñeca vuelve la pantalla completa.
+ */
+@Composable
+private fun AmbientPrep(state: PrepUiState.Active?) {
+    Box(modifier = Modifier.fillMaxSize().background(AmbientColors.background), contentAlignment = Alignment.Center) {
+        if (state == null) return@Box
+        CircularProgressIndicator(
+            progress = { if (state.isLate) 1f else state.remainingFraction },
+            modifier = Modifier.fillMaxSize().padding(2.dp),
+            colors = ProgressIndicatorDefaults.colors(indicatorColor = AmbientColors.onBackground, trackColor = AmbientColors.track),
+            strokeWidth = 2.dp,
+        )
+        val name = stringResource(state.step.title())
+        val description = if (state.isLate) stringResource(R.string.a11y_prep_late, name, state.minutesLate)
+        else stringResource(R.string.a11y_prep_left, name, state.minutesLeft)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 30.dp).clearAndSetSemantics { contentDescription = description },
+        ) {
+            Text(text = name, style = AppTheme.type.title, color = AmbientColors.onBackground, textAlign = TextAlign.Center, maxLines = 2)
+            if (state.isLate) {
+                Text(
+                    text = stringResource(R.string.prep_late, state.minutesLate),
+                    style = AppTheme.type.title,
+                    color = AmbientColors.onBackground,
+                    textAlign = TextAlign.Center,
+                )
+            } else {
+                Countdown(minutes = state.minutesLeft, color = AmbientColors.onBackground, unitColor = AmbientColors.onBackgroundVariant)
+            }
+        }
+    }
+}
+
 /** Círculo de marcado: vacío o relleno con check. */
 @Composable
 private fun CheckDot(checked: Boolean, color: Color) {
@@ -319,3 +370,7 @@ private fun PrepLeaveLightPreview() = ATiempoPreview(dark = false) { PrepScreen(
 @WearPreviews
 @Composable
 private fun PrepLateDarkPreview() = ATiempoPreview(dark = true) { PrepScreen(preview(PrepStep.LEAVE, late = true), previewZone, {}, {}) }
+
+@WearPreviews
+@Composable
+private fun PrepAmbientPreview() = ATiempoPreview(dark = false) { PrepScreen(preview(PrepStep.PREPARE), previewZone, {}, {}, ambient = true) }

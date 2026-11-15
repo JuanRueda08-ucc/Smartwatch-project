@@ -345,3 +345,21 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
 - **Datos del emulador:** se borraron los datos de la app (`pm clear`) para quitar la sesión fantasma y los registros
   cortos de las pruebas. Se sembraron de nuevo; la prueba de esta tarea dejó una sesión de Clase.
 - Probado en el emulador en modo demo: "Prepararte te tomó 13 min. La próxima vez te aviso 3 min después."
+
+### D-034 · 2026-11-15 · Pantallas pequeñas, texto grande y modo ambiente (tarea 5.1)
+- **Revisión en tres relojes:** Large Round (227 dp), Small Round (192 dp) y cuadrado (180 dp), con Wear OS 6.
+  En Small Round, Inicio perdía "Ver plan", el botón tapaba la cuenta regresiva de los estados y el resultado
+  cortaba la línea de aprendizaje.
+- **Escala por tamaño de pantalla:** la escala tipográfica y el ancho y la distancia al borde del botón inferior se
+  multiplican por `ancho / 227` (`screenScale`, entre 0,8 y 1). Nunca agranda y el alto de los botones sigue en
+  48 dp. Es más fiel al diseño que tener tamaños aparte por dispositivo.
+- **Pantallas fijas que no caben** (pantalla pequeña o texto grande): `FitColumn` centra el contenido cuando cabe y,
+  si no cabe, lo deja desplazar con el dedo o la corona. Un degradado sobre el botón aparece solo cuando hay más
+  abajo. El anillo del estado se dibuja encima del contenido para que siempre se vea completo.
+- **Modo ambiente** con `AmbientLifecycleObserver` (`androidx.wear:wear` 1.4.0):
+  - la preparación tiene su versión en reposo: negro, anillo fino blanco, paso y minutos, sin botón ni colores;
+  - las demás pantallas muestran solo la hora en blanco;
+  - la hora de arriba pierde la píldora clara.
+  Así la persona puede mirar cuánto le queda con la muñeca abajo, sin gastar batería.
+- **Emuladores nuevos:** el disco D: tiene poco espacio, así que la partición de datos de los emuladores nuevos se
+  bajó a 2 GB. El Small Round se borró después de revisarlo.

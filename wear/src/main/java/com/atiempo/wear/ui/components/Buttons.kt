@@ -1,5 +1,7 @@
 package com.atiempo.wear.ui.components
 
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.unit.Dp
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -36,11 +38,16 @@ import com.atiempo.wear.ui.theme.AppTheme
 
 /** Medidas del botón principal inferior (D-011). */
 object BottomAction {
-    val Width = 132.dp
+    /** 132 dp en Large Round; se reduce con la pantalla (D-034). */
+    val Width: Dp
+        @Composable @ReadOnlyComposable get() = 132.dp * AppTheme.scale
+    /** El alto no se reduce: es el objetivo táctil mínimo de 48 dp. */
     val Height = 48.dp
-    val BottomGap = 26.dp
+    val BottomGap: Dp
+        @Composable @ReadOnlyComposable get() = 26.dp * AppTheme.scale
     /** Espacio que el contenido debe dejar libre abajo para no quedar bajo el botón. */
-    val ReservedHeight = Height + BottomGap + 8.dp
+    val ReservedHeight: Dp
+        @Composable @ReadOnlyComposable get() = Height + BottomGap + 8.dp
 }
 
 /**

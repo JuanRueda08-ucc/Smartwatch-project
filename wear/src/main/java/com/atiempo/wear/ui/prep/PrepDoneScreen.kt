@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -39,6 +40,8 @@ import com.atiempo.wear.domain.model.PrepStep
 import com.atiempo.wear.ui.components.ATiempoPreview
 import com.atiempo.wear.ui.components.BottomAction
 import com.atiempo.wear.ui.components.BottomActionButton
+import com.atiempo.wear.ui.components.FitColumn
+import com.atiempo.wear.ui.components.TIME_TEXT_CLEARANCE
 import com.atiempo.wear.ui.components.WearPreviews
 import com.atiempo.wear.ui.components.clockText
 import com.atiempo.wear.ui.theme.AppTheme
@@ -130,13 +133,9 @@ fun PrepDoneRoute(container: AppContainer, sessionId: Long, onDone: () -> Unit) 
 fun PrepDoneScreen(state: ResultUiState, zone: ZoneId, onDone: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize().background(AppTheme.colors.background)) {
         val result = state as? ResultUiState.Loaded ?: return@Box
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 26.dp)
-                .padding(top = 20.dp, bottom = BottomAction.Height + BottomAction.BottomGap + 2.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+        FitColumn(
+            padding = PaddingValues(start = 26.dp * AppTheme.scale, end = 26.dp * AppTheme.scale, top = TIME_TEXT_CLEARANCE, bottom = BottomAction.Height + BottomAction.BottomGap),
+            modifier = Modifier.fillMaxSize(),
         ) {
             Box(
                 modifier = Modifier
