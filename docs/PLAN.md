@@ -62,7 +62,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 
 - [x] 5.1 Revisar todas las pantallas en tema claro y oscuro, en Large Round, Small Round y Square, y con texto grande.
       Revisar también el modo ambiente.
-- [ ] 5.2 Accesibilidad: `contentDescription`, contraste ≥ 4.5:1, objetivos táctiles ≥ 48 dp.
+- [x] 5.2 Accesibilidad: `contentDescription`, contraste ≥ 4.5:1, objetivos táctiles ≥ 48 dp.
 - [ ] 5.3 Ícono de la app y nombre final.
 - [ ] 5.4 Capturas de cada pantalla en `design/capturas/` (claro como principal, más una muestra en oscuro)
       y un video corto de la demo.

@@ -363,3 +363,18 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   Así la persona puede mirar cuánto le queda con la muñeca abajo, sin gastar batería.
 - **Emuladores nuevos:** el disco D: tiene poco espacio, así que la partición de datos de los emuladores nuevos se
   bajó a 2 GB. El Small Round se borró después de revisarlo.
+
+### D-035 · 2026-11-15 · Revisión de accesibilidad (tarea 5.2)
+- **Descripciones:** los 16 íconos con `contentDescription = null` acompañan un texto visible o están dentro de un
+  elemento con descripción propia (botones con etiqueta, tarjetas con `clearAndSetSemantics`, marcas con
+  `stateDescription`), así que no se leen dos veces. Los controles que son solo ícono (flecha "Ver eventos" de
+  Inicio y − / + del editor) ya tenían descripción.
+- **Lectores de pantalla:** anillos, barras del resumen, línea de tiempo y estados ya dicen lo que muestran
+  ("Prepárate. Faltan 12 min", "Jueves: tarde"). Sin cambios.
+- **Objetivos táctiles:** un script lee con `uiautomator` los elementos tocables de Inicio, Eventos, Rutinas,
+  Editor, Ajustes, Detalle, Explicación y Estados, y los compara con 48 dp. No hay ninguno menor en reposo; los
+  únicos avisos son filas que se están encogiendo en el borde de la lista al desplazar.
+- **Contraste:** `design/contraste.py` también revisa ahora la paleta del modo ambiente (21:1, 10,2:1 y 11,3:1).
+  Ningún par por debajo de 4,5:1 en texto ni de 3:1 en elementos que no son texto.
+- **Texto grande:** probado con escala 1,3 en el reloj cuadrado (el peor caso). Inicio se reduce para verse
+  completo y los estados muestran lo esencial y desplazan el resto (D-034).

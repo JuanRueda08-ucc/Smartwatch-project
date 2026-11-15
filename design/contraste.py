@@ -45,4 +45,16 @@ for name, P in (("Claro", L), ("Oscuro", D)):
     print(f"Rango texto sobre background: {min(txt):.2f} – {max(txt):.2f}")
     print(f"onState sobre estados: mín {min(cr(P['onState'], P[c]) for c in TEXT[1:]):.2f}")
 
+# Modo ambiente (D-034): igual en los dos temas.
+A = dict(background="#000000", on="#FFFFFF", variant="#B4B4BE", track="#3A3A42")
+print("\n=== Ambiente ===")
+for label, v, need in [
+    ("texto / fondo", cr(A["on"], A["background"]), 4.5),
+    ("texto secundario / fondo", cr(A["variant"], A["background"]), 4.5),
+    ("anillo (no texto) / pista", cr(A["on"], A["track"]), 3.0),
+]:
+    mark = "OK " if v >= need else "MAL"
+    if v < need: fails.append(("Ambiente", label, round(v, 2), need))
+    print(f"{mark} {v:5.2f}  (mín {need})  {label}")
+
 print("\nFALLAS:", fails or "ninguna")
