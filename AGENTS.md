@@ -5,7 +5,7 @@ Léela completa antes de tocar código. `CLAUDE.md` la importa.
 
 ## Qué es este proyecto
 
-**A Tiempo** (nombre de trabajo): una app para smartwatch con **Wear OS** que ayuda a la persona a
+**TickGo** (antes "A Tiempo", nombre de trabajo; ver D-036): una app para smartwatch con **Wear OS** que ayuda a la persona a
 empezar a prepararse y salir con tiempo suficiente para llegar a una cita, clase o actividad.
 No es una alarma fija: divide la preparación en **4 estados** con vibraciones distintas y **aprende**
 cuánto tarda realmente la persona en cada rutina.

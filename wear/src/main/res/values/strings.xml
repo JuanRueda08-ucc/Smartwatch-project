@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">A Tiempo</string>
+    <string name="app_name">TickGo</string>
 
     <!-- Tiempo -->
     <string name="unit_min">min</string>
@@ -198,7 +198,7 @@
     <string name="settings_auto_detail">Oscuro de 19:00 a 5:59</string>
     <string name="settings_full_screen">Avisos a pantalla completa</string>
     <string name="settings_full_screen_detail">Toca para permitirlos</string>
-    <string name="settings_version">A Tiempo · versión %1$s</string>
+    <string name="settings_version">TickGo · versión %1$s</string>
     <string name="settings_version_hint">Mantén presionado para opciones de demo</string>
     <string name="settings_demo">Modo demo</string>
     <string name="settings_demo_detail">1 min pasa en 5 s</string>

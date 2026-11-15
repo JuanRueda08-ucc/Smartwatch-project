@@ -253,7 +253,7 @@ Una sola pantalla que cambia según el estado activo:
 - Sección "Avisos": interruptor de vibraciones ("Un patrón distinto por estado"). Si el sistema no permite abrir
   los avisos a pantalla completa, aparece "Avisos a pantalla completa · Toca para permitirlos" con borde
   `state3Check`, que abre el ajuste del sistema (D-028).
-- Sección "Acerca de": "A Tiempo · versión 0.1". Mantenerla presionada descubre el interruptor "Modo demo · 1 min
+- Sección "Acerca de": "TickGo · versión 0.1". Mantenerla presionada descubre el interruptor "Modo demo · 1 min
   pasa en 5 s".
 - Con el modo demo activo: botón "Ir al próximo aviso", que salta a 3 s (de la demo) antes del siguiente aviso y
   vuelve a Inicio. Todo, incluida la hora de arriba, usa la hora acelerada.

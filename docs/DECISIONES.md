@@ -378,3 +378,15 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   Ningún par por debajo de 4,5:1 en texto ni de 3:1 en elementos que no son texto.
 - **Texto grande:** probado con escala 1,3 en el reloj cuadrado (el peor caso). Inicio se reduce para verse
   completo y los estados muestran lo esencial y desplazan el resto (D-034).
+
+### D-036 · 2026-11-15 · Nombre e ícono finales: TickGo (tarea 5.3)
+- **Nombre:** elegido por la persona entre varias opciones: "tick" (el reloj que avanza) + "go" (salir). Es corto
+  y cabe bajo el ícono. Cambia en `app_name`, Ajustes, el prototipo, AGENTS.md y DISENO_UI.
+- **El paquete sigue siendo `com.atiempo.wear`:** renombrarlo no se ve en la interfaz y arriesga romper datos,
+  alarmas e instalación a dos días de la entrega.
+- **Ícono:** el mismo concepto del provisional, afinado:
+  - anillo casi completo de las 12 a las 10, cuyo hueco sugiere movimiento;
+  - marca a las 12 como en una esfera ("tick");
+  - flecha hacia adelante ("go");
+  - trazos blancos de 4 a 5 dp sobre `primary` (#2F5BD3), dentro del círculo seguro de 66 dp;
+  - la versión monocromática usa el mismo dibujo.
