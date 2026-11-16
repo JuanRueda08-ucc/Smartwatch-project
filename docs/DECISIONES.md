@@ -390,3 +390,15 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   - flecha hacia adelante ("go");
   - trazos blancos de 4 a 5 dp sobre `primary` (#2F5BD3), dentro del círculo seguro de 66 dp;
   - la versión monocromática usa el mismo dibujo.
+
+### D-037 · 2026-11-15 · Sin pantalla de bienvenida (onboarding)
+- **Inicio sí, onboarding no.** Inicio ya es la pantalla principal: responde de un vistazo "¿cuánto me falta?" y,
+  durante una preparación, lleva de vuelta al aviso. No es un menú de navegación, es la información misma.
+- **Por qué no hay carrusel de bienvenida:**
+  - en el reloj las interacciones duran segundos; 3 o 4 pantallas de bienvenida se saltan o estorban, y las
+    guías de Wear OS recomiendan evitarlas;
+  - la app se explica usándola: los datos de ejemplo muestran un plan desde el primer momento, Inicio sin eventos
+    dice qué hacer ("Crear con voz") y la pantalla de voz trae ejemplos que se pueden tocar;
+  - lo que la app aprende y por qué avisa a cierta hora se explica en contexto (Resultado y "¿Por qué a esta hora?").
+- **Permisos sin pantallas extra:** el de notificaciones se pide al abrir la app; si falta el de avisos a pantalla
+  completa, Ajustes muestra la fila "Avisos a pantalla completa · Toca para permitirlos".
