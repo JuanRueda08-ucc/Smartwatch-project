@@ -402,3 +402,17 @@ Nota para la Fase 3: el emulador viene en UTC; para la demo conviene ponerlo en 
   - lo que la app aprende y por qué avisa a cierta hora se explica en contexto (Resultado y "¿Por qué a esta hora?").
 - **Permisos sin pantallas extra:** el de notificaciones se pide al abrir la app; si falta el de avisos a pantalla
   completa, Ajustes muestra la fila "Avisos a pantalla completa · Toca para permitirlos".
+
+### D-038 · 2026-11-15 · Cierre: lint sin errores (tarea 5.6)
+- **Corregido:**
+  - texto suelto en `ic_directions_walk.xml`;
+  - lectura de recursos con `LocalResources` en la voz;
+  - descripción hablada de los pasos como plural ("1 minuto");
+  - el receptor de reinicio comprueba la acción;
+  - `toUri()`;
+  - 7 textos que ya no se usaban.
+- **Avisos que se dejan a propósito:**
+  - `FLAG_ACTIVITY_NEW_TASK` en la notificación y al abrir Ajustes del sistema: hace falta para abrir una actividad
+    desde fuera de la app.
+  - El orden del parámetro `modifier` en `Buttons.kt`: cambiarlo toca todas las pantallas a dos días de la entrega,
+    sin efecto visible.

@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -208,7 +209,7 @@ private fun StepEditor(estimate: StepEstimate, onChange: (PrepStep, Int) -> Unit
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             StepperButton(R.drawable.ic_remove, stringResource(R.string.routine_less)) { onChange(estimate.step, -1) }
-            val description = stringResource(R.string.a11y_step_minutes, name, estimate.minutes)
+            val description = pluralStringResource(R.plurals.a11y_step_minutes, estimate.minutes, name, estimate.minutes)
             Row(modifier = Modifier.clearAndSetSemantics { contentDescription = description }) {
                 Text(
                     text = estimate.minutes.toString(),

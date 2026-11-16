@@ -67,7 +67,7 @@ Objetivo: tener todas las pantallas definidas y aprobadas antes de programarlas.
 - [x] 5.4 Capturas de cada pantalla en `design/capturas/` (claro como principal, más una muestra en oscuro)
       y un video corto de la demo.
 - [x] 5.5 `README.md` con descripción, capturas, cómo compilar y decisiones de diseño.
-- [ ] 5.6 Último commit y push antes de las 11:00 PM.
+- [x] 5.6 Último commit y push antes de las 11:00 PM.
 
 ---
 

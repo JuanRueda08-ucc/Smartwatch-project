@@ -34,5 +34,8 @@ class AlertReceiver : BroadcastReceiver() {
  * `ATiempoApp` recupera la preparación y vuelve a programar la próxima alarma.
  */
 class RescheduleReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) = Unit
+    override fun onReceive(context: Context, intent: Intent) {
+        // Solo responde a las acciones del sistema declaradas en el manifiesto; el trabajo lo hace el arranque.
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED && intent.action != Intent.ACTION_MY_PACKAGE_REPLACED) return
+    }
 }

@@ -21,7 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -66,7 +66,7 @@ fun CreateVoiceRoute(container: AppContainer, onParsed: () -> Unit) {
         factory = viewModelFactory { initializer { CreateVoiceViewModel(container.drafts, container.clock, container.zone) } },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val resources = LocalResources.current
     // Entrada de texto de Wear: dictado o teclado (D-020).
     val input = rememberTextInput(
         prompt = stringResource(R.string.voice_prompt),
@@ -98,7 +98,7 @@ fun CreateVoiceRoute(container: AppContainer, onParsed: () -> Unit) {
         state = state,
         voiceAvailable = voiceAvailable,
         onSpeak = listen,
-        onExample = { viewModel.onTranscript(context.getString(it)) },
+        onExample = { viewModel.onTranscript(resources.getString(it)) },
     )
 }
 

@@ -153,8 +153,10 @@
     <string name="routine_use_learned">Usar lo aprendido</string>
     <string name="routine_less">Menos minutos</string>
     <string name="routine_more">Más minutos</string>
-    <string name="a11y_routine_bar">%1$s: %2$d min</string>
-    <string name="a11y_step_minutes">%1$s: %2$d minutos</string>
+    <plurals name="a11y_step_minutes">
+        <item quantity="one">%1$s: %2$d minuto</item>
+        <item quantity="other">%1$s: %2$d minutos</item>
+    </plurals>
 
     <!-- 3.11 Resumen semanal -->
     <string name="summary_period">Últimos 7 días</string>
@@ -212,28 +214,22 @@
     <string name="traffic_medium">medio</string>
     <string name="traffic_high">alto</string>
 
-    <!-- Pantallas provisionales de la Fase 2: título y qué mostrarán -->
+    <!-- Títulos de pantalla -->
     <string name="events_title">Eventos</string>
-    <string name="events_placeholder">Tus próximos eventos y accesos a rutinas, resumen y ajustes</string>
-    <string name="detail_title">Detalle del evento</string>
-    <string name="detail_placeholder">Línea de tiempo de los 4 estados con sus horas</string>
     <string name="explain_title">¿Por qué te avisé antes?</string>
     <string name="explain_title_later">¿Por qué te aviso más tarde?</string>
     <string name="routines_title">Rutinas</string>
-    <string name="summary_title">Resumen semanal</string>
     <string name="settings_title">Ajustes</string>
 
     <!-- Acciones -->
     <string name="action_view_plan">Ver plan</string>
     <string name="action_view_events">Ver eventos</string>
     <string name="action_new_event">Nuevo evento</string>
-    <string name="action_view_event">Ver un evento</string>
     <string name="action_routines">Rutinas</string>
     <string name="action_summary">Resumen semanal</string>
     <string name="action_settings">Ajustes</string>
     <string name="action_why_this_time">¿Por qué a esta hora?</string>
     <string name="action_start_now">Empezar ahora</string>
-    <string name="action_continue">Continuar</string>
     <string name="action_save">Guardar</string>
     <string name="action_left">Ya salí</string>
     <string name="action_done">Listo</string>
